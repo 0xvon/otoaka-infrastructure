@@ -8,7 +8,7 @@ require('dotenv').config();
 const appName = process.env.APP_NAME;
 
 const app = new cdk.App();
-new RocketApiStack(app, `${appName}-vpc`, {
+new RocketApiStack(app, `${appName}`, {
     env: {
         region: 'ap-northeast-1',
     },
