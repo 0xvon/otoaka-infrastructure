@@ -1,14 +1,24 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
 import * as cdk from '@aws-cdk/core';
-import { RocketApiStack } from '../lib/rocket-api-stack';
+import { VPCStack } from '../lib/vpc';
+import { ALBStack } from '../lib/alb';
 
 require('dotenv').config();
 
-const appName = process.env.APP_NAME;
+const appName = process.env.APP_NAME ? process.env.APP_NAME : 'sample';
 
 const app = new cdk.App();
-new RocketApiStack(app, `${appName}`, {
+const vpcStack = new VPCStack(app, `${appName}-vpc`, {
+    appName,
+    env: {
+        region: 'ap-northeast-1',
+    },
+});
+
+const alb = new ALBStack(app, `${appName}-alb`, {
+    appName,
+    vpc: vpcStack.vpc,
     env: {
         region: 'ap-northeast-1',
     },
