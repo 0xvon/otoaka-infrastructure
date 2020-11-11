@@ -3,8 +3,16 @@ import {
     Vpc,
     InstanceType,
 } from '@aws-cdk/aws-ec2';
-import { FargateCluster, KubernetesVersion } from '@aws-cdk/aws-eks';
-import { Role, ServicePrincipal, ManagedPolicy } from '@aws-cdk/aws-iam';
+import {
+    FargateCluster,
+    KubernetesVersion,
+} from '@aws-cdk/aws-eks';
+import {
+    Role,
+    ServicePrincipal,
+    ManagedPolicy,
+    PolicyStatement,
+} from '@aws-cdk/aws-iam';
 import { deployment, service } from './manifest';
 
 interface EKSStackProps extends cdk.StackProps {
@@ -23,6 +31,16 @@ export class EKSStack extends cdk.Stack {
                 ManagedPolicy.fromAwsManagedPolicyName('AmazonEKSServicePolicy'),
             ],
         });
+        eksRole.addToPolicy(
+            new PolicyStatement({
+                resources: ['*'],
+                actions: [
+                    'elasticloadbalancing:*',
+                    'ec2:CreateSecurityGroup',
+                    'ec2:Describe*',
+                ],
+            }),
+        );
 
         const cluster = new FargateCluster(this, `${props.appName}-cluster`, {
             vpc: props.vpc,
