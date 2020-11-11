@@ -39,6 +39,7 @@ export class ALBStack extends cdk.Stack {
             vpc: props.vpc,
             vpcSubnets: {
                 subnets: props.vpc.publicSubnets,
+                onePerAz: true,
             },
         });
 
