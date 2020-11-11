@@ -18,7 +18,7 @@ jobs:
         run: |
           cd ./rocket-api
           npm install -g aws-cdk
-          npm ci
+          npm i
           cdk deploy
         env:
           AWS_DEFAULT_REGION: ${{ secrets.AWS_REGION }}
