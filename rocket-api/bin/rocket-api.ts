@@ -2,7 +2,7 @@
 import 'source-map-support/register';
 import * as cdk from '@aws-cdk/core';
 import { VPCStack } from '../lib/vpc';
-import { ALBStack } from '../lib/alb';
+import { EKSStack } from '../lib/eks';
 
 require('dotenv').config();
 
@@ -16,7 +16,7 @@ const vpcStack = new VPCStack(app, `${appName}-vpc`, {
     },
 });
 
-const alb = new ALBStack(app, `${appName}-alb`, {
+const alb = new EKSStack(app, `${appName}-eks`, {
     appName,
     vpc: vpcStack.vpc,
     env: {
