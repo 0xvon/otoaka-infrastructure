@@ -1,5 +1,5 @@
 const appLabel = {
-    app: 'rocket-api',
+    app: 'hello-kubernetes',
 };
 
 export const deployment = {
