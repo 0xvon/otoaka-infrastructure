@@ -24,21 +24,21 @@ import { RemovalPolicy } from '@aws-cdk/core';
 interface RDSStackProps extends cdk.StackProps {
     appName: string
     vpc: Vpc
-    appSG: SecurityGroup
+    // appSG: SecurityGroup
 }
 
 export class RDSStack extends cdk.Stack {
     constructor(scope: cdk.Construct, id: string, props: RDSStackProps) {
         super(scope, id, props);
-        const rdsSecurityGroup = new SecurityGroup(this, `${props.appName}-DB-SG`, {
-            allowAllOutbound: true,
-            vpc: props.vpc,
-            securityGroupName: `${props.appName}-DB-SG`,
-        });
-        rdsSecurityGroup.addIngressRule(
-            props.appSG,
-            Port.tcp(3306),
-        );
+        // const rdsSecurityGroup = new SecurityGroup(this, `${props.appName}-DB-SG`, {
+        //     allowAllOutbound: true,
+        //     vpc: props.vpc,
+        //     securityGroupName: `${props.appName}-DB-SG`,
+        // });
+        // rdsSecurityGroup.addIngressRule(
+        //     props.appSG,
+        //     Port.tcp(3306),
+        // );
 
         const rdsParameterGroup = new ParameterGroup(this, `${props.appName}-PG`, {
             engine: DatabaseClusterEngine.auroraMysql({
