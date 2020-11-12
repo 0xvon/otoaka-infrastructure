@@ -16,7 +16,7 @@ jobs:
           
       - name: Deployment
         run: |
-          cd ./rocket-api
+          cd ./api
           npm install -g aws-cdk
           npm i
           npm run build
