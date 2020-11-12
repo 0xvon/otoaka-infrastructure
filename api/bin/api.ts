@@ -3,7 +3,7 @@ import 'source-map-support/register';
 import * as cdk from '@aws-cdk/core';
 import { VPCStack } from '../lib/vpc';
 import { RDSStack } from '../lib/rds';
-// import { EKSStack } from '../lib/eks';
+import { EKSStack } from '../lib/eks';
 
 require('dotenv').config();
 
@@ -17,7 +17,7 @@ const vpcStack = new VPCStack(app, `${appName}-vpc`, {
     },
 });
 
-const rds = new RDSStack(app, `${appName}-rds`, {
+const eks = new EKSStack(app, `${appName}-eks`, {
     appName,
     vpc: vpcStack.vpc,
     env: {
@@ -25,10 +25,11 @@ const rds = new RDSStack(app, `${appName}-rds`, {
     },
 });
 
-// const alb = new EKSStack(app, `${appName}-eks`, {
-//     appName,
-//     vpc: vpcStack.vpc,
-//     env: {
-//         region: 'ap-northeast-1',
-//     },
-// });
+
+const rds = new RDSStack(app, `${appName}-rds`, {
+    appName,
+    vpc: vpcStack.vpc,
+    env: {
+        region: 'ap-northeast-1',
+    },
+});

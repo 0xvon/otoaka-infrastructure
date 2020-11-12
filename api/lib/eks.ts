@@ -17,7 +17,7 @@ import {
     PolicyStatement,
 } from '@aws-cdk/aws-iam';
 import {
-    AutoScalingGroup, UpdateType,
+    AutoScalingGroup, UpdatePolicy,
 } from '@aws-cdk/aws-autoscaling';
 import { deployment, service } from './manifest';
 import {
@@ -83,7 +83,7 @@ export class EKSStack extends cdk.Stack {
                 kubernetesVersion: '1.17',
                 nodeType: NodeType.STANDARD,
             }),
-            updateType: UpdateType.ROLLING_UPDATE,
+            updatePolicy: UpdatePolicy.rollingUpdate(),
         });
     }
 }
