@@ -17,7 +17,7 @@ const vpcStack = new VPCStack(app, `${appName}-vpc`, {
     },
 });
 
-const eks = new EKSStack(app, `${appName}-eks`, {
+const eksStack = new EKSStack(app, `${appName}-eks`, {
     appName,
     vpc: vpcStack.vpc,
     env: {
@@ -25,10 +25,10 @@ const eks = new EKSStack(app, `${appName}-eks`, {
     },
 });
 
-
-const rds = new RDSStack(app, `${appName}-rds`, {
+const rdsStack = new RDSStack(app, `${appName}-rds`, {
     appName,
     vpc: vpcStack.vpc,
+    appSGId: eksStack.eks.clusterSecurityGroupId,
     env: {
         region: 'ap-northeast-1',
     },

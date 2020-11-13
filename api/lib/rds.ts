@@ -19,26 +19,25 @@ import {
     DatabaseInstanceEngine,
     ParameterGroup,
 } from '@aws-cdk/aws-rds';
-import { RemovalPolicy } from '@aws-cdk/core';
 
 interface RDSStackProps extends cdk.StackProps {
     appName: string
     vpc: Vpc
-    // appSG: SecurityGroup
+    appSGId: string
 }
 
 export class RDSStack extends cdk.Stack {
     constructor(scope: cdk.Construct, id: string, props: RDSStackProps) {
         super(scope, id, props);
-        // const rdsSecurityGroup = new SecurityGroup(this, `${props.appName}-DB-SG`, {
-        //     allowAllOutbound: true,
-        //     vpc: props.vpc,
-        //     securityGroupName: `${props.appName}-DB-SG`,
-        // });
-        // rdsSecurityGroup.addIngressRule(
-        //     props.appSG,
-        //     Port.tcp(3306),
-        // );
+        const rdsSecurityGroup = new SecurityGroup(this, `${props.appName}-DB-SG`, {
+            allowAllOutbound: true,
+            vpc: props.vpc,
+            securityGroupName: `${props.appName}-DB-SG`,
+        });
+        rdsSecurityGroup.addIngressRule(
+            SecurityGroup.fromSecurityGroupId(this, `${props.appName}-APP-SG`, props.appSGId),
+            Port.tcp(3306),
+        );
 
         const rdsParameterGroup = new ParameterGroup(this, `${props.appName}-PG`, {
             engine: DatabaseClusterEngine.auroraMysql({
@@ -57,6 +56,9 @@ export class RDSStack extends cdk.Stack {
                 max_allowed_packet: '67108864',
                 server_audit_logging: '1',
                 time_zone: 'Asia/Tokyo',
+                slow_query_log: '1',
+                long_query_time: '1',
+                innodb_print_all_deadlocks: '1',
             },
         });
 
@@ -64,15 +66,21 @@ export class RDSStack extends cdk.Stack {
             engine: DatabaseClusterEngine.auroraMysql({
                 version: AuroraMysqlEngineVersion.VER_2_08_1,
             }),
-            // credentials: Credentials.fromSecret('clusteradmin'),
-            removalPolicy: RemovalPolicy.DESTROY,
+            credentials: Credentials.fromPassword('admin', new cdk.SecretValue('adminpassword')),
             instanceProps: {
                 vpcSubnets: {
                     subnets: props.vpc.privateSubnets,
                 },
                 vpc: props.vpc,
+                securityGroups: [rdsSecurityGroup],
+                autoMinorVersionUpgrade: true,
             },
+            cloudwatchLogsExports: [
+                'slowquery',
+                'error',
+            ],
             parameterGroup: rdsParameterGroup,
+            removalPolicy: cdk.RemovalPolicy.DESTROY,
         });
     }
 }
