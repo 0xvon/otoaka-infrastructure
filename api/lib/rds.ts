@@ -1,32 +1,28 @@
 import * as cdk from '@aws-cdk/core';
 import {
     Vpc,
-    IVpc,
-    InstanceType,
-    InstanceClass,
-    InstanceSize,
     SecurityGroup,
     Port,
-    SubnetType,
 } from '@aws-cdk/aws-ec2';
 import {
     DatabaseCluster,
     DatabaseClusterEngine,
     AuroraMysqlEngineVersion,
-    MysqlEngineVersion,
     Credentials,
-    DatabaseInstance,
-    DatabaseInstanceEngine,
     ParameterGroup,
 } from '@aws-cdk/aws-rds';
 
 interface RDSStackProps extends cdk.StackProps {
     appName: string
     vpc: Vpc
-    appSGId: string
+    username: string
+    password: string
 }
 
 export class RDSStack extends cdk.Stack {
+    rds: DatabaseCluster;
+    rdsSecurityGroup: SecurityGroup;
+
     constructor(scope: cdk.Construct, id: string, props: RDSStackProps) {
         super(scope, id, props);
         const rdsSecurityGroup = new SecurityGroup(this, `${props.appName}-DB-SG`, {
@@ -34,10 +30,7 @@ export class RDSStack extends cdk.Stack {
             vpc: props.vpc,
             securityGroupName: `${props.appName}-DB-SG`,
         });
-        rdsSecurityGroup.addIngressRule(
-            SecurityGroup.fromSecurityGroupId(this, `${props.appName}-APP-SG`, props.appSGId),
-            Port.tcp(3306),
-        );
+        this.rdsSecurityGroup = rdsSecurityGroup;
 
         const rdsParameterGroup = new ParameterGroup(this, `${props.appName}-PG`, {
             engine: DatabaseClusterEngine.auroraMysql({
@@ -66,7 +59,7 @@ export class RDSStack extends cdk.Stack {
             engine: DatabaseClusterEngine.auroraMysql({
                 version: AuroraMysqlEngineVersion.VER_2_08_1,
             }),
-            credentials: Credentials.fromPassword('admin', new cdk.SecretValue('adminpassword')),
+            credentials: Credentials.fromPassword(props.username, new cdk.SecretValue(props.password)),
             instanceProps: {
                 vpcSubnets: {
                     subnets: props.vpc.privateSubnets,
@@ -74,6 +67,7 @@ export class RDSStack extends cdk.Stack {
                 vpc: props.vpc,
                 securityGroups: [rdsSecurityGroup],
                 autoMinorVersionUpgrade: true,
+                
             },
             cloudwatchLogsExports: [
                 'slowquery',
@@ -82,5 +76,14 @@ export class RDSStack extends cdk.Stack {
             parameterGroup: rdsParameterGroup,
             removalPolicy: cdk.RemovalPolicy.DESTROY,
         });
+
+        this.rds = cluster;
     }
+
+    injectSecurityGroup(appSGId: string) {
+        this.rdsSecurityGroup.addIngressRule(
+            SecurityGroup.fromSecurityGroupId(this, `APP-SG`, appSGId),
+            Port.tcp(3306),
+        );
+    };
 }

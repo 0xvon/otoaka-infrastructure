@@ -8,6 +8,8 @@ import { EKSStack } from '../lib/eks';
 require('dotenv').config();
 
 const appName = process.env.APP_NAME ? process.env.APP_NAME : 'sample';
+const rdsUserName = process.env.RDS_USERNAME ? process.env.RDS_USERNAME : 'admin';
+const rdsPassword = process.env.RDS_PASSWORD ? process.env.RDS_PASSWORD : 'password';
 
 const app = new cdk.App();
 const vpcStack = new VPCStack(app, `${appName}-vpc`, {
@@ -17,19 +19,25 @@ const vpcStack = new VPCStack(app, `${appName}-vpc`, {
     },
 });
 
-const eksStack = new EKSStack(app, `${appName}-eks`, {
+const rdsStack = new RDSStack(app, `${appName}-rds`, {
     appName,
+    username: rdsUserName,
+    password: rdsPassword,
     vpc: vpcStack.vpc,
     env: {
         region: 'ap-northeast-1',
     },
 });
 
-const rdsStack = new RDSStack(app, `${appName}-rds`, {
+const eksStack = new EKSStack(app, `${appName}-eks`, {
     appName,
+    clusterEndpoint: rdsStack.rds.clusterEndpoint.hostname,
+    rdsUsername: rdsUserName,
+    rdsPassword: rdsPassword,
     vpc: vpcStack.vpc,
-    appSGId: eksStack.eks.clusterSecurityGroupId,
     env: {
         region: 'ap-northeast-1',
     },
 });
+
+rdsStack.injectSecurityGroup(eksStack.eks.clusterSecurityGroupId);

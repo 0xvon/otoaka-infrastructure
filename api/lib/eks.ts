@@ -26,6 +26,9 @@ import { deployment, service } from './manifest';
 interface EKSStackProps extends cdk.StackProps {
     appName: string
     vpc: Vpc
+    clusterEndpoint: string
+    rdsUsername: string
+    rdsPassword: string
 }
 
 export class EKSStack extends cdk.Stack {
