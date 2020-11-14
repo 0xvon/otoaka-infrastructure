@@ -28,5 +28,6 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           APP_NAME: rocket-api-dev
+          RDS_DB_NAME: rocket_db
           RDS_USERNAME: rocketadmin
           RDS_PASSWORD: rocketpassword

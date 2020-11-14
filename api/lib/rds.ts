@@ -15,6 +15,7 @@ import {
 interface RDSStackProps extends cdk.StackProps {
     appName: string
     vpc: Vpc
+    dbname: string
     username: string
     password: string
 }
@@ -60,6 +61,7 @@ export class RDSStack extends cdk.Stack {
                 version: AuroraMysqlEngineVersion.VER_2_08_1,
             }),
             credentials: Credentials.fromPassword(props.username, new cdk.SecretValue(props.password)),
+            defaultDatabaseName: props.dbname,
             instanceProps: {
                 vpcSubnets: {
                     subnets: props.vpc.privateSubnets,

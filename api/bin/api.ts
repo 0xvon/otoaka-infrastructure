@@ -8,6 +8,7 @@ import { EKSStack } from '../lib/eks';
 require('dotenv').config();
 
 const appName = process.env.APP_NAME ? process.env.APP_NAME : 'sample';
+const rdsdbname = process.env.RDS_DB_NAME ? process.env.RDS_DB_NAME : 'sample';
 const rdsUserName = process.env.RDS_USERNAME ? process.env.RDS_USERNAME : 'admin';
 const rdsPassword = process.env.RDS_PASSWORD ? process.env.RDS_PASSWORD : 'password';
 
@@ -21,6 +22,7 @@ const vpcStack = new VPCStack(app, `${appName}-vpc`, {
 
 const rdsStack = new RDSStack(app, `${appName}-rds`, {
     appName,
+    dbname: rdsdbname,
     username: rdsUserName,
     password: rdsPassword,
     vpc: vpcStack.vpc,
