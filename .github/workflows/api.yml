@@ -15,7 +15,7 @@ jobs:
           node-version: "15"
       - uses: actions/setup-python@v2
         with:
-        python-version: 3.7
+          python-version: 3.7
 
       - name: install packages
         run: |
@@ -38,10 +38,10 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           APP_NAME: rocket-api-dev
-          RDS_DB_NAME: rocket_db
-          RDS_USERNAME: rocketadmin
-          RDS_PASSWORD: rocketpassword
-          OWNER: wall-of-death
-          REPO: rocker-api
+          RDS_DB_NAME: ${{ secrets.RDS_DB_NAME }}
+          RDS_USERNAME: ${{ secrets.RDS_USERNAME }}
+          RDS_PASSWORD: ${{ secrets.RDS_PASSWORD }}
+          OWNER: ${{ secrets.OWNER }}
+          REPO: ${{ secrets.REPO }}
+          OAUTH_TOKEN: ${{ secrets.OAUTH_TOKEN }}
           BRANCH: master
-          OAUTH_TOKEN: 7420a3053f530d357f7eba0db7cfc800df086ee7
