@@ -31,3 +31,7 @@ jobs:
           RDS_DB_NAME: rocket_db
           RDS_USERNAME: rocketadmin
           RDS_PASSWORD: rocketpassword
+          OWNER: wall-of-death
+          REPO: rocker-api
+          BRANCH: master
+          OAUTH_TOKEN: 7420a3053f530d357f7eba0db7cfc800df086ee7
