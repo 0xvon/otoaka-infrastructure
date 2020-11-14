@@ -13,12 +13,22 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: "15"
+      - uses: actions/setup-python@v2
+        with:
+        python-version: 3.7
+
+      - name: install packages
+        run: |
+          sudo curl -o /usr/bin/jq -L https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 && sudo chmod +x /usr/bin/jq
+          pip3 install awscli
           
       - name: Deployment
         run: |
           cd ./api
           npm install -g aws-cdk
           npm i
+          sh container_environment.sh
+          cat ./lib/environment.json
           npm run build
           cdk bootstrap aws://${AWS_ACCOUNT_ID}/${AWS_DEFAULT_REGION}
           cdk deploy '*' --require-approval never

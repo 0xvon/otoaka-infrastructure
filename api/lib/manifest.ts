@@ -1,3 +1,5 @@
+import environment from './environment.json';
+
 export const appLabel = {
     app: 'hello-kubernetes',
 };
@@ -17,6 +19,7 @@ export const deployment = {
                         name: 'hello-kubernetes',
                         image: 'paulbouwer/hello-kubernetes:1.5',
                         ports: [{ containerPort: 8080 }],
+                        env: environment.Secrets,
                     },
                 ],
             },
