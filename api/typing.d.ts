@@ -1,11 +1,11 @@
-declare module '*/environment.json' {
-    interface Secret {
-        Name: string;
-        ValueFrom: string;
-    }
+export interface SSMSecret {
+    name: string;
+    value: string;
+};
 
+declare module '*/environment.json' {
     interface Environment {
-        Secrets: Secret[];
+        Secrets: SSMSecret[];
     }
 
     const env: Environment;

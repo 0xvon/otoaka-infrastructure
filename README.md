@@ -17,8 +17,16 @@ $ npm i -g cdk
 
 ```
 $ cd api
-$ sh upload_container_environment.sh <APP_NAME> <KEY> <VALUE>
-例: sh upload_container_environment.sh sample-api-dev hogehoge fugafuga
+$ aws ssm put-parameter \
+    --name "/<APP_NAME>/<KEY>" \
+    --value "<VALUE>" \
+    --type "SecureString" --overwrite
+
+例)
+$ aws ssm put-parameter \
+    --name "/sample-api-dev/hogehoge" \
+    --value "fugafuga" \
+    --type "SecureString" --overwrite
 ```
 
 ↓の形式のレスポンスが返ってきたらOK
