@@ -20,8 +20,19 @@ import {
 import {
     Repository,
 } from '@aws-cdk/aws-ecr';
-
-import { deployment, service } from './manifest';
+import {
+    LinuxBuildImage,
+    BuildSpec,
+    PipelineProject,
+} from '@aws-cdk/aws-codebuild';
+import {
+    Artifact, Pipeline,
+} from '@aws-cdk/aws-codepipeline';
+import {
+    GitHubSourceAction,
+    CodeBuildAction,
+} from '@aws-cdk/aws-codepipeline-actions';
+import { appLabel, deployment, service } from './manifest';
 
 interface EKSStackProps extends cdk.StackProps {
     appName: string
@@ -29,6 +40,10 @@ interface EKSStackProps extends cdk.StackProps {
     clusterEndpoint: string
     rdsUsername: string
     rdsPassword: string
+    githubOwner: string
+    githubRepo: string
+    githubBranch: string
+    githubOauthToken: string
 }
 
 export class EKSStack extends cdk.Stack {
@@ -86,6 +101,88 @@ export class EKSStack extends cdk.Stack {
                 subnetType: SubnetType.PUBLIC,
             },
             updatePolicy: UpdatePolicy.rollingUpdate(),
+        });
+
+        const sourceOutput = new Artifact();
+        const sourceAction = new GitHubSourceAction({
+            actionName: `${props.appName}-SourceAction`,
+            owner: props.githubOwner,
+            repo: props.githubRepo,
+            oauthToken: new cdk.SecretValue(props.githubOauthToken),
+            output: sourceOutput,
+            branch: props.githubBranch,
+        });
+
+        const codeBuildProject = new PipelineProject(this, `${props.appName}-CodeBuildProj`, {
+            projectName: `${props.appName}-CodeBuildProj`,
+            environment: {
+                buildImage: LinuxBuildImage.fromAsset(this, `${props.appName}-CustomImage`, {
+                    directory: '../dockerAssets.d',
+                }),
+                privileged: true,
+            },
+            environmentVariables: {
+                'CLUSTER_NAME': {
+                    value: `${cluster.clusterName}`,
+                },
+                'ECR_REPO_URI': {
+                    value: `${ecrRepository.repositoryUri}`,
+                },
+                'APP_NAME': {
+                    value: `${appLabel.app}`,
+                },
+            },
+            buildSpec: BuildSpec.fromObject({
+                version: "0.2",
+                phases: {
+                    pre_build: {
+                        commands: [
+                            'env',
+                            'export TAG=${CODEBUILD_RESOLVED_SOURCE_VERSION}',
+                            '/usr/local/bin/entrypoint.sh',
+                        ],
+                    },
+                    build: {
+                        commands: [
+                            'ocker build -t $ECR_REPO_URI:$TAG .',
+                            '$(aws ecr get-login --no-include-email)',
+                            'docker push $ECR_REPO_URI:$TAG',
+                        ],
+                    },
+                    post_build: {
+                        commands: [
+                            'kubectl get no',
+                            'kubectl set image deployment $APP_NAME $APP_NAME=$ECR_REPO_URI:$TAG'
+                        ],
+                    },
+                },
+            })
+        });
+        cluster.awsAuth.addMastersRole(codeBuildProject.role!);
+        codeBuildProject.addToRolePolicy(new PolicyStatement({
+            actions: ['eks.DescribeCluster'],
+            resources: [`${cluster.clusterArn}`],
+        }));
+
+        const buildAction = new CodeBuildAction({
+            actionName: `${props.appName}-BuildAction`,
+            project: codeBuildProject,
+            input: sourceOutput,
+            outputs: [new Artifact()],
+        })
+
+        const pipeline = new Pipeline(this, `${props.appName}-Pipeline`, {
+            pipelineName: `${props.appName}-Pipeline`,
+            stages: [
+                {
+                    stageName: 'Source',
+                    actions: [sourceAction],
+                },
+                {
+                    stageName: 'Build',
+                    actions: [buildAction],
+                },
+            ],
         });
     }
 }

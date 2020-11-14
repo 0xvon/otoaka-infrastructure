@@ -1,4 +1,4 @@
-const appLabel = {
+export const appLabel = {
     app: 'hello-kubernetes',
 };
 
