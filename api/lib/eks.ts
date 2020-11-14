@@ -116,9 +116,7 @@ export class EKSStack extends cdk.Stack {
         const codeBuildProject = new PipelineProject(this, `${props.appName}-CodeBuildProj`, {
             projectName: `${props.appName}-CodeBuildProj`,
             environment: {
-                buildImage: LinuxBuildImage.fromAsset(this, `${props.appName}-CustomImage`, {
-                    directory: '../dockerAssets.d',
-                }),
+                buildImage: LinuxBuildImage.AMAZON_LINUX_2_3,
                 privileged: true,
             },
             environmentVariables: {

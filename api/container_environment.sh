@@ -1,5 +1,4 @@
 #!bin/sh
-APP_NAME=sample
 
 aws ssm get-parameters-by-path \
     --path /${APP_NAME}/ \
