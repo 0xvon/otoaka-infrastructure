@@ -158,7 +158,7 @@ export class EKSStack extends cdk.Stack {
         });
         cluster.awsAuth.addMastersRole(codeBuildProject.role!);
         codeBuildProject.addToRolePolicy(new PolicyStatement({
-            actions: ['eks.DescribeCluster'],
+            actions: ['eks:DescribeCluster'],
             resources: [`${cluster.clusterArn}`],
         }));
 
