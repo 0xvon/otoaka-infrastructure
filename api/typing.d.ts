@@ -1,7 +1,7 @@
 export interface SSMSecret {
     name: string;
     value: string;
-};
+}
 
 declare module '*/environment.json' {
     interface Environment {
