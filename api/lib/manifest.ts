@@ -85,7 +85,7 @@ export const deployment = {
     apiVersion: 'apps/v1',
     kind: 'Deployment',
     metadata: { name: 'hello-kubernetes' },
-    stringData: stringData,
+    // stringData: stringData,
     spec: {
         replicas: 3,
         selector: { matchLabels: appLabel },
@@ -100,7 +100,7 @@ export const deployment = {
                         env: environment.Secrets,
                     },
                 ],
-                env: containerEnvironments,
+                // env: containerEnvironments,
             },
         },
     },
