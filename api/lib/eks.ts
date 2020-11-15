@@ -43,7 +43,6 @@ interface EKSStackProps extends cdk.StackProps {
     githubOwner: string
     githubRepo: string
     githubBranch: string
-    githubOauthToken: string
 }
 
 export class EKSStack extends cdk.Stack {
@@ -108,7 +107,7 @@ export class EKSStack extends cdk.Stack {
             actionName: `${props.appName}-SourceAction`,
             owner: props.githubOwner,
             repo: props.githubRepo,
-            oauthToken: new cdk.SecretValue(props.githubOauthToken),
+            oauthToken: cdk.SecretValue.ssmSecure("GITHUB_OAUTH_TOKEN", "1"),
             output: sourceOutput,
             branch: props.githubBranch,
         });
