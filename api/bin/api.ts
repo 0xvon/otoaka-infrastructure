@@ -14,6 +14,7 @@ const rdsPassword = process.env.RDS_PASSWORD ? process.env.RDS_PASSWORD : 'passw
 const githubOwner = process.env.OWNER ? process.env.OWNER : 'something';
 const githubRepo = process.env.REPO ? process.env.REPO : 'something';
 const githubBranch = process.env.BRANCH ? process.env.BRANCH : 'master';
+const githubOauthToken = process.env.OAUTH_TOKEN ? process.env.OAUTH_TOKEN : 'xxxxxx';
 
 const app = new cdk.App();
 const vpcStack = new VPCStack(app, `${appName}-vpc`, {
@@ -43,6 +44,7 @@ const eksStack = new EKSStack(app, `${appName}-eks`, {
     githubOwner: githubOwner,
     githubRepo: githubRepo,
     githubBranch: githubBranch,
+    githubOauthToken: githubOauthToken,
     env: {
         region: 'ap-northeast-1',
     },
