@@ -104,7 +104,7 @@ export class EKSStack extends cdk.Stack {
         });
 
         const githubToken = cdk.SecretValue.secretsManager('GITHUB_TOKEN', {
-            jsonField: props.githubOauthToken,
+            jsonField: 'GITHUB_TOKEN',
         })
 
         const sourceOutput = new Artifact();
