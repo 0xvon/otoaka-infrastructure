@@ -43,7 +43,6 @@ interface EKSStackProps extends cdk.StackProps {
     githubOwner: string
     githubRepo: string
     githubBranch: string
-    githubOauthToken: string
 }
 
 export class EKSStack extends cdk.Stack {
