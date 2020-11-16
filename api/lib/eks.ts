@@ -138,12 +138,12 @@ export class EKSStack extends cdk.Stack {
                         commands: [
                             'env',
                             'export TAG=${CODEBUILD_RESOLVED_SOURCE_VERSION}',
-                            '/usr/local/bin/entrypoint.sh',
+                            // '/usr/local/bin/entrypoint.sh',
                         ],
                     },
                     build: {
                         commands: [
-                            'ocker build -t $ECR_REPO_URI:$TAG .',
+                            'docker build -t $ECR_REPO_URI:$TAG .',
                             '$(aws ecr get-login --no-include-email)',
                             'docker push $ECR_REPO_URI:$TAG',
                         ],
