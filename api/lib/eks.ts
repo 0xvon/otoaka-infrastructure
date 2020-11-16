@@ -162,6 +162,17 @@ export class EKSStack extends cdk.Stack {
             actions: ['eks:DescribeCluster'],
             resources: [`${cluster.clusterArn}`],
         }));
+        codeBuildProject.addToRolePolicy(new PolicyStatement({
+            actions: [
+                'ecr:GetAuthorizationToken',
+                'ecr:BatchCheckLayerAvailability',
+                'ecr:CompleteLayerUpload',
+                'ecr:InitiateLayerUpload',
+                'ecr:PutImage',
+                'ecr:UploadLayerPart',
+            ],
+            resources: [`${ecrRepository.repositoryArn}`],
+        }));
 
         const buildAction = new CodeBuildAction({
             actionName: `${props.appName}-BuildAction`,
