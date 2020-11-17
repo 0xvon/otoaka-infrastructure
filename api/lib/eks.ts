@@ -47,8 +47,11 @@ interface EKSStackProps extends cdk.StackProps {
 
 export class EKSStack extends cdk.Stack {
     eks: Cluster;
+    appName: string;
     constructor(scope: cdk.Construct, id: string, props: EKSStackProps) {
         super(scope, id, props);
+
+        this.appName = props.appName;
 
         const eksRole = new Role(this, `${props.appName}-EKSRole`, {
             assumedBy: new ServicePrincipal('eks.amazonaws.com'),

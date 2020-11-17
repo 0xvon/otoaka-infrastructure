@@ -37,7 +37,7 @@ const containerEnvironments: ContainerEnv[] = environment.Secrets.map(function(s
         name: secret.name,
         valueFrom: {
             secretKeyRef: {
-                name: 'hello-kubernetes',
+                name: 'api',
                 key: secret.name,
             },
         },
@@ -45,7 +45,7 @@ const containerEnvironments: ContainerEnv[] = environment.Secrets.map(function(s
 })
 
 export const appLabel = {
-    app: 'hello-kubernetes',
+    app: 'api',
 };
 
 // const app = new App();
@@ -84,7 +84,7 @@ export const appLabel = {
 export const deployment = {
     apiVersion: 'apps/v1',
     kind: 'Deployment',
-    metadata: { name: 'hello-kubernetes' },
+    metadata: { name: 'api' },
     // stringData: stringData,
     spec: {
         replicas: 3,
@@ -94,8 +94,8 @@ export const deployment = {
             spec: {
                 containers: [
                     {
-                        name: 'hello-kubernetes',
-                        image: 'paulbouwer/hello-kubernetes:1.5',
+                        name: 'api',
+                        image: '960722127407.dkr.ecr.ap-northeast-1.amazonaws.com/rocket-api-dev:418955a20484cef79a4349fc8ab4968da69e8cc8',
                         ports: [{ containerPort: 8080 }],
                         env: environment.Secrets,
                     },
@@ -119,7 +119,7 @@ export const deployment = {
 export const service = {
     apiVersion: 'v1',
     kind: 'Service',
-    metadata: { name: 'hello-kubernetes' },
+    metadata: { name: 'api' },
     spec: {
         type: 'LoadBalancer',
         ports: [{ port: 80, targetPort: 8080 }],
