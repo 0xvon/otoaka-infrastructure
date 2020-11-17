@@ -138,13 +138,13 @@ export class EKSStack extends cdk.Stack {
                         commands: [
                             'env',
                             'export TAG=${CODEBUILD_RESOLVED_SOURCE_VERSION}',
+                            '$(aws ecr get-login --no-include-email)',
                             // '/usr/local/bin/entrypoint.sh',
                         ],
                     },
                     build: {
                         commands: [
                             'docker build -t $ECR_REPO_URI:$TAG .',
-                            '$(aws ecr get-login --no-include-email)',
                             'docker push $ECR_REPO_URI:$TAG',
                         ],
                     },
@@ -171,7 +171,7 @@ export class EKSStack extends cdk.Stack {
                 'ecr:PutImage',
                 'ecr:UploadLayerPart',
             ],
-            resources: [`${ecrRepository.repositoryArn}`],
+            resources: ['*'],
         }));
 
         const buildAction = new CodeBuildAction({
