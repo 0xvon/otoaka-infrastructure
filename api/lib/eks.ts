@@ -2,7 +2,7 @@ import * as cdk from '@aws-cdk/core';
 import {
     Vpc,
     InstanceType,
-    SubnetType,, Subnet
+    SubnetType,
 } from '@aws-cdk/aws-ec2';
 import {
     Cluster,
