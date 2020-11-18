@@ -19,6 +19,7 @@ export class VPCStack extends cdk.Stack {
 
         const vpc: Vpc = new Vpc(this, `${props.appName}-vpc`, {
             cidr: '192.168.0.0/16',
+            natGateways: 0,
             subnetConfiguration: [
                 {
                     cidrMask: 24,
