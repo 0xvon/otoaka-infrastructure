@@ -85,7 +85,7 @@ export class EKSStack extends cdk.Stack {
             vpc: props.vpc,
             vpcSubnets: [
                 {
-                    subnetType: SubnetType.PUBLIC,
+                    subnets: props.vpc.publicSubnets,
                 },
             ],
             endpointAccess: EndpointAccess.PUBLIC,
@@ -96,6 +96,9 @@ export class EKSStack extends cdk.Stack {
         });
         cluster.addNodegroupCapacity(`${props.appName}-capacity`, {
             desiredSize: 1,
+            subnets: {
+                subnets: props.vpc.publicSubnets,
+            },
             instanceType: new InstanceType('t2.small'),
         });
         cluster.addManifest(`${props.appName}-pod`, service, deployment(ecrRepository.repositoryUri));
@@ -107,7 +110,7 @@ export class EKSStack extends cdk.Stack {
             minCapacity: 1,
             maxCapacity: 10,
             vpcSubnets: {
-                subnetType: SubnetType.PUBLIC,
+                subnets: props.vpc.publicSubnets,
             },
             updatePolicy: UpdatePolicy.rollingUpdate(),
         });

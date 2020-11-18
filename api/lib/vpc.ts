@@ -31,7 +31,8 @@ export class VPCStack extends cdk.Stack {
             ],
         });
         vpc.publicSubnets.forEach(subnet => {
-            cdk.Tags.of(subnet).add(`kubernetes.io/cluster/${props.appName}-cluster`, 'shared')
+            cdk.Tags.of(subnet).add(`kubernetes.io/cluster/${props.appName}-cluster`, 'shared');
+            cdk.Tags.of(subnet).add(`kubernetes.io/role/elb`, '1');
         });
         this.vpc = vpc;
     }
