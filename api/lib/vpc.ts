@@ -30,6 +30,9 @@ export class VPCStack extends cdk.Stack {
                 },
             ],
         });
+        vpc.publicSubnets.forEach(subnet => {
+            cdk.Tags.of(subnet).add(`kubernetes.io/cluster/${props.appName}-cluster`, 'shared')
+        });
         this.vpc = vpc;
     }
 }
