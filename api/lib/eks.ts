@@ -6,7 +6,9 @@ import {
 } from '@aws-cdk/aws-ec2';
 import {
     Cluster,
+    EndpointAccess,
     KubernetesVersion,
+    
 } from '@aws-cdk/aws-eks';
 import {
     Role,
@@ -75,9 +77,18 @@ export class EKSStack extends cdk.Stack {
             assumedBy: new ServicePrincipal('ec2.amazonaws.com'),
         });
 
+        const ecrRepository = new Repository(this, `${props.appName}-ECR`, {
+            repositoryName: `${props.appName}`,
+        });
+
         const cluster = new Cluster(this, `${props.appName}-cluster`, {
             vpc: props.vpc,
-            kubectlEnabled: true,
+            vpcSubnets: [
+                {
+                    subnets: props.vpc.publicSubnets,
+                },
+            ],
+            endpointAccess: EndpointAccess.PUBLIC,
             defaultCapacity: 0,
             mastersRole: eksRole,
             version: KubernetesVersion.V1_17,
@@ -87,12 +98,8 @@ export class EKSStack extends cdk.Stack {
             desiredSize: 2,
             instanceType: new InstanceType('t2.small'),
         });
-        cluster.addManifest(`${props.appName}-pod`, service, deployment);
+        cluster.addManifest(`${props.appName}-pod`, service, deployment(ecrRepository.repositoryUri));
         this.eks = cluster;
-
-        const ecrRepository = new Repository(this, `${props.appName}-ECR`, {
-            repositoryName: `${props.appName}`,
-        });
 
         cluster.addAutoScalingGroupCapacity(`${props.appName}-nodes`, {
             autoScalingGroupName: `${props.appName}-EKS-ASG`,
@@ -140,7 +147,7 @@ export class EKSStack extends cdk.Stack {
                     pre_build: {
                         commands: [
                             'env',
-                            'export TAG=${CODEBUILD_RESOLVED_SOURCE_VERSION}',
+                            'export TAG=latest',
                             '$(aws ecr get-login --no-include-email)',
                             // '/usr/local/bin/entrypoint.sh',
                         ],

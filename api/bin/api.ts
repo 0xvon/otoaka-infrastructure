@@ -5,8 +5,6 @@ import { VPCStack } from '../lib/vpc';
 import { RDSStack } from '../lib/rds';
 import { EKSStack } from '../lib/eks';
 
-require('dotenv').config();
-
 const appName = process.env.APP_NAME ? process.env.APP_NAME : 'sample';
 const rdsdbname = process.env.RDS_DB_NAME ? process.env.RDS_DB_NAME : 'sample';
 const rdsUserName = process.env.RDS_USERNAME ? process.env.RDS_USERNAME : 'admin';

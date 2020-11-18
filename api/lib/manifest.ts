@@ -12,6 +12,8 @@
 import environment from './environment.json';
 import { SSMSecret } from '../typing';
 
+const appName = process.env.APP_NAME ? process.env.APP_NAME : 'sample';
+
 interface Obj {
     [index: string]: string;
 }
@@ -81,30 +83,33 @@ export const appLabel = {
 //     },
 // });
 
-export const deployment = {
-    apiVersion: 'apps/v1',
-    kind: 'Deployment',
-    metadata: { name: 'api' },
-    // stringData: stringData,
-    spec: {
-        replicas: 3,
-        selector: { matchLabels: appLabel },
-        template: {
-            metadata: { labels: appLabel },
-            spec: {
-                containers: [
-                    {
-                        name: 'api',
-                        image: '960722127407.dkr.ecr.ap-northeast-1.amazonaws.com/rocket-api-dev:418955a20484cef79a4349fc8ab4968da69e8cc8',
-                        ports: [{ containerPort: 8080 }],
-                        env: environment.Secrets,
-                    },
-                ],
-                // env: containerEnvironments,
+export const deployment = (imageUrl: string) => {
+    return {
+        apiVersion: 'apps/v1',
+        kind: 'Deployment',
+        metadata: { name: appLabel.app },
+        // stringData: stringData,
+        spec: {
+            replicas: 3,
+            selector: { matchLabels: appLabel },
+            template: {
+                metadata: { labels: appLabel },
+                spec: {
+                    containers: [
+                        {
+                            name: appLabel.app,
+                            image: `${imageUrl}:latest`,
+                            ports: [{ containerPort: 8080 }],
+                            env: environment.Secrets,
+                        },
+                    ],
+                    // env: containerEnvironments,
+                },
             },
         },
-    },
-};
+    };
+
+} 
 
 // export const service = new Service(chart, 'load-balancer', {
 //     spec: {
@@ -119,7 +124,7 @@ export const deployment = {
 export const service = {
     apiVersion: 'v1',
     kind: 'Service',
-    metadata: { name: 'api' },
+    metadata: { name: appLabel.app },
     spec: {
         type: 'LoadBalancer',
         ports: [{ port: 80, targetPort: 8080 }],
