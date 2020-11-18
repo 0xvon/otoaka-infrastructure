@@ -39,7 +39,7 @@ import { appLabel, deployment, service } from './manifest';
 interface EKSStackProps extends cdk.StackProps {
     appName: string
     vpc: Vpc
-    clusterEndpoint: string
+    // clusterEndpoint: string
     rdsUsername: string
     rdsPassword: string
     githubOwner: string
@@ -92,7 +92,7 @@ export class EKSStack extends cdk.Stack {
             defaultCapacity: 0,
             mastersRole: eksRole,
             version: KubernetesVersion.V1_18,
-            clusterName: `${props.appName}-cluster-one`,
+            clusterName: `${props.appName}-cluster`,
         });
         cluster.addNodegroupCapacity(`${props.appName}-capacity`, {
             desiredSize: 2,

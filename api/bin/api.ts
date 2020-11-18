@@ -21,20 +21,20 @@ const vpcStack = new VPCStack(app, `${appName}-vpc`, {
     },
 });
 
-const rdsStack = new RDSStack(app, `${appName}-rds`, {
-    appName,
-    dbname: rdsdbname,
-    username: rdsUserName,
-    password: rdsPassword,
-    vpc: vpcStack.vpc,
-    env: {
-        region: 'ap-northeast-1',
-    },
-});
+// const rdsStack = new RDSStack(app, `${appName}-rds`, {
+//     appName,
+//     dbname: rdsdbname,
+//     username: rdsUserName,
+//     password: rdsPassword,
+//     vpc: vpcStack.vpc,
+//     env: {
+//         region: 'ap-northeast-1',
+//     },
+// });
 
 const eksStack = new EKSStack(app, `${appName}-eks`, {
     appName,
-    clusterEndpoint: rdsStack.rds.clusterEndpoint.hostname,
+    // clusterEndpoint: rdsStack.rds.clusterEndpoint.hostname,
     rdsUsername: rdsUserName,
     rdsPassword: rdsPassword,
     vpc: vpcStack.vpc,
@@ -46,4 +46,4 @@ const eksStack = new EKSStack(app, `${appName}-eks`, {
     },
 });
 
-rdsStack.injectSecurityGroup(eksStack.eks.clusterSecurityGroupId);
+// rdsStack.injectSecurityGroup(eksStack.eks.clusterSecurityGroupId);
