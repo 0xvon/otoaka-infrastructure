@@ -95,7 +95,7 @@ export class EKSStack extends cdk.Stack {
             clusterName: `${props.appName}-cluster`,
         });
         cluster.addNodegroupCapacity(`${props.appName}-capacity`, {
-            desiredSize: 2,
+            desiredSize: 1,
             instanceType: new InstanceType('t2.small'),
         });
         cluster.addManifest(`${props.appName}-pod`, service, deployment(ecrRepository.repositoryUri));

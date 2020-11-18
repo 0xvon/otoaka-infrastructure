@@ -90,7 +90,7 @@ export const deployment = (imageUrl: string) => {
         metadata: { name: appLabel.app },
         // stringData: stringData,
         spec: {
-            replicas: 3,
+            replicas: 1,
             selector: { matchLabels: appLabel },
             template: {
                 metadata: { labels: appLabel },
