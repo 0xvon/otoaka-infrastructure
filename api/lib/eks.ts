@@ -92,7 +92,7 @@ export class EKSStack extends cdk.Stack {
             defaultCapacity: 0,
             mastersRole: eksRole,
             version: KubernetesVersion.V1_18,
-            clusterName: `${props.appName}-cluster1`,
+            clusterName: `${props.appName}-cluster-one`,
         });
         cluster.addNodegroupCapacity(`${props.appName}-capacity`, {
             desiredSize: 2,
