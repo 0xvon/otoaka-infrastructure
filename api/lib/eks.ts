@@ -2,7 +2,7 @@ import * as cdk from '@aws-cdk/core';
 import {
     Vpc,
     InstanceType,
-    SubnetType,
+    SubnetType,, Subnet
 } from '@aws-cdk/aws-ec2';
 import {
     Cluster,
@@ -85,7 +85,7 @@ export class EKSStack extends cdk.Stack {
             vpc: props.vpc,
             vpcSubnets: [
                 {
-                    subnets: props.vpc.publicSubnets,
+                    subnetType: SubnetType.PUBLIC,
                 },
             ],
             endpointAccess: EndpointAccess.PUBLIC,
@@ -103,7 +103,7 @@ export class EKSStack extends cdk.Stack {
 
         cluster.addAutoScalingGroupCapacity(`${props.appName}-nodes`, {
             autoScalingGroupName: `${props.appName}-EKS-ASG`,
-            instanceType: new InstanceType('t3.medium'),
+            instanceType: new InstanceType('t3.small'),
             minCapacity: 1,
             maxCapacity: 10,
             vpcSubnets: {
