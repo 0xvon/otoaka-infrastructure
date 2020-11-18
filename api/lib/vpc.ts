@@ -2,9 +2,6 @@ import * as cdk from '@aws-cdk/core';
 import {
     Vpc,
     SubnetType,
-    SecurityGroup,
-    Peer,
-    Port,
 } from '@aws-cdk/aws-ec2';
 
 interface VPCStackProps extends cdk.StackProps {
@@ -33,13 +30,13 @@ export class VPCStack extends cdk.Stack {
                 },
                 {
                     cidrMask: 24,
-                    name: `${props.appName}-private1`,
-                    subnetType: SubnetType.PRIVATE,
+                    name: `${props.appName}-isolated1`,
+                    subnetType: SubnetType.ISOLATED,
                 },
                 {
                     cidrMask: 24,
-                    name: `${props.appName}-private2`,
-                    subnetType: SubnetType.PRIVATE,
+                    name: `${props.appName}-isolated2`,
+                    subnetType: SubnetType.ISOLATED,
                 },
             ],
         });
