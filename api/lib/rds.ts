@@ -64,7 +64,7 @@ export class RDSStack extends cdk.Stack {
             defaultDatabaseName: props.dbname,
             instanceProps: {
                 vpcSubnets: {
-                    subnets: props.vpc.privateSubnets,
+                    subnets: props.vpc.isolatedSubnets,
                 },
                 vpc: props.vpc,
                 securityGroups: [rdsSecurityGroup],
