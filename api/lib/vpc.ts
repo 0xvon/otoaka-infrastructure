@@ -20,22 +20,12 @@ export class VPCStack extends cdk.Stack {
             subnetConfiguration: [
                 {
                     cidrMask: 24,
-                    name: `${props.appName}-public1`,
+                    name: `${props.appName}-app`,
                     subnetType: SubnetType.PUBLIC,
                 },
                 {
                     cidrMask: 24,
-                    name: `${props.appName}-public2`,
-                    subnetType: SubnetType.PUBLIC,
-                },
-                {
-                    cidrMask: 24,
-                    name: `${props.appName}-isolated1`,
-                    subnetType: SubnetType.ISOLATED,
-                },
-                {
-                    cidrMask: 24,
-                    name: `${props.appName}-isolated2`,
+                    name: `${props.appName}-rds`,
                     subnetType: SubnetType.ISOLATED,
                 },
             ],
