@@ -91,7 +91,7 @@ export class EKSStack extends cdk.Stack {
             endpointAccess: EndpointAccess.PUBLIC,
             defaultCapacity: 0,
             mastersRole: eksRole,
-            version: KubernetesVersion.V1_17,
+            version: KubernetesVersion.V1_18,
             clusterName: `${props.appName}-cluster`,
         });
         cluster.addNodegroupCapacity(`${props.appName}-capacity`, {
