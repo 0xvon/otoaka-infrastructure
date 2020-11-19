@@ -177,7 +177,7 @@ export class EKSStack extends cdk.Stack {
                             'env',
                             'export TAG=latest',
                             '$(aws ecr get-login --no-include-email)',
-                            'aws eks update-kubeconfig --name $CLUSTER_NAME --kubeconfig --role-arn $ROLE_ARN'
+                            'aws eks update-kubeconfig --name $CLUSTER_NAME --role-arn $ROLE_ARN'
                         ],
                     },
                     build: {
