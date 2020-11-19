@@ -177,7 +177,8 @@ export class EKSStack extends cdk.Stack {
                             'env',
                             'export TAG=latest',
                             '$(aws ecr get-login --no-include-email)',
-                            'aws eks update-kubeconfig --name $CLUSTER_NAME --role-arn $ROLE_ARN'
+                            'aws eks update-kubeconfig --name $CLUSTER_NAME --role-arn $ROLE_ARN',
+                            'kubectl get no',
                         ],
                     },
                     build: {
@@ -189,7 +190,7 @@ export class EKSStack extends cdk.Stack {
                     post_build: {
                         commands: [
                             'kubectl get no',
-                            'kubectl set image deployment $APP_NAME $APP_NAME=$ECR_REPO_URI:$TAG'
+                            'kubectl set image deployment $APP_NAME $APP_NAME=$ECR_REPO_URI:$TAG',
                         ],
                     },
                 },
@@ -209,6 +210,7 @@ export class EKSStack extends cdk.Stack {
                 'ecr:InitiateLayerUpload',
                 'ecr:PutImage',
                 'ecr:UploadLayerPart',
+                'sts:AssumeRole',
             ],
             resources: ['*'],
         }));
