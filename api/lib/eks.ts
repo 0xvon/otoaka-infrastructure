@@ -165,6 +165,9 @@ export class EKSStack extends cdk.Stack {
                 'APP_NAME': {
                     value: `${appLabel.app}`,
                 },
+                'ROLE_ARN': {
+                    value: `${adminRole.roleArn}`,
+                }
             },
             buildSpec: BuildSpec.fromObject({
                 version: "0.2",
@@ -174,7 +177,7 @@ export class EKSStack extends cdk.Stack {
                             'env',
                             'export TAG=latest',
                             '$(aws ecr get-login --no-include-email)',
-                            // '/usr/local/bin/entrypoint.sh',
+                            'aws eks update-kubeconfig --name $CLUSTER_NAME --kubeconfig --role-arn $ROLE_ARN'
                         ],
                     },
                     build: {
