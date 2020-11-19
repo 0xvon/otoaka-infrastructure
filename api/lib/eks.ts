@@ -8,6 +8,7 @@ import {
     Cluster,
     EndpointAccess,
     KubernetesVersion,
+    AwsAuth,
 } from '@aws-cdk/aws-eks';
 import {
     Role,
@@ -15,6 +16,7 @@ import {
     AccountRootPrincipal,
     ManagedPolicy,
     PolicyStatement,
+    User,
 } from '@aws-cdk/aws-iam';
 import {
     UpdatePolicy,
@@ -35,6 +37,7 @@ import {
     CodeBuildAction,
 } from '@aws-cdk/aws-codepipeline-actions';
 import { appLabel, deployment, service } from './manifest';
+import { users } from '../config';
 
 interface EKSStackProps extends cdk.StackProps {
     appName: string
@@ -98,7 +101,7 @@ export class EKSStack extends cdk.Stack {
             version: KubernetesVersion.V1_18,
             clusterName: `${props.appName}-cluster`,
         });
-        cluster.addNodegroupCapacity(`${props.appName}-capacity`, {
+        const ng = cluster.addNodegroupCapacity(`${props.appName}-capacity`, {
             desiredSize: 1,
             subnets: {
                 subnets: props.vpc.publicSubnets,
@@ -106,6 +109,23 @@ export class EKSStack extends cdk.Stack {
             instanceType: new InstanceType('t2.small'),
         });
         cluster.addManifest(`${props.appName}-pod`, service, deployment(ecrRepository.repositoryUri));
+        const awsAuth = new AwsAuth(this, `${props.appName}-AwsAuth`, {
+            cluster: cluster,
+        });
+        awsAuth.addRoleMapping(ng.role, {
+            groups: ["system:bootstrappers", "system:nodes"],
+            username: "system:node:{{EC2PrivateDNSName}}",
+        });
+        awsAuth.addMastersRole(
+            Role.fromRoleArn(this, 'clusterAdminAtAwsAuth', adminRole.roleArn),
+            adminRole.roleName
+        );
+        users.forEach(user => {
+            awsAuth.addUserMapping(User.fromUserName(this, user, user), {
+                username: user,
+                groups: ["system:masters"],
+            });
+        });
         this.eks = cluster;
 
         cluster.addAutoScalingGroupCapacity(`${props.appName}-nodes`, {
