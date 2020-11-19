@@ -79,10 +79,6 @@ export class EKSStack extends cdk.Stack {
             assumedBy: new AccountRootPrincipal(),
         });
 
-        const workerRole = new Role(this, `${props.appName}-WorkerRole`, {
-            assumedBy: new ServicePrincipal('ec2.amazonaws.com'),
-        });
-
         const ecrRepository = new Repository(this, `${props.appName}-ECR`, {
             repositoryName: `${props.appName}`,
         });
@@ -119,7 +115,7 @@ export class EKSStack extends cdk.Stack {
             username: "system:node:{{EC2PrivateDNSName}}",
         });
         awsAuth.addMastersRole(
-            Role.fromRoleArn(this, 'clusterAdminAtAwsAuth', adminRole.roleArn),
+            adminRole,
             adminRole.roleName
         );
         users.forEach(user => {
@@ -196,6 +192,7 @@ export class EKSStack extends cdk.Stack {
                 },
             })
         });
+        ecrRepository.grantPullPush(codeBuildProject.role!);
         cluster.awsAuth.addMastersRole(codeBuildProject.role!);
         codeBuildProject.addToRolePolicy(new PolicyStatement({
             actions: ['eks:DescribeCluster'],
