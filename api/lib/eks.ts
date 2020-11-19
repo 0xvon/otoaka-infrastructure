@@ -8,11 +8,11 @@ import {
     Cluster,
     EndpointAccess,
     KubernetesVersion,
-    
 } from '@aws-cdk/aws-eks';
 import {
     Role,
     ServicePrincipal,
+    AccountRootPrincipal,
     ManagedPolicy,
     PolicyStatement,
 } from '@aws-cdk/aws-iam';
@@ -72,6 +72,9 @@ export class EKSStack extends cdk.Stack {
                 ],
             }),
         );
+        const adminRole = new Role(this, `${props.appName}-EKSAdminRole`, {
+            assumedBy: new AccountRootPrincipal(),
+        });
 
         const workerRole = new Role(this, `${props.appName}-WorkerRole`, {
             assumedBy: new ServicePrincipal('ec2.amazonaws.com'),
@@ -90,7 +93,8 @@ export class EKSStack extends cdk.Stack {
             ],
             endpointAccess: EndpointAccess.PUBLIC,
             defaultCapacity: 0,
-            mastersRole: eksRole,
+            role: eksRole,
+            mastersRole: adminRole,
             version: KubernetesVersion.V1_18,
             clusterName: `${props.appName}-cluster`,
         });
