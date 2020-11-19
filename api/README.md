@@ -1,14 +1,24 @@
-# Welcome to your CDK TypeScript project!
+# API Infrastructure
 
-This is a blank project for TypeScript development with CDK.
+### Environment
 
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
+- VPC
+- EKS
+- CodePipeline
+- RDS Aurora for MySQL
 
-## Useful commands
+<br>
 
- * `npm run build`   compile typescript to js
- * `npm run watch`   watch for changes and compile
- * `npm run test`    perform the jest unit tests
- * `cdk deploy`      deploy this stack to your default AWS account/region
- * `cdk diff`        compare deployed stack with current state
- * `cdk synth`       emits the synthesized CloudFormation template
+### Architecture
+
+<img src='../assets/api.png' width=500 />
+
+<br>
+
+### Deploy
+
+```
+$ cdk deploy
+```
+
+<br>
