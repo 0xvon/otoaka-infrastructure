@@ -108,6 +108,8 @@ export class EKSStack extends cdk.Stack {
             },
             instanceType: new InstanceType('t2.small'),
         });
+        ng.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName("service-role/AmazonEC2RoleforSSM"));
+        ng.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName("AmazonEC2ContainerRegistryPowerUser"));
         cluster.addManifest(`${props.appName}-pod`, service, deployment(ecrRepository.repositoryUri));
         const awsAuth = new AwsAuth(this, `${props.appName}-AwsAuth`, {
             cluster: cluster,

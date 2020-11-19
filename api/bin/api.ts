@@ -47,3 +47,4 @@ const eksStack = new EKSStack(app, `${appName}-eks`, {
 });
 
 // rdsStack.injectSecurityGroup(eksStack.eks.clusterSecurityGroupId);
+app.synth();
