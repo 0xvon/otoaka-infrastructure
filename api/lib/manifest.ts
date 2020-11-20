@@ -24,12 +24,20 @@ export const appLabel = {
     app: 'api',
 };
 
-export const deployment = (imageUrl: string, stringData: Obj, containerEnvironments: ContainerEnv[]) => {
+export const secret = (stringData: Obj) => {
+    return {
+        apiVersion: 'v1',
+        kind: 'Secret',
+        metadata: { name: appLabel.app },
+        stringData: stringData,
+    };
+};
+
+export const deployment = (imageUrl: string, containerEnvironments: ContainerEnv[]) => {
     return {
         apiVersion: 'apps/v1',
         kind: 'Deployment',
         metadata: { name: appLabel.app },
-        stringData: stringData,
         spec: {
             replicas: 1,
             selector: { matchLabels: appLabel },
