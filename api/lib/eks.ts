@@ -270,7 +270,7 @@ export class EKSStack extends cdk.Stack {
                 valueFrom: {
                     secretKeyRef: {
                         name: 'api',
-                        key: newStringData[key],
+                        key: key,
                     },
                 },
             };
