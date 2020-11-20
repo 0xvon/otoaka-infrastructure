@@ -36,7 +36,8 @@ import {
     GitHubSourceAction,
     CodeBuildAction,
 } from '@aws-cdk/aws-codepipeline-actions';
-import { appLabel, deployment, service } from './manifest';
+import { appLabel, deployment, service, stringData, ContainerEnv, Obj } from './manifest';
+import { SSMSecret } from '../typing';
 import { users } from '../config';
 
 interface EKSStackProps extends cdk.StackProps {
@@ -106,7 +107,8 @@ export class EKSStack extends cdk.Stack {
         });
         ng.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName("service-role/AmazonEC2RoleforSSM"));
         ng.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName("AmazonEC2ContainerRegistryPowerUser"));
-        cluster.addManifest(`${props.appName}-pod`, service, deployment(ecrRepository.repositoryUri));
+        const [ newStringData, newContainerEnvironments ] = this.injectContainerEnv();
+        cluster.addManifest(`${props.appName}-pod`, service, deployment(ecrRepository.repositoryUri, newStringData, newContainerEnvironments));
         const awsAuth = new AwsAuth(this, `${props.appName}-AwsAuth`, {
             cluster: cluster,
         });
@@ -235,5 +237,28 @@ export class EKSStack extends cdk.Stack {
                 },
             ],
         });
+    }
+
+    private injectContainerEnv(): [Obj, ContainerEnv[]] {
+        var newStringData = stringData;
+
+        newStringData["DATABASE_HOST"] = "s0znzigqvfehvff5.cbetxkdyhwsb.us-east-1.rds.amazonaws.com";
+        newStringData["DATABASE_NAME"] = "k6wzwtd2rxfh67wk";
+        newStringData["DATABASE_PASSWORD"] = "l53q2rdezr37fbvp";
+        newStringData["DATABASE_USERNAME"] = "mqmxmrqzd9ju4jrx";
+
+        const containerEnvironments: ContainerEnv[] = Object.keys(newStringData).map(key => {
+            return {
+                name: key,
+                valueFrom: {
+                    secretKeyRef: {
+                        name: 'api',
+                        key: newStringData[key],
+                    },
+                },
+            };
+        })
+
+        return [ newStringData, containerEnvironments ];
     }
 }
