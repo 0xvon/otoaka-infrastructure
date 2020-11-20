@@ -46,6 +46,9 @@ interface EKSStackProps extends cdk.StackProps {
     // clusterEndpoint: string
     rdsUsername: string
     rdsPassword: string
+    awsAccessKeyId: string,
+    awsSecretAccessKey: string,
+    awsRegion: string,
     githubOwner: string
     githubRepo: string
     githubBranch: string
@@ -54,10 +57,20 @@ interface EKSStackProps extends cdk.StackProps {
 export class EKSStack extends cdk.Stack {
     eks: Cluster;
     appName: string;
+    rdsUsername: string;
+    rdsPassword: string;
+    awsAccessKeyId: string;
+    awsSecretAccessKey: string;
+    awsRegion: string;
     constructor(scope: cdk.Construct, id: string, props: EKSStackProps) {
         super(scope, id, props);
 
         this.appName = props.appName;
+        this.rdsUsername = props.rdsUsername;
+        this.rdsPassword = props.rdsPassword;
+        this.awsAccessKeyId = props.awsAccessKeyId;
+        this.awsSecretAccessKey = props.awsSecretAccessKey;
+        this.awsRegion = props.awsRegion;
 
         const eksRole = new Role(this, `${props.appName}-EKSRole`, {
             assumedBy: new ServicePrincipal('eks.amazonaws.com'),
@@ -246,6 +259,10 @@ export class EKSStack extends cdk.Stack {
         newStringData["DATABASE_NAME"] = "k6wzwtd2rxfh67wk";
         newStringData["DATABASE_PASSWORD"] = "l53q2rdezr37fbvp";
         newStringData["DATABASE_USERNAME"] = "mqmxmrqzd9ju4jrx";
+        newStringData["AWS_ACCESS_KEY_ID"] = this.awsAccessKeyId;
+        newStringData["AWS_SECRET_ACCESS_KEY"] = this.awsSecretAccessKey;
+        newStringData["AWS_REGION"] = this.awsRegion;
+        newStringData["SNS_PLATFORM_APPLICATION_ARN"] = "arn:aws:sns:ap-northeast-1:960722127407:app/APNS_SANDBOX/rocket-ios-dev";
 
         const containerEnvironments: ContainerEnv[] = Object.keys(newStringData).map(key => {
             return {

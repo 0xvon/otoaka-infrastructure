@@ -12,6 +12,9 @@ const rdsPassword = process.env.RDS_PASSWORD ? process.env.RDS_PASSWORD : 'passw
 const githubOwner = process.env.OWNER ? process.env.OWNER : 'something';
 const githubRepo = process.env.REPO ? process.env.REPO : 'something';
 const githubBranch = process.env.BRANCH ? process.env.BRANCH : 'master';
+const awsAccessKeyId = process.env.AWS_ACCESS_KEY_ID ? process.env.AWS_ACCESS_KEY_ID : 'HOGE';
+const awsSecretAccessKey = process.env.AWS_SECRET_ACCESS_KEY ? process.env.AWS_SECRET_ACCESS_KEY : 'HOGE';
+const awsRegion = process.env.AWS_REGION ? process.env.AWS_REGION : 'ap-northeast-1';
 
 const app = new cdk.App();
 const vpcStack = new VPCStack(app, `${appName}-vpc`, {
@@ -37,6 +40,9 @@ const eksStack = new EKSStack(app, `${appName}-eks`, {
     // clusterEndpoint: rdsStack.rds.clusterEndpoint.hostname,
     rdsUsername: rdsUserName,
     rdsPassword: rdsPassword,
+    awsAccessKeyId: awsAccessKeyId,
+    awsSecretAccessKey: awsSecretAccessKey,
+    awsRegion: awsRegion,
     vpc: vpcStack.vpc,
     githubOwner: githubOwner,
     githubRepo: githubRepo,
