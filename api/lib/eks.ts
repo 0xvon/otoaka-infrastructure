@@ -102,7 +102,7 @@ export class EKSStack extends cdk.Stack {
             subnets: {
                 subnets: props.vpc.publicSubnets,
             },
-            instanceType: new InstanceType('t2.small'),
+            instanceType: new InstanceType('t2.medium'),
         });
         ng.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName("service-role/AmazonEC2RoleforSSM"));
         ng.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName("AmazonEC2ContainerRegistryPowerUser"));
@@ -128,7 +128,7 @@ export class EKSStack extends cdk.Stack {
 
         cluster.addAutoScalingGroupCapacity(`${props.appName}-nodes`, {
             autoScalingGroupName: `${props.appName}-EKS-ASG`,
-            instanceType: new InstanceType('t3.small'),
+            instanceType: new InstanceType('t3.medium'),
             minCapacity: 1,
             maxCapacity: 10,
             vpcSubnets: {
