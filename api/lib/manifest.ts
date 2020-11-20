@@ -95,7 +95,7 @@ export const deployment = (imageUrl: string) => {
             template: {
                 metadata: { labels: appLabel },
                 spec: {
-                    restartPolicy: 'OnFailure',
+                    restartPolicy: 'Always',
                     containers: [
                         {
                             name: appLabel.app,
