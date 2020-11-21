@@ -259,6 +259,7 @@ export class EKSStack extends cdk.Stack {
         newStringData["DATABASE_NAME"] = "k6wzwtd2rxfh67wk";
         newStringData["DATABASE_PASSWORD"] = "l53q2rdezr37fbvp";
         newStringData["DATABASE_USERNAME"] = "mqmxmrqzd9ju4jrx";
+        newStringData["DATABASE_URL"] = `mysql://mqmxmrqzd9ju4jrx:l53q2rdezr37fbvp@s0znzigqvfehvff5.cbetxkdyhwsb.us-east-1.rds.amazonaws.com:3306/k6wzwtd2rxfh67wk`;
         newStringData["AWS_ACCESS_KEY_ID"] = this.awsAccessKeyId;
         newStringData["AWS_SECRET_ACCESS_KEY"] = this.awsSecretAccessKey;
         newStringData["AWS_REGION"] = this.awsRegion;
