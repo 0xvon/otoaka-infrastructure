@@ -5,7 +5,18 @@ import * as CognitoUserPool from '../lib/cognitoUserPool';
 test('SQS Queue Created', () => {
     const app = new cdk.App();
     // WHEN
-    const stack = new CognitoUserPool.CognitoUserPoolStack(app, 'MyTestStack');
+    const stack = new CognitoUserPool.CognitoUserPoolStack(app, `CognitoUserPool`, {
+        appName: 'sample',
+        signinCallbackUrl: 'https://sample.com',
+        signoutCallbackUrl: 'https://sample.com',
+        googleWebClientId: 'sample',
+        googleWebAppSecret: 'sample',
+        facebookAppId: 'sample',
+        facebookAppSecret: 'sample',
+        env: {
+            region: 'ap-northeast-1',
+        },
+    });
     // THEN
     expectCDK(stack).to(haveResource("AWS::SQS::Queue",{
         VisibilityTimeout: 300
@@ -15,7 +26,18 @@ test('SQS Queue Created', () => {
 test('SNS Topic Created', () => {
     const app = new cdk.App();
     // WHEN
-    const stack = new CognitoUserPool.CognitoUserPoolStack(app, 'MyTestStack');
+    const stack = new CognitoUserPool.CognitoUserPoolStack(app, `CognitoUserPool`, {
+        appName: 'sample',
+        signinCallbackUrl: 'https://sample.com',
+        signoutCallbackUrl: 'https://sample.com',
+        googleWebClientId: 'sample',
+        googleWebAppSecret: 'sample',
+        facebookAppId: 'sample',
+        facebookAppSecret: 'sample',
+        env: {
+            region: 'ap-northeast-1',
+        },
+    });
     // THEN
     expectCDK(stack).to(haveResource("AWS::SNS::Topic"));
 });
