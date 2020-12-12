@@ -6,7 +6,7 @@ on:
 
 jobs:
   deploy:
-    name: CDK deoloy
+    name: Deoloy API
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2

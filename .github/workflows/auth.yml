@@ -6,7 +6,7 @@ on:
 
 jobs:
   deploy:
-    name: CDK deoloy
+    name: Deploy Auth
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -21,11 +21,11 @@ jobs:
         run: |
           sudo curl -o /usr/bin/jq -L https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 && sudo chmod +x /usr/bin/jq
           pip3 install awscli
+          npm install -g aws-cdk
           
       - name: Deployment
         run: |
           cd ./auth
-          npm install -g aws-cdk
           npm i
           npm run build
           cdk bootstrap aws://${AWS_ACCOUNT_ID}/${AWS_DEFAULT_REGION}
