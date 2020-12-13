@@ -6,7 +6,7 @@ on:
 
 jobs:
   deploy:
-    name: Deoloy API
+    name: Deploy Auth
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -21,14 +21,12 @@ jobs:
         run: |
           sudo curl -o /usr/bin/jq -L https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 && sudo chmod +x /usr/bin/jq
           pip3 install awscli
+          npm install -g aws-cdk
           
       - name: Deployment
         run: |
-          cd ./api
-          npm install -g aws-cdk
+          cd ./auth
           npm i
-          sh container_environment.sh
-          cat ./lib/environment.json
           npm run build
           cdk bootstrap aws://${AWS_ACCOUNT_ID}/${AWS_DEFAULT_REGION}
           cdk deploy '*' --require-approval never
@@ -37,11 +35,10 @@ jobs:
           AWS_DEFAULT_REGION: ${{ secrets.AWS_REGION }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          APP_NAME: rocket-api-dev
-          RDS_DB_NAME: ${{ secrets.RDS_DB_NAME }}
-          RDS_USERNAME: ${{ secrets.RDS_USERNAME }}
-          RDS_PASSWORD: ${{ secrets.RDS_PASSWORD }}
-          OWNER: ${{ secrets.OWNER }}
-          REPO: ${{ secrets.REPO }}
-          OAUTH_TOKEN: ${{ secrets.OAUTH_TOKEN }}
-          BRANCH: master
+          APP_NAME: rocket-auth-dev
+          SIGNIN_CALLBACK_URL: ${{ secrets.SIGNIN_CALLBACK_URL }}
+          SIGNOUT_CALLBACK_URL: ${{ secrets.SIGNOUT_CALLBACK_URL }}
+          GOOGLE_WEB_CLIENT_ID: ${{ secrets.GOOGLE_WEB_CLIENT_ID }}
+          GOOGLE_WEB_APP_SECRET: ${{ secrets.GOOGLE_WEB_APP_SECRET }}
+          FACEBOOK_APP_ID: ${{ secrets.FACEBOOK_APP_ID }}
+          FACEBOOK_APP_SECRET: ${{ secrets.FACEBOOK_APP_SECRET }}

@@ -35,22 +35,22 @@ const vpcStack = new VPCStack(app, `${appName}-vpc`, {
 //     },
 // });
 
-const eksStack = new EKSStack(app, `${appName}-eks`, {
-    appName,
-    // clusterEndpoint: rdsStack.rds.clusterEndpoint.hostname,
-    rdsUsername: rdsUserName,
-    rdsPassword: rdsPassword,
-    awsAccessKeyId: awsAccessKeyId,
-    awsSecretAccessKey: awsSecretAccessKey,
-    awsRegion: awsRegion,
-    vpc: vpcStack.vpc,
-    githubOwner: githubOwner,
-    githubRepo: githubRepo,
-    githubBranch: githubBranch,
-    env: {
-        region: 'ap-northeast-1',
-    },
-});
+// const eksStack = new EKSStack(app, `${appName}-eks`, {
+//     appName,
+//     // clusterEndpoint: rdsStack.rds.clusterEndpoint.hostname,
+//     rdsUsername: rdsUserName,
+//     rdsPassword: rdsPassword,
+//     awsAccessKeyId: awsAccessKeyId,
+//     awsSecretAccessKey: awsSecretAccessKey,
+//     awsRegion: awsRegion,
+//     vpc: vpcStack.vpc,
+//     githubOwner: githubOwner,
+//     githubRepo: githubRepo,
+//     githubBranch: githubBranch,
+//     env: {
+//         region: 'ap-northeast-1',
+//     },
+// });
 
 // rdsStack.injectSecurityGroup(eksStack.eks.clusterSecurityGroupId);
 app.synth();
