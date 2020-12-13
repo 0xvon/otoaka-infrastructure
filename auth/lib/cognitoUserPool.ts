@@ -82,21 +82,21 @@ export class CognitoUserPoolStack extends cdk.Stack {
             },
         });
 
-        // const facebookIdProvider = new UserPoolIdentityProviderFacebook(this, `${props.appName}-facebookIdProvider`, {
-        //     userPool: userPool,
-        //     clientId: props.facebookAppId,
-        //     clientSecret: props.facebookAppSecret,
-        //     scopes: [
-        //         'phone',
-        //         'email',
-        //         'openid',
-        //         'aws.cognito.signin.user.admin',
-        //         'profile',
-        //     ],
-        //     attributeMapping: {
-        //         email: ProviderAttribute.FACEBOOK_EMAIL,
-        //     },
-        // });
+        const facebookIdProvider = new UserPoolIdentityProviderFacebook(this, `${props.appName}-facebookIdProvider`, {
+            userPool: userPool,
+            clientId: props.facebookAppId,
+            clientSecret: props.facebookAppSecret,
+            scopes: [
+                'phone',
+                'email',
+                'openid',
+                'aws.cognito.signin.user.admin',
+                'profile',
+            ],
+            attributeMapping: {
+                email: ProviderAttribute.FACEBOOK_EMAIL,
+            },
+        });
 
         const appClient = userPool.addClient(`${props.appName}-appClient`, {
             userPoolClientName: `${props.appName}-appClient`,
