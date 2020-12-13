@@ -11,10 +11,6 @@ import {
     ProviderAttribute,
     OAuthScope,
 } from '@aws-cdk/aws-cognito';
-import {
-
-} from '@aws-cdk/aws-iam';
-
 
 interface CognitoUserPoolStackProps extends cdk.StackProps {
     appName: string,
@@ -70,36 +66,6 @@ export class CognitoUserPoolStack extends cdk.Stack {
             },
         });
 
-        const appClient = userPool.addClient(`${props.appName}-appClient`, {
-            userPoolClientName: `${props.appName}-appClient`,
-            generateSecret: true,
-            supportedIdentityProviders: [
-                UserPoolClientIdentityProvider.GOOGLE,
-                UserPoolClientIdentityProvider.COGNITO,
-                UserPoolClientIdentityProvider.FACEBOOK,
-            ],
-            oAuth: {
-                flows: {
-                    authorizationCodeGrant: true,
-                    implicitCodeGrant: true,
-                },
-                scopes: [
-                    OAuthScope.PHONE,
-                    OAuthScope.EMAIL,
-                    OAuthScope.OPENID,
-                    OAuthScope.COGNITO_ADMIN,
-                    OAuthScope.PROFILE,
-                ],
-                callbackUrls: [
-                    props.signinCallbackUrl,
-                ],
-                logoutUrls: [
-                    props.signoutCallbackUrl,
-                ],
-
-            },
-        });
-
         const googleIdProvider = new UserPoolIdentityProviderGoogle(this, `${props.appName}-googleIdProvider`, {
             userPool: userPool,
             clientId: props.googleWebClientId,
@@ -129,6 +95,36 @@ export class CognitoUserPoolStack extends cdk.Stack {
             ],
             attributeMapping: {
                 email: ProviderAttribute.FACEBOOK_EMAIL,
+            },
+        });
+
+        const appClient = userPool.addClient(`${props.appName}-appClient`, {
+            userPoolClientName: `${props.appName}-appClient`,
+            generateSecret: true,
+            supportedIdentityProviders: [
+                UserPoolClientIdentityProvider.GOOGLE,
+                UserPoolClientIdentityProvider.COGNITO,
+                UserPoolClientIdentityProvider.FACEBOOK,
+            ],
+            oAuth: {
+                flows: {
+                    authorizationCodeGrant: true,
+                    implicitCodeGrant: true,
+                },
+                scopes: [
+                    OAuthScope.PHONE,
+                    OAuthScope.EMAIL,
+                    OAuthScope.OPENID,
+                    OAuthScope.COGNITO_ADMIN,
+                    OAuthScope.PROFILE,
+                ],
+                callbackUrls: [
+                    props.signinCallbackUrl,
+                ],
+                logoutUrls: [
+                    props.signoutCallbackUrl,
+                ],
+
             },
         });
     }
