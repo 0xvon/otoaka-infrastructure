@@ -126,6 +126,7 @@ export class CognitoStack extends cdk.Stack {
         const idPool = new IdentityPool(this, `${props.appName}-idPool`, {
             allowUnauthenticatedIdentities: true,
             identityPoolName: `${props.appName}-idPool`,
+            cognitoIdentityProviders: userPool.identityProviders,
         });
     }
 }
