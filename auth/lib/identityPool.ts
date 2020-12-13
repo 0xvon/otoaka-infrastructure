@@ -37,6 +37,16 @@ export class IdentityPool extends cdk.Construct {
                         "mobileanalytics:PutEvents",
                     ],
                     resources: ["*"],
+                }),
+                new iam.PolicyStatement({
+                    effect: iam.Effect.ALLOW,
+                    actions: [
+                        "s3:*",
+                    ],
+                    resources: [
+                        "arn:aws:s3:::rocket-for-bands-dev",
+                        "arn:aws:s3:::rocket-for-bands-dev/*",
+                    ],
                 })
             ]
         });
