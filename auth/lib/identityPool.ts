@@ -45,7 +45,6 @@ export class IdentityPool extends cdk.Construct {
             ...props,
             allowUnauthenticatedIdentities: props.allowUnauthenticatedIdentities,
             identityPoolName: props.identityPoolName,
-            cognitoIdentityProviders: props.cognitoIdentityProviders,
         })
 
         const authenticatedRole = new iam.Role(this, 'authRole', {
