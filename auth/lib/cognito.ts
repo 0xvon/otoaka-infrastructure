@@ -7,12 +7,12 @@ import {
     Mfa,
     AccountRecovery,
     VerificationEmailStyle,
-    UserPoolClientIdentityProvider,
     ProviderAttribute,
     OAuthScope,
 } from '@aws-cdk/aws-cognito';
+import { IdentityPool } from './identityPool';
 
-interface CognitoUserPoolStackProps extends cdk.StackProps {
+interface CognitoStackProps extends cdk.StackProps {
     appName: string,
     signinCallbackUrl: string,
     signoutCallbackUrl: string,
@@ -22,8 +22,8 @@ interface CognitoUserPoolStackProps extends cdk.StackProps {
     facebookAppSecret: string,
 }
 
-export class CognitoUserPoolStack extends cdk.Stack {
-    constructor(scope: cdk.App, id: string, props: CognitoUserPoolStackProps) {
+export class CognitoStack extends cdk.Stack {
+    constructor(scope: cdk.App, id: string, props: CognitoStackProps) {
         super(scope, id, props);
 
         const userPool = new UserPool(this, `${props.appName}-userPool`, {
@@ -101,11 +101,6 @@ export class CognitoUserPoolStack extends cdk.Stack {
         const appClient = userPool.addClient(`${props.appName}-appClient`, {
             userPoolClientName: `${props.appName}-appClient`,
             generateSecret: true,
-            supportedIdentityProviders: [
-                UserPoolClientIdentityProvider.COGNITO,
-                // UserPoolClientIdentityProvider.FACEBOOK,
-                // UserPoolClientIdentityProvider.GOOGLE,
-            ],
             oAuth: {
                 flows: {
                     authorizationCodeGrant: true,
@@ -126,6 +121,11 @@ export class CognitoUserPoolStack extends cdk.Stack {
                 ],
 
             },
+        });
+
+        const idPool = new IdentityPool(this, `${props.appName}-idPool`, {
+            allowUnauthenticatedIdentities: true,
+            identityPoolName: `${props.appName}-idPool`,
         });
     }
 }

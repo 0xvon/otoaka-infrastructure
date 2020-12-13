@@ -1,11 +1,11 @@
 import { expect as expectCDK, haveResource } from '@aws-cdk/assert';
 import * as cdk from '@aws-cdk/core';
-import * as CognitoUserPool from '../lib/cognitoUserPool';
+import * as Cognito from '../lib/cognito';
 
 test('SQS Queue Created', () => {
     const app = new cdk.App();
     // WHEN
-    const stack = new CognitoUserPool.CognitoUserPoolStack(app, `CognitoUserPool`, {
+    const stack = new Cognito.CognitoStack(app, `CognitoUserPool`, {
         appName: 'sample',
         signinCallbackUrl: 'https://sample.com',
         signoutCallbackUrl: 'https://sample.com',
@@ -26,7 +26,7 @@ test('SQS Queue Created', () => {
 test('SNS Topic Created', () => {
     const app = new cdk.App();
     // WHEN
-    const stack = new CognitoUserPool.CognitoUserPoolStack(app, `CognitoUserPool`, {
+    const stack = new Cognito.CognitoStack(app, `CognitoUserPool`, {
         appName: 'sample',
         signinCallbackUrl: 'https://sample.com',
         signoutCallbackUrl: 'https://sample.com',
