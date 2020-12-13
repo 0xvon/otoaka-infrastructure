@@ -66,21 +66,21 @@ export class CognitoUserPoolStack extends cdk.Stack {
             },
         });
 
-        // const googleIdProvider = new UserPoolIdentityProviderGoogle(this, `${props.appName}-googleIdProvider`, {
-        //     userPool: userPool,
-        //     clientId: props.googleWebClientId,
-        //     clientSecret: props.googleWebAppSecret,
-        //     scopes: [
-        //         'phone',
-        //         'email',
-        //         'openid',
-        //         'aws.cognito.signin.user.admin',
-        //         'profile',
-        //     ],
-        //     attributeMapping: {
-        //         email: ProviderAttribute.GOOGLE_EMAIL,
-        //     },
-        // });
+        const googleIdProvider = new UserPoolIdentityProviderGoogle(this, `${props.appName}-googleIdProvider`, {
+            userPool: userPool,
+            clientId: props.googleWebClientId,
+            clientSecret: props.googleWebAppSecret,
+            scopes: [
+                'phone',
+                'email',
+                'openid',
+                'aws.cognito.signin.user.admin',
+                'profile',
+            ],
+            attributeMapping: {
+                email: ProviderAttribute.GOOGLE_EMAIL,
+            },
+        });
 
         // const facebookIdProvider = new UserPoolIdentityProviderFacebook(this, `${props.appName}-facebookIdProvider`, {
         //     userPool: userPool,
