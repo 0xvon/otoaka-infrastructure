@@ -30,15 +30,22 @@ export class IdentityPool extends cdk.Construct {
         const unauthenticatedPolicyDocument = props.unauthenticatedPolicyDocument ?? new iam.PolicyDocument({
             statements: [
                 new iam.PolicyStatement({
+                    sid: "VisualEditor0",
                     effect: iam.Effect.ALLOW,
                     actions: [
-                        "cognito-sync:*",
-                        "s3:*",
+                        "s3:GetAccessPoint",
+                        "s3:GetAccountPublicAccessBlock",
+                        "s3:ListAllMyBuckets",
+                        "s3:ListAccessPoints",
+                        "s3:ListJobs",
                         "mobileanalytics:PutEvents",
+                        "s3:CreateJob",
+                        "cognito-sync:*",
                     ],
                     resources: ["*"],
                 }),
                 new iam.PolicyStatement({
+                    sid: "VisualEditor1",
                     effect: iam.Effect.ALLOW,
                     actions: [
                         "s3:PutAnalyticsConfiguration",
