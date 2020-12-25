@@ -142,8 +142,8 @@ export class IdentityPool extends cdk.Construct {
                 new iam.FederatedPrincipal("cognito-identity.amazonaws.com", {
                     "StringEquals": { "cognito-identity.amazonaws.com:aud": identityPool.ref },
                     "ForAnyValue:StringLike": { "cognito-identity.amazonaws.com:amr": "authenticated" },
-                }),
-            inlinePolicies: { 'policy': authenticatedPolicyDocument },
+                }, 'sts:AssumeRoleWithWebIdentity'),
+            inlinePolicies: { 'authPolicy': authenticatedPolicyDocument },
         });
 
         const unauthenticatedRole = new iam.Role(this, 'unauthRole', {
@@ -151,8 +151,8 @@ export class IdentityPool extends cdk.Construct {
                 new iam.FederatedPrincipal("cognito-identity.amazonaws.com", {
                     "StringEquals": { "cognito-identity.amazonaws.com:aud": identityPool.ref },
                     "ForAnyValue:StringLike": { "cognito-identity.amazonaws.com:amr": "unauthenticated" },
-                }),
-            inlinePolicies: { 'policy': unauthenticatedPolicyDocument },
+                }, 'sts:AssumeRoleWithWebIdentity'),
+            inlinePolicies: { 'unauthPolicy': unauthenticatedPolicyDocument },
             });
 
         new cognito.CfnIdentityPoolRoleAttachment(this, 'roleAttachment', {
