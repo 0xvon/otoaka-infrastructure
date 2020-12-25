@@ -15,6 +15,9 @@ const app = new cdk.App();
 
 const s3Stack = new S3Stack(app, `${appName}-s3`, {
     appName,
+    env: {
+        region: 'ap-northeast-1',
+    },
 });
 
 const cognitoUserPoolStack = new CognitoStack(app, `${appName}-cognito`, {
