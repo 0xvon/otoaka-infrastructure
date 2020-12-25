@@ -26,7 +26,7 @@ export class S3Stack extends cdk.Stack {
             actions: [
                 's3:GetObject',
             ],
-            resources: [bucket.bucketArn],
+            resources: [`arn:aws:s3:::${props.appName}-storage/*`],
             principals: [new AnyPrincipal()],
         }));
         this.bucket = bucket;
