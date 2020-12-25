@@ -124,8 +124,8 @@ export class IdentityPool extends cdk.Construct {
                     resources: [
                         "arn:aws:s3:ap-northeast-1:960722127407:accesspoint/*",
                         "arn:aws:s3:*:960722127407:job/*",
-                        "arn:aws:s3:::rocket-for-bands-dev",
-                        "arn:aws:s3:::rocket-for-bands-dev/*",
+                        "arn:aws:s3:::rocket-ios-dev",
+                        "arn:aws:s3:::rocket-ios-dev/*",
                     ],
                 })
             ]
