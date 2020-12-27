@@ -146,7 +146,7 @@ export class IdentityPool extends cdk.Construct {
                     "ForAnyValue:StringLike": { "cognito-identity.amazonaws.com:amr": "unauthenticated" },
                 }),
             inlinePolicies: { 'policy': unauthenticatedPolicyDocument },
-            });
+        });
 
         new cognito.CfnIdentityPoolRoleAttachment(this, 'roleAttachment', {
             identityPoolId: identityPool.ref,
