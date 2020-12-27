@@ -129,14 +129,15 @@ export class CognitoStack extends cdk.Stack {
             },
         });
 
-        const authenticatedPolicyDocument = new PolicyDocument({
+        const unauthenticatedPolicyDocument = new PolicyDocument({
             statements: [
                 new PolicyStatement({
+                    sid: "VisualEditor0",
                     effect: Effect.ALLOW,
                     actions: [
+                        "mobileanalytics:PutEvents",
                         "cognito-sync:*",
                         "cognito-identity:*",
-                        "mobileanalytics:PutEvents",
                         "s3:CreateJob",
                     ],
                     resources: ["*"],
@@ -147,6 +148,7 @@ export class CognitoStack extends cdk.Stack {
                     actions: [
                         "s3:PutObject",
                         "s3:GetObject",
+                        "s3:deleteObject",
                     ],
                     resources: [
                         `arn:aws:s3:::${props.bucketName}/\${cognito-identity.amazonaws.com:sub}/*`,
@@ -157,7 +159,7 @@ export class CognitoStack extends cdk.Stack {
         });
 
         const idPool = new IdentityPool(this, `${props.appName}-idPool`, {
-            authenticatedPolicyDocument: authenticatedPolicyDocument,
+            unauthenticatedPolicyDocument: unauthenticatedPolicyDocument,
             allowUnauthenticatedIdentities: true,
             identityPoolName: `${props.appName}-idPool`,
         });
