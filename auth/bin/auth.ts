@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import * as cdk from '@aws-cdk/core';
 import { CognitoStack } from '../lib/cognito';
+import { S3Stack } from '../lib/s3';
 
 const appName = process.env.APP_NAME ? process.env.APP_NAME : 'sample';
 const signinCallbackUrl = process.env.SIGNIN_CALLBACK_URL ? process.env.SIGNIN_CALLBACK_URL : 'https://sample.com';
@@ -11,8 +12,17 @@ const facebookAppId = process.env.FACEBOOK_APP_ID ? process.env.FACEBOOK_APP_ID 
 const facebookAppSecret = process.env.FACEBOOK_APP_SECRET ? process.env.FACEBOOK_APP_SECRET : 'dev.sample.hoge';
 
 const app = new cdk.App();
+
+const s3Stack = new S3Stack(app, `${appName}-s3`, {
+    appName,
+    env: {
+        region: 'ap-northeast-1',
+    },
+});
+
 const cognitoUserPoolStack = new CognitoStack(app, `${appName}-cognito`, {
     appName,
+    bucketName: s3Stack.bucket.bucketName,
     signinCallbackUrl: signinCallbackUrl,
     signoutCallbackUrl: signoutCallbackUrl,
     googleWebClientId: googleWebClientId,

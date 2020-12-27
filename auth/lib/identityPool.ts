@@ -30,15 +30,22 @@ export class IdentityPool extends cdk.Construct {
         const unauthenticatedPolicyDocument = props.unauthenticatedPolicyDocument ?? new iam.PolicyDocument({
             statements: [
                 new iam.PolicyStatement({
+                    sid: "VisualEditor0",
                     effect: iam.Effect.ALLOW,
                     actions: [
-                        "cognito-sync:*",
-                        "s3:*",
+                        "s3:GetAccessPoint",
+                        "s3:GetAccountPublicAccessBlock",
+                        "s3:ListAllMyBuckets",
+                        "s3:ListAccessPoints",
+                        "s3:ListJobs",
                         "mobileanalytics:PutEvents",
+                        "s3:CreateJob",
+                        "cognito-sync:*",
                     ],
                     resources: ["*"],
                 }),
                 new iam.PolicyStatement({
+                    sid: "VisualEditor1",
                     effect: iam.Effect.ALLOW,
                     actions: [
                         "s3:PutAnalyticsConfiguration",
@@ -117,8 +124,8 @@ export class IdentityPool extends cdk.Construct {
                     resources: [
                         "arn:aws:s3:ap-northeast-1:960722127407:accesspoint/*",
                         "arn:aws:s3:*:960722127407:job/*",
-                        "arn:aws:s3:::rocket-for-bands-dev",
-                        "arn:aws:s3:::rocket-for-bands-dev/*",
+                        "arn:aws:s3:::rocket-ios-dev",
+                        "arn:aws:s3:::rocket-ios-dev/*",
                     ],
                 })
             ]
@@ -135,8 +142,8 @@ export class IdentityPool extends cdk.Construct {
                 new iam.FederatedPrincipal("cognito-identity.amazonaws.com", {
                     "StringEquals": { "cognito-identity.amazonaws.com:aud": identityPool.ref },
                     "ForAnyValue:StringLike": { "cognito-identity.amazonaws.com:amr": "authenticated" },
-                }),
-            inlinePolicies: { 'policy': authenticatedPolicyDocument },
+                }, 'sts:AssumeRoleWithWebIdentity'),
+            inlinePolicies: { 'authPolicy': authenticatedPolicyDocument },
         });
 
         const unauthenticatedRole = new iam.Role(this, 'unauthRole', {

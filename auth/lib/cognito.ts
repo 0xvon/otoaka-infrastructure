@@ -10,10 +10,16 @@ import {
     ProviderAttribute,
     OAuthScope,
 } from '@aws-cdk/aws-cognito';
+import {
+    PolicyDocument,
+    PolicyStatement,
+    Effect,
+} from '@aws-cdk/aws-iam';
 import { IdentityPool } from './identityPool';
 
 interface CognitoStackProps extends cdk.StackProps {
     appName: string,
+    bucketName: string,
     signinCallbackUrl: string,
     signoutCallbackUrl: string,
     googleWebClientId: string,
@@ -123,7 +129,35 @@ export class CognitoStack extends cdk.Stack {
             },
         });
 
+        const unauthenticatedPolicyDocument = new PolicyDocument({
+            statements: [
+                new PolicyStatement({
+                    sid: "VisualEditor0",
+                    effect: Effect.ALLOW,
+                    actions: [
+                        "mobileanalytics:PutEvents",
+                        "cognito-sync:*",
+                        "cognito-identity:*",
+                        "s3:CreateJob",
+                    ],
+                    resources: ["*"],
+                }),
+                new PolicyStatement({
+                    sid: "VisualEditor1",
+                    effect: Effect.ALLOW,
+                    actions: [
+                        "s3:PutObject",
+                        "s3:GetObject",
+                    ],
+                    resources: [
+                        `arn:aws:s3:::${props.bucketName}/*`,
+                    ],
+                })
+            ]
+        });
+
         const idPool = new IdentityPool(this, `${props.appName}-idPool`, {
+            unauthenticatedPolicyDocument: unauthenticatedPolicyDocument,
             allowUnauthenticatedIdentities: true,
             identityPoolName: `${props.appName}-idPool`,
         });

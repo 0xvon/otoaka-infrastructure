@@ -7,6 +7,7 @@ test('SQS Queue Created', () => {
     // WHEN
     const stack = new Cognito.CognitoStack(app, `CognitoUserPool`, {
         appName: 'sample',
+        bucketName: 'sample',
         signinCallbackUrl: 'https://sample.com',
         signoutCallbackUrl: 'https://sample.com',
         googleWebClientId: 'sample',
@@ -28,6 +29,7 @@ test('SNS Topic Created', () => {
     // WHEN
     const stack = new Cognito.CognitoStack(app, `CognitoUserPool`, {
         appName: 'sample',
+        bucketName: 'sample',
         signinCallbackUrl: 'https://sample.com',
         signoutCallbackUrl: 'https://sample.com',
         googleWebClientId: 'sample',
