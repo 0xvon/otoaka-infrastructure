@@ -63,7 +63,7 @@ export class IdentityPool extends cdk.Construct {
                 new iam.FederatedPrincipal("cognito-identity.amazonaws.com", {
                     "StringEquals": { "cognito-identity.amazonaws.com:aud": identityPool.ref },
                     "ForAnyValue:StringLike": { "cognito-identity.amazonaws.com:amr": "unauthenticated" },
-                }),
+                }, 'sts:AssumeRoleWithWebIdentity'),
             inlinePolicies: { 'policy': unauthenticatedPolicyDocument },
         });
 
