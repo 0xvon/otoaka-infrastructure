@@ -151,8 +151,8 @@ export class CognitoStack extends cdk.Stack {
                         "s3:deleteObject",
                     ],
                     resources: [
-                        `arn:aws:s3:::${props.bucketName}/\${cognito-identity.amazonaws.com:sub}/*`,
-                        `arn:aws:s3:::${props.bucketName}/\${cognito-identity.amazonaws.com:sub}`,
+                        `arn:aws:s3:::${props.bucketName}/assets/\${cognito-identity.amazonaws.com:sub}/*`,
+                        `arn:aws:s3:::${props.bucketName}/assets/\${cognito-identity.amazonaws.com:sub}`,
                     ],
                 }),
             ]
