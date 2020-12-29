@@ -153,7 +153,7 @@ export class CognitoStack extends cdk.Stack {
                     resources: [
                         `arn:aws:s3:::${props.bucketName}/assets/\${cognito-identity.amazonaws.com:sub}/*`,
                         `arn:aws:s3:::${props.bucketName}/assets/\${cognito-identity.amazonaws.com:sub}`,
-                        `arn:aws:s3:::${props.bucketName}/assets/*`,
+                        // `arn:aws:s3:::${props.bucketName}/assets/*`,
                     ],
                 }),
             ]
