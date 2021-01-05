@@ -15,7 +15,7 @@ const githubBranch = process.env.BRANCH ?? 'master';
 const awsAccessKeyId = process.env.AWS_ACCESS_KEY_ID ?? 'HOGE';
 const awsSecretAccessKey = process.env.AWS_SECRET_ACCESS_KEY ?? 'HOGE';
 const awsRegion = process.env.AWS_REGION ?? 'ap-northeast-1';
-const cognitoUserPoolId = process.env.COGNITO_USER_POOL_ID ?? 'something';
+const cognitoUserPoolId = process.env.COGNITO_USER_POOL_ID ?? 'ap-northeast-1_cZhPmp0Td';
 const snsPlatformApplicationArn = process.env.SNS_PLATFORM_APPLICATION_ARN ?? '"arn:aws:sns:ap-northeast-1:960722127407:app/APNS_SANDBOX/rocket-ios-dev"';
 
 const app = new cdk.App();
