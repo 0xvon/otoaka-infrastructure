@@ -42,11 +42,14 @@ import { users } from '../config';
 interface EKSStackProps extends cdk.StackProps {
     appName: string
     vpc: Vpc
-    // clusterEndpoint: string
+    clusterEndpoint: string
+    dbname: string
     rdsUsername: string
     rdsPassword: string
     awsAccessKeyId: string,
     awsSecretAccessKey: string,
+    snsPlatformApplicationArn: string,
+    cognitoUserPoolId: string,
     awsRegion: string,
     githubOwner: string
     githubRepo: string
@@ -55,20 +58,28 @@ interface EKSStackProps extends cdk.StackProps {
 
 export class EKSStack extends cdk.Stack {
     eks: Cluster;
+    clusterEndpoint: string;
+    dbname: string;
     appName: string;
     rdsUsername: string;
     rdsPassword: string;
     awsAccessKeyId: string;
     awsSecretAccessKey: string;
+    snsPlatformApplicationArn: string;
+    cognitoUserPoolId: string,
     awsRegion: string;
     constructor(scope: cdk.Construct, id: string, props: EKSStackProps) {
         super(scope, id, props);
 
         this.appName = props.appName;
+        this.clusterEndpoint = props.clusterEndpoint;
+        this.dbname = props.dbname;
         this.rdsUsername = props.rdsUsername;
         this.rdsPassword = props.rdsPassword;
         this.awsAccessKeyId = props.awsAccessKeyId;
         this.awsSecretAccessKey = props.awsSecretAccessKey;
+        this.snsPlatformApplicationArn = props.snsPlatformApplicationArn;
+        this.cognitoUserPoolId = props.cognitoUserPoolId;
         this.awsRegion = props.awsRegion;
 
         const eksRole = new Role(this, `${props.appName}-EKSRole`, {
@@ -254,15 +265,16 @@ export class EKSStack extends cdk.Stack {
     private injectContainerEnv(): [Obj, ContainerEnv[]] {
         var newStringData = stringData;
 
-        newStringData["DATABASE_HOST"] = "s0znzigqvfehvff5.cbetxkdyhwsb.us-east-1.rds.amazonaws.com";
-        newStringData["DATABASE_NAME"] = "k6wzwtd2rxfh67wk";
-        newStringData["DATABASE_PASSWORD"] = "l53q2rdezr37fbvp";
-        newStringData["DATABASE_USERNAME"] = "mqmxmrqzd9ju4jrx";
-        newStringData["DATABASE_URL"] = `mysql://mqmxmrqzd9ju4jrx:l53q2rdezr37fbvp@s0znzigqvfehvff5.cbetxkdyhwsb.us-east-1.rds.amazonaws.com:3306/k6wzwtd2rxfh67wk`;
+        newStringData["DATABASE_HOST"] = this.clusterEndpoint
+        newStringData["DATABASE_NAME"] = this.dbname
+        newStringData["DATABASE_PASSWORD"] = this.rdsPassword;
+        newStringData["DATABASE_USERNAME"] = this.rdsUsername;
+        newStringData["DATABASE_URL"] = `mysql://${this.rdsUsername}:${this.rdsPassword}@${this.clusterEndpoint}:3306/${this.dbname}`;
         newStringData["AWS_ACCESS_KEY_ID"] = this.awsAccessKeyId;
         newStringData["AWS_SECRET_ACCESS_KEY"] = this.awsSecretAccessKey;
         newStringData["AWS_REGION"] = this.awsRegion;
-        newStringData["SNS_PLATFORM_APPLICATION_ARN"] = "arn:aws:sns:ap-northeast-1:960722127407:app/APNS_SANDBOX/rocket-ios-dev";
+        newStringData["SNS_PLATFORM_APPLICATION_ARN"] = this.snsPlatformApplicationArn;
+        newStringData["CONGNITO_IDP_USER_POOL_ID"] = this.cognitoUserPoolId;
 
         const containerEnvironments: ContainerEnv[] = Object.keys(newStringData).map(key => {
             return {
