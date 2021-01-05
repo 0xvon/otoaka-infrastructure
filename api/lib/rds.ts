@@ -81,11 +81,4 @@ export class RDSStack extends cdk.Stack {
 
         this.rds = cluster;
     }
-
-    injectSecurityGroup(appSGId: string) {
-        this.rdsSecurityGroup.addIngressRule(
-            SecurityGroup.fromSecurityGroupId(this, `APP-SG`, appSGId),
-            Port.tcp(3306),
-        );
-    };
 }

@@ -2,6 +2,8 @@ import * as cdk from '@aws-cdk/core';
 import {
     Vpc,
     InstanceType,
+    SecurityGroup,
+    Port,
 } from '@aws-cdk/aws-ec2';
 import {
     Cluster,
@@ -36,7 +38,7 @@ import {
     CodeBuildAction,
 } from '@aws-cdk/aws-codepipeline-actions';
 import { appLabel, deployment, secret, service, stringData, ContainerEnv, Obj } from './manifest';
-import { SSMSecret } from '../typing';
+// import { SSMSecret } from '../typing';
 import { users } from '../config';
 
 interface EKSStackProps extends cdk.StackProps {
@@ -49,6 +51,7 @@ interface EKSStackProps extends cdk.StackProps {
     awsAccessKeyId: string,
     awsSecretAccessKey: string,
     snsPlatformApplicationArn: string,
+    rdsSecurityGroup: SecurityGroup;
     cognitoUserPoolId: string,
     awsRegion: string,
     githubOwner: string
@@ -58,6 +61,7 @@ interface EKSStackProps extends cdk.StackProps {
 
 export class EKSStack extends cdk.Stack {
     eks: Cluster;
+    rdsSecurityGroup: SecurityGroup;
     clusterEndpoint: string;
     dbname: string;
     appName: string;
@@ -72,6 +76,7 @@ export class EKSStack extends cdk.Stack {
         super(scope, id, props);
 
         this.appName = props.appName;
+        this.rdsSecurityGroup = props.rdsSecurityGroup;
         this.clusterEndpoint = props.clusterEndpoint;
         this.dbname = props.dbname;
         this.rdsUsername = props.rdsUsername;
@@ -150,6 +155,7 @@ export class EKSStack extends cdk.Stack {
             });
         });
         this.eks = cluster;
+        this.injectSecurityGroup(cluster.clusterSecurityGroupId);
 
         cluster.addAutoScalingGroupCapacity(`${props.appName}-nodes`, {
             autoScalingGroupName: `${props.appName}-EKS-ASG`,
@@ -290,4 +296,11 @@ export class EKSStack extends cdk.Stack {
 
         return [ newStringData, containerEnvironments ];
     }
+
+    injectSecurityGroup(appSGId: string) {
+        this.rdsSecurityGroup.addIngressRule(
+            SecurityGroup.fromSecurityGroupId(this, `APP-SG`, appSGId),
+            Port.tcp(3306),
+        );
+    };
 }

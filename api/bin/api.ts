@@ -39,6 +39,7 @@ const rdsStack = new RDSStack(app, `${appName}-rds`, {
 
 const eksStack = new EKSStack(app, `${appName}-eks`, {
     appName,
+    rdsSecurityGroup: rdsStack.rdsSecurityGroup,
     clusterEndpoint: rdsStack.rds.clusterEndpoint.hostname,
     dbname: rdsdbname,
     rdsUsername: rdsUserName,
@@ -57,5 +58,4 @@ const eksStack = new EKSStack(app, `${appName}-eks`, {
     },
 });
 
-rdsStack.injectSecurityGroup(eksStack.eks.clusterSecurityGroupId);
 app.synth();
