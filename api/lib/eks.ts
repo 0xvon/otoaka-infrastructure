@@ -66,7 +66,7 @@ export class EKSStack extends cdk.Stack {
     awsAccessKeyId: string;
     awsSecretAccessKey: string;
     snsPlatformApplicationArn: string;
-    cognitoUserPoolId: string,
+    cognitoUserPoolId: string;
     awsRegion: string;
     constructor(scope: cdk.Construct, id: string, props: EKSStackProps) {
         super(scope, id, props);
