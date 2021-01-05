@@ -22,7 +22,7 @@ interface RDSStackProps extends cdk.StackProps {
 
 export class RDSStack extends cdk.Stack {
     rds: DatabaseCluster;
-    rdsSecurityGroup: SecurityGroup;
+    rdsSecurityGroupId: string;
 
     constructor(scope: cdk.Construct, id: string, props: RDSStackProps) {
         super(scope, id, props);
@@ -31,7 +31,7 @@ export class RDSStack extends cdk.Stack {
             vpc: props.vpc,
             securityGroupName: `${props.appName}-DB-SG`,
         });
-        this.rdsSecurityGroup = rdsSecurityGroup;
+        this.rdsSecurityGroupId = rdsSecurityGroup.securityGroupId;
 
         const rdsParameterGroup = new ParameterGroup(this, `${props.appName}-PG`, {
             engine: DatabaseClusterEngine.auroraMysql({

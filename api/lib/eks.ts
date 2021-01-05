@@ -51,7 +51,7 @@ interface EKSStackProps extends cdk.StackProps {
     awsAccessKeyId: string,
     awsSecretAccessKey: string,
     snsPlatformApplicationArn: string,
-    rdsSecurityGroup: SecurityGroup;
+    rdsSecurityGroupId: string,
     cognitoUserPoolId: string,
     awsRegion: string,
     githubOwner: string
@@ -61,7 +61,7 @@ interface EKSStackProps extends cdk.StackProps {
 
 export class EKSStack extends cdk.Stack {
     eks: Cluster;
-    rdsSecurityGroup: SecurityGroup;
+    rdsSecurityGroupId: string;
     clusterEndpoint: string;
     dbname: string;
     appName: string;
@@ -76,7 +76,7 @@ export class EKSStack extends cdk.Stack {
         super(scope, id, props);
 
         this.appName = props.appName;
-        this.rdsSecurityGroup = props.rdsSecurityGroup;
+        this.rdsSecurityGroupId = props.rdsSecurityGroupId;
         this.clusterEndpoint = props.clusterEndpoint;
         this.dbname = props.dbname;
         this.rdsUsername = props.rdsUsername;
@@ -298,7 +298,9 @@ export class EKSStack extends cdk.Stack {
     }
 
     injectSecurityGroup(appSGId: string) {
-        this.rdsSecurityGroup.addIngressRule(
+        let rdsSecurityGroup = SecurityGroup.fromSecurityGroupId(this, `${this.appName}-DB-SG`, this.rdsSecurityGroupId);
+
+        rdsSecurityGroup.addIngressRule(
             SecurityGroup.fromSecurityGroupId(this, `APP-SG`, appSGId),
             Port.tcp(3306),
         );

@@ -39,7 +39,7 @@ const rdsStack = new RDSStack(app, `${appName}-rds`, {
 
 const eksStack = new EKSStack(app, `${appName}-eks`, {
     appName,
-    rdsSecurityGroup: rdsStack.rdsSecurityGroup,
+    rdsSecurityGroupId: rdsStack.rdsSecurityGroupId,
     clusterEndpoint: rdsStack.rds.clusterEndpoint.hostname,
     dbname: rdsdbname,
     rdsUsername: rdsUserName,
