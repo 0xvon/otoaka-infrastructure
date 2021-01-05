@@ -198,7 +198,10 @@ export class EKSStack extends cdk.Stack {
                 },
                 'ROLE_ARN': {
                     value: `${adminRole.roleArn}`,
-                }
+                },
+                'DOCKER_BUILDKIT': {
+                    value: '1',
+                },
             },
             buildSpec: BuildSpec.fromObject({
                 version: "0.2",
