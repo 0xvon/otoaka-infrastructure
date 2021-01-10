@@ -37,7 +37,7 @@ jobs:
           AWS_DEFAULT_REGION: ${{ secrets.AWS_REGION }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          APP_NAME: rocket-api-dev
+          APP_NAME: rocket-api
           RDS_DB_NAME: ${{ secrets.RDS_DB_NAME }}
           RDS_USERNAME: ${{ secrets.RDS_USERNAME }}
           RDS_PASSWORD: ${{ secrets.RDS_PASSWORD }}
@@ -45,3 +45,5 @@ jobs:
           REPO: ${{ secrets.REPO }}
           OAUTH_TOKEN: ${{ secrets.OAUTH_TOKEN }}
           BRANCH: master
+          COGNITO_USER_POOL_ID: ap-northeast-1_cZhPmp0Td
+          SNS_PLATFORM_APPLICATION_ARN: arn:aws:sns:ap-northeast-1:960722127407:app/APNS_SANDBOX/rocket-ios-dev
