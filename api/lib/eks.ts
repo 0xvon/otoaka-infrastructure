@@ -44,14 +44,14 @@ import { users } from '../config';
 interface EKSStackProps extends cdk.StackProps {
     appName: string
     vpc: Vpc
-    clusterEndpoint: string
+    // clusterEndpoint: string
     dbname: string
     rdsUsername: string
     rdsPassword: string
     awsAccessKeyId: string,
     awsSecretAccessKey: string,
     snsPlatformApplicationArn: string,
-    rdsSecurityGroupId: string,
+    // rdsSecurityGroupId: string,
     cognitoUserPoolId: string,
     awsRegion: string,
     githubOwner: string
@@ -76,8 +76,8 @@ export class EKSStack extends cdk.Stack {
         super(scope, id, props);
 
         this.appName = props.appName;
-        this.rdsSecurityGroupId = props.rdsSecurityGroupId;
-        this.clusterEndpoint = props.clusterEndpoint;
+        // this.rdsSecurityGroupId = props.rdsSecurityGroupId;
+        // this.clusterEndpoint = props.clusterEndpoint;
         this.dbname = props.dbname;
         this.rdsUsername = props.rdsUsername;
         this.rdsPassword = props.rdsPassword;
@@ -155,7 +155,7 @@ export class EKSStack extends cdk.Stack {
             });
         });
         this.eks = cluster;
-        this.injectSecurityGroup(cluster.clusterSecurityGroupId);
+        // this.injectSecurityGroup(cluster.clusterSecurityGroupId);
 
         cluster.addAutoScalingGroupCapacity(`${props.appName}-nodes`, {
             autoScalingGroupName: `${props.appName}-EKS-ASG`,
@@ -274,11 +274,12 @@ export class EKSStack extends cdk.Stack {
     private injectContainerEnv(): [Obj, ContainerEnv[]] {
         var newStringData = stringData;
 
-        newStringData["DATABASE_HOST"] = this.clusterEndpoint
-        newStringData["DATABASE_NAME"] = this.dbname
-        newStringData["DATABASE_PASSWORD"] = this.rdsPassword;
-        newStringData["DATABASE_USERNAME"] = this.rdsUsername;
-        newStringData["DATABASE_URL"] = `mysql://${this.rdsUsername}:${this.rdsPassword}@${this.clusterEndpoint}:3306/${this.dbname}`;
+        // newStringData["DATABASE_HOST"] = this.clusterEndpoint
+        // newStringData["DATABASE_NAME"] = this.dbname
+        // newStringData["DATABASE_PASSWORD"] = this.rdsPassword;
+        // newStringData["DATABASE_USERNAME"] = this.rdsUsername;
+        // newStringData["DATABASE_URL"] = `mysql://${this.rdsUsername}:${this.rdsPassword}@${this.clusterEndpoint}:3306/${this.dbname}`;
+        newStringData['DATABASE_URL'] = 'mysql://mqmxmrqzd9ju4jrx:l53q2rdezr37fbvp@s0znzigqvfehvff5.cbetxkdyhwsb.us-east-1.rds.amazonaws.com:3306/k6wzwtd2rxfh67wk'
         newStringData["AWS_ACCESS_KEY_ID"] = this.awsAccessKeyId;
         newStringData["AWS_SECRET_ACCESS_KEY"] = this.awsSecretAccessKey;
         newStringData["AWS_REGION"] = this.awsRegion;
@@ -300,12 +301,12 @@ export class EKSStack extends cdk.Stack {
         return [ newStringData, containerEnvironments ];
     }
 
-    injectSecurityGroup(appSGId: string) {
-        let rdsSecurityGroup = SecurityGroup.fromSecurityGroupId(this, `${this.appName}-DB-SG`, this.rdsSecurityGroupId);
+    // injectSecurityGroup(appSGId: string) {
+    //     let rdsSecurityGroup = SecurityGroup.fromSecurityGroupId(this, `${this.appName}-DB-SG`, this.rdsSecurityGroupId);
 
-        rdsSecurityGroup.addIngressRule(
-            SecurityGroup.fromSecurityGroupId(this, `APP-SG`, appSGId),
-            Port.tcp(3306),
-        );
-    };
+    //     rdsSecurityGroup.addIngressRule(
+    //         SecurityGroup.fromSecurityGroupId(this, `APP-SG`, appSGId),
+    //         Port.tcp(3306),
+    //     );
+    // };
 }

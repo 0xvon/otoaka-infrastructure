@@ -37,25 +37,25 @@ const vpcStack = new VPCStack(app, `${appName}-vpc`, {
 //     },
 // });
 
-// const eksStack = new EKSStack(app, `${appName}-eks`, {
-//     appName,
-//     rdsSecurityGroupId: rdsStack.rdsSecurityGroupId,
-//     clusterEndpoint: rdsStack.rds.clusterEndpoint.hostname,
-//     dbname: rdsdbname,
-//     rdsUsername: rdsUserName,
-//     rdsPassword: rdsPassword,
-//     awsAccessKeyId: awsAccessKeyId,
-//     awsSecretAccessKey: awsSecretAccessKey,
-//     snsPlatformApplicationArn: snsPlatformApplicationArn,
-//     cognitoUserPoolId: cognitoUserPoolId,
-//     awsRegion: awsRegion,
-//     vpc: vpcStack.vpc,
-//     githubOwner: githubOwner,
-//     githubRepo: githubRepo,
-//     githubBranch: githubBranch,
-//     env: {
-//         region: 'ap-northeast-1',
-//     },
-// });
+const eksStack = new EKSStack(app, `${appName}-eks`, {
+    appName,
+    // rdsSecurityGroupId: rdsStack.rdsSecurityGroupId,
+    // clusterEndpoint: rdsStack.rds.clusterEndpoint.hostname,
+    dbname: rdsdbname,
+    rdsUsername: rdsUserName,
+    rdsPassword: rdsPassword,
+    awsAccessKeyId: awsAccessKeyId,
+    awsSecretAccessKey: awsSecretAccessKey,
+    snsPlatformApplicationArn: snsPlatformApplicationArn,
+    cognitoUserPoolId: cognitoUserPoolId,
+    awsRegion: awsRegion,
+    vpc: vpcStack.vpc,
+    githubOwner: githubOwner,
+    githubRepo: githubRepo,
+    githubBranch: githubBranch,
+    env: {
+        region: 'ap-northeast-1',
+    },
+});
 
 app.synth();
