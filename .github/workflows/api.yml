@@ -46,4 +46,5 @@ jobs:
           OAUTH_TOKEN: ${{ secrets.OAUTH_TOKEN }}
           BRANCH: master
           COGNITO_USER_POOL_ID: ap-northeast-1_9vZdbAQB5
-          SNS_PLATFORM_APPLICATION_ARN: arn:aws:sns:ap-northeast-1:960722127407:app/APNS_SANDBOX/rocket-ios-dev
+          SNS_PLATFORM_APPLICATION_ARN: arn:aws:sns:ap-northeast-1:960722127407:app/APNS/rocket-ios-prod
+
