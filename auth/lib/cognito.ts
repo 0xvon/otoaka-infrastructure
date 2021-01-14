@@ -77,10 +77,8 @@ export class CognitoStack extends cdk.Stack {
             clientId: props.googleWebClientId,
             clientSecret: props.googleWebAppSecret,
             scopes: [
-                'phone',
                 'email',
                 'openid',
-                'aws.cognito.signin.user.admin',
                 'profile',
             ],
             attributeMapping: {
@@ -93,10 +91,8 @@ export class CognitoStack extends cdk.Stack {
             clientId: props.facebookAppId,
             clientSecret: props.facebookAppSecret,
             scopes: [
-                'phone',
                 'email',
                 'openid',
-                'aws.cognito.signin.user.admin',
                 'profile',
             ],
             attributeMapping: {
