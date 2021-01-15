@@ -127,7 +127,7 @@ export class EKSStack extends cdk.Stack {
             clusterName: `${props.appName}-cluster`,
         });
         const ng = cluster.addNodegroupCapacity(`${props.appName}-capacity`, {
-            desiredSize: 1,
+            desiredSize: 2,
             subnets: {
                 subnets: props.vpc.publicSubnets,
             },
@@ -159,8 +159,8 @@ export class EKSStack extends cdk.Stack {
 
         cluster.addAutoScalingGroupCapacity(`${props.appName}-nodes`, {
             autoScalingGroupName: `${props.appName}-EKS-ASG`,
-            instanceType: new InstanceType('t3.medium'),
-            minCapacity: 1,
+            instanceType: new InstanceType('t2.medium'),
+            minCapacity: 2,
             maxCapacity: 10,
             vpcSubnets: {
                 subnets: props.vpc.publicSubnets,
