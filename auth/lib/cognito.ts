@@ -91,9 +91,8 @@ export class CognitoStack extends cdk.Stack {
             clientId: props.facebookAppId,
             clientSecret: props.facebookAppSecret,
             scopes: [
+                'public_profile',
                 'email',
-                'openid',
-                'profile',
             ],
             attributeMapping: {
                 email: ProviderAttribute.FACEBOOK_EMAIL,
