@@ -17,6 +17,7 @@ const awsSecretAccessKey = process.env.AWS_SECRET_ACCESS_KEY ?? 'HOGE';
 const awsRegion = process.env.AWS_REGION ?? 'ap-northeast-1';
 const cognitoUserPoolId = process.env.COGNITO_USER_POOL_ID ?? 'ap-northeast-1_cZhPmp0Td';
 const snsPlatformApplicationArn = process.env.SNS_PLATFORM_APPLICATION_ARN ?? 'arn:aws:sns:ap-northeast-1:960722127407:app/APNS_SANDBOX/rocket-ios-dev';
+const acmCertificateArn = process.env.ACM_CERTIFICATE_ARN ?? 'arn:aws:acm:us-east-1:960722127407:certificate/cb96c11f-08b0-4eef-b01c-b780ebc5ecc5';
 
 const app = new cdk.App();
 const vpcStack = new VPCStack(app, `${appName}-vpc`, {
@@ -47,6 +48,7 @@ const eksStack = new EKSStack(app, `${appName}-eks`, {
     awsAccessKeyId: awsAccessKeyId,
     awsSecretAccessKey: awsSecretAccessKey,
     snsPlatformApplicationArn: snsPlatformApplicationArn,
+    acmCertificateArn: acmCertificateArn,
     cognitoUserPoolId: cognitoUserPoolId,
     awsRegion: awsRegion,
     vpc: vpcStack.vpc,
