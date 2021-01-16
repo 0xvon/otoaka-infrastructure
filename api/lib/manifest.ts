@@ -75,7 +75,20 @@ export const service = (acmCertificateArn: string) => {
         },
         spec: {
             type: 'LoadBalancer',
-            ports: [{ port: 443, targetPort: 8080 }],
+            ports: [
+                {
+                    name: 'https',
+                    protocol: 'TCP',
+                    port: 443,
+                    targetPort: 8080
+                },
+                {
+                    name: 'http',
+                    protocol: 'TCP',
+                    port: 80,
+                    targetPort: 8080
+                },
+            ],
             selector: appLabel,
         },
     };
