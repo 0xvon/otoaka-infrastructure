@@ -62,10 +62,10 @@ export const deployment = (imageUrl: string, containerEnvironments: ContainerEnv
                                 },
                             },
                             env: [
-                                // {
-                                //     name: 'MACKEREL_KUBERNETES_KUBELET_READ_ONLY_PORT',
-                                //     value: '0',
-                                // },
+                                {
+                                    name: 'MACKEREL_KUBERNETES_KUBELET_READ_ONLY_PORT',
+                                    value: '10522',
+                                },
                                 {
                                     name: 'MACKEREL_CONTAINER_PLATFORM',
                                     value: 'kubernetes',                                    
