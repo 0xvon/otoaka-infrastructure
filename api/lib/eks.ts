@@ -37,7 +37,7 @@ import {
     GitHubSourceAction,
     CodeBuildAction,
 } from '@aws-cdk/aws-codepipeline-actions';
-import { appLabel, deployment, secret, service, stringData, ContainerEnv, Obj } from './manifest';
+import { appLabel, deployment, secret, service, serviceAccount, clusterRole, clusterRoleBinding, stringData, ContainerEnv, Obj } from './manifest';
 // import { SSMSecret } from '../typing';
 import { users } from '../config';
 
@@ -140,7 +140,15 @@ export class EKSStack extends cdk.Stack {
         ng.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName("service-role/AmazonEC2RoleforSSM"));
         ng.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName("AmazonEC2ContainerRegistryPowerUser"));
         const [ newStringData, newContainerEnvironments ] = this.injectContainerEnv();
-        cluster.addManifest(`${props.appName}-pod`, service(props.acmCertificateArn), secret(newStringData), deployment(ecrRepository.repositoryUri, newContainerEnvironments, props.mackerelApiKey));
+        cluster.addManifest(
+            `${props.appName}-pod`,
+            service(props.acmCertificateArn),
+            secret(newStringData),
+            deployment(ecrRepository.repositoryUri, newContainerEnvironments, props.mackerelApiKey),
+            serviceAccount,
+            clusterRole,
+            clusterRoleBinding,
+        );
         const awsAuth = new AwsAuth(this, `${props.appName}-AwsAuth`, {
             cluster: cluster,
         });
