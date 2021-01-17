@@ -18,6 +18,7 @@ const awsRegion = process.env.AWS_REGION ?? 'ap-northeast-1';
 const cognitoUserPoolId = process.env.COGNITO_USER_POOL_ID ?? 'ap-northeast-1_cZhPmp0Td';
 const snsPlatformApplicationArn = process.env.SNS_PLATFORM_APPLICATION_ARN ?? 'arn:aws:sns:ap-northeast-1:960722127407:app/APNS_SANDBOX/rocket-ios-dev';
 const acmCertificateArn = process.env.ACM_CERTIFICATE_ARN ?? 'arn:aws:acm:ap-northeast-1:960722127407:certificate/a32583f3-ec6e-420a-8dd4-9c5aa26a3215'; // need to create in the same region as a Load Balancer
+const mackerelApiKey = process.env.MACKEREL_APIKEY ?? 'hogehoge';
 
 const app = new cdk.App();
 const vpcStack = new VPCStack(app, `${appName}-vpc`, {
@@ -48,6 +49,7 @@ const eksStack = new EKSStack(app, `${appName}-eks`, {
     awsAccessKeyId: awsAccessKeyId,
     awsSecretAccessKey: awsSecretAccessKey,
     snsPlatformApplicationArn: snsPlatformApplicationArn,
+    mackerelApiKey: mackerelApiKey,
     acmCertificateArn: acmCertificateArn,
     cognitoUserPoolId: cognitoUserPoolId,
     awsRegion: awsRegion,

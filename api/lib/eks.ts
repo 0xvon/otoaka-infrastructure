@@ -52,6 +52,7 @@ interface EKSStackProps extends cdk.StackProps {
     awsSecretAccessKey: string,
     snsPlatformApplicationArn: string,
     acmCertificateArn: string,
+    mackerelApiKey: string,
     // rdsSecurityGroupId: string,
     cognitoUserPoolId: string,
     awsRegion: string,
@@ -71,6 +72,7 @@ export class EKSStack extends cdk.Stack {
     awsAccessKeyId: string;
     awsSecretAccessKey: string;
     snsPlatformApplicationArn: string;
+    mackerelApiKey: string;
     cognitoUserPoolId: string;
     awsRegion: string;
     constructor(scope: cdk.Construct, id: string, props: EKSStackProps) {
@@ -85,6 +87,7 @@ export class EKSStack extends cdk.Stack {
         this.awsAccessKeyId = props.awsAccessKeyId;
         this.awsSecretAccessKey = props.awsSecretAccessKey;
         this.snsPlatformApplicationArn = props.snsPlatformApplicationArn;
+        this.mackerelApiKey = props.mackerelApiKey;
         this.cognitoUserPoolId = props.cognitoUserPoolId;
         this.awsRegion = props.awsRegion;
 
@@ -137,7 +140,7 @@ export class EKSStack extends cdk.Stack {
         ng.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName("service-role/AmazonEC2RoleforSSM"));
         ng.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName("AmazonEC2ContainerRegistryPowerUser"));
         const [ newStringData, newContainerEnvironments ] = this.injectContainerEnv();
-        cluster.addManifest(`${props.appName}-pod`, service(props.acmCertificateArn), secret(newStringData), deployment(ecrRepository.repositoryUri, newContainerEnvironments));
+        cluster.addManifest(`${props.appName}-pod`, service(props.acmCertificateArn), secret(newStringData), deployment(ecrRepository.repositoryUri, newContainerEnvironments, props.mackerelApiKey));
         const awsAuth = new AwsAuth(this, `${props.appName}-AwsAuth`, {
             cluster: cluster,
         });

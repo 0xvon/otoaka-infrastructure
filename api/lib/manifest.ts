@@ -33,7 +33,7 @@ export const secret = (stringData: Obj) => {
     };
 };
 
-export const deployment = (imageUrl: string, containerEnvironments: ContainerEnv[]) => {
+export const deployment = (imageUrl: string, containerEnvironments: ContainerEnv[], mackerelApiKey: string) => {
     return {
         apiVersion: 'apps/v1',
         kind: 'Deployment',
@@ -52,6 +52,42 @@ export const deployment = (imageUrl: string, containerEnvironments: ContainerEnv
                             ports: [{ containerPort: 8080 }],
                             env: containerEnvironments,
                         },
+                        {
+                            name: 'mackerel-container-agent',
+                            image: 'mackerel/mackerel-container-agent:latest',
+                            imagePullPolicy: 'Always',
+                            resources: {
+                                limits: {
+                                    memory: '128Mi'
+                                },
+                            },
+                            env: [
+                                {
+                                    name: 'MACKEREL_CONTAINER_PLATFORM',
+                                    value: 'kubernetes',                                    
+                                },
+                                {
+                                    name: 'MACKEREL_APIKEY',
+                                    value: mackerelApiKey,
+                                },
+                                {
+                                    name: 'MACKEREL_KUBERNETES_KUBELET_HOST',
+                                    valueFrom: {
+                                        fieldRef: {
+                                            fieldPath: 'metadata.namespace'
+                                        },
+                                    },
+                                },
+                                {
+                                    name: 'MACKEREL_KUBERNETES_POD_NAME',
+                                    valueFrom: {
+                                        fieldRef: {
+                                            fieldPath: 'metadata.name'
+                                        },
+                                    },
+                                },
+                            ]
+                        }
                     ],
                 },
             },
