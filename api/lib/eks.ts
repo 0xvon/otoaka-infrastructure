@@ -91,6 +91,10 @@ export class EKSStack extends cdk.Stack {
         this.cognitoUserPoolId = props.cognitoUserPoolId;
         this.awsRegion = props.awsRegion;
 
+        const instanceType = 'm5.large';
+        const minCapacity = 1;
+        const maxCapacity = 10;
+
         const eksRole = new Role(this, `${props.appName}-EKSRole`, {
             assumedBy: new ServicePrincipal('eks.amazonaws.com'),
             managedPolicies: [
@@ -131,11 +135,11 @@ export class EKSStack extends cdk.Stack {
             clusterName: `${props.appName}-cluster`,
         });
         const ng = cluster.addNodegroupCapacity(`${props.appName}-capacity`, {
-            desiredSize: 2,
+            desiredSize: minCapacity,
             subnets: {
                 subnets: props.vpc.publicSubnets,
             },
-            instanceType: new InstanceType('t2.medium'),
+            instanceType: new InstanceType(instanceType),
         });
         ng.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName("service-role/AmazonEC2RoleforSSM"));
         ng.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName("AmazonEC2ContainerRegistryPowerUser"));
@@ -145,9 +149,9 @@ export class EKSStack extends cdk.Stack {
             service(props.acmCertificateArn),
             secret(newStringData),
             deployment(ecrRepository.repositoryUri, newContainerEnvironments, props.mackerelApiKey),
-            // serviceAccount(),
-            // clusterRole(),
-            // clusterRoleBinding(),
+            serviceAccount(),
+            clusterRole(),
+            clusterRoleBinding(),
         );
         const awsAuth = new AwsAuth(this, `${props.appName}-AwsAuth`, {
             cluster: cluster,
@@ -171,9 +175,9 @@ export class EKSStack extends cdk.Stack {
 
         cluster.addAutoScalingGroupCapacity(`${props.appName}-nodes`, {
             autoScalingGroupName: `${props.appName}-EKS-ASG`,
-            instanceType: new InstanceType('t2.medium'),
-            minCapacity: 2,
-            maxCapacity: 10,
+            instanceType: new InstanceType(instanceType),
+            minCapacity: minCapacity,
+            maxCapacity: maxCapacity,
             vpcSubnets: {
                 subnets: props.vpc.publicSubnets,
             },

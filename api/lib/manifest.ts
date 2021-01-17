@@ -39,7 +39,7 @@ export const deployment = (imageUrl: string, containerEnvironments: ContainerEnv
         kind: 'Deployment',
         metadata: { name: appLabel.app },
         spec: {
-            replicas: 1,
+            replicas: 0,
             selector: { matchLabels: appLabel },
             template: {
                 metadata: { labels: appLabel },
@@ -52,54 +52,54 @@ export const deployment = (imageUrl: string, containerEnvironments: ContainerEnv
                             ports: [{ containerPort: 8080 }],
                             env: containerEnvironments,
                         },
-                        // {
-                        //     name: 'mackerel-container-agent',
-                        //     image: 'mackerel/mackerel-container-agent:latest',
-                        //     imagePullPolicy: 'Always',
-                        //     resources: {
-                        //         limits: {
-                        //             memory: '128Mi'
-                        //         },
-                        //     },
-                        //     env: [
-                        //         {
-                        //             name: 'MACKEREL_KUBERNETES_KUBELET_READ_ONLY_PORT',
-                        //             value: '0',
-                        //         },
-                        //         {
-                        //             name: 'MACKEREL_CONTAINER_PLATFORM',
-                        //             value: 'kubernetes',                                    
-                        //         },
-                        //         {
-                        //             name: 'MACKEREL_APIKEY',
-                        //             value: mackerelApiKey,
-                        //         },
-                        //         {
-                        //             name: 'MACKEREL_KUBERNETES_NAMESPACE',
-                        //             valueFrom: {
-                        //                 fieldRef: {
-                        //                     fieldPath: 'metadata.namespace'
-                        //                 },
-                        //             },
-                        //         },
-                        //         {
-                        //             name: 'MACKEREL_KUBERNETES_KUBELET_HOST',
-                        //             valueFrom: {
-                        //                 fieldRef: {
-                        //                     fieldPath: 'status.hostIP'
-                        //                 },
-                        //             },
-                        //         },
-                        //         {
-                        //             name: 'MACKEREL_KUBERNETES_POD_NAME',
-                        //             valueFrom: {
-                        //                 fieldRef: {
-                        //                     fieldPath: 'metadata.name'
-                        //                 },
-                        //             },
-                        //         },
-                        //     ]
-                        // }
+                        {
+                            name: 'mackerel-container-agent',
+                            image: 'mackerel/mackerel-container-agent:latest',
+                            imagePullPolicy: 'Always',
+                            resources: {
+                                limits: {
+                                    memory: '128Mi'
+                                },
+                            },
+                            env: [
+                                {
+                                    name: 'MACKEREL_KUBERNETES_KUBELET_READ_ONLY_PORT',
+                                    value: '0',
+                                },
+                                {
+                                    name: 'MACKEREL_CONTAINER_PLATFORM',
+                                    value: 'kubernetes',                                    
+                                },
+                                {
+                                    name: 'MACKEREL_APIKEY',
+                                    value: mackerelApiKey,
+                                },
+                                {
+                                    name: 'MACKEREL_KUBERNETES_NAMESPACE',
+                                    valueFrom: {
+                                        fieldRef: {
+                                            fieldPath: 'metadata.namespace'
+                                        },
+                                    },
+                                },
+                                {
+                                    name: 'MACKEREL_KUBERNETES_KUBELET_HOST',
+                                    valueFrom: {
+                                        fieldRef: {
+                                            fieldPath: 'status.hostIP'
+                                        },
+                                    },
+                                },
+                                {
+                                    name: 'MACKEREL_KUBERNETES_POD_NAME',
+                                    valueFrom: {
+                                        fieldRef: {
+                                            fieldPath: 'metadata.name'
+                                        },
+                                    },
+                                },
+                            ]
+                        }
                     ],
                 },
             },
