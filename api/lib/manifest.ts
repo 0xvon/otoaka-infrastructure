@@ -145,8 +145,9 @@ export const serviceAccount = () => {
         apiVersion: 'v1',
         kind: 'ServiceAccount',
         metadata: {
-            name: `${appLabel.app}-serviceaccount`
-        }
+            name: `mackerel-serviceaccount`,
+            namespace: 'default',
+        },
     };
 };
 
@@ -155,7 +156,7 @@ export const clusterRole = () => {
         apiVersion: 'rbac.authorization.k8s.io/v1',
         kind: 'ClusterRole',
         metadata: {
-            name: `${appLabel.app}-mackerel-container-agent-cluster-role`,
+            name: `mackerel-container-agent-clusterrole`,
         },
         rules: [
             {
@@ -178,17 +179,17 @@ export const clusterRoleBinding = () => {
         apiVersion: 'rbac.authorization.k8s.io/v1',
         kind: 'ClusterRoleBinding',
         metadata: {
-            name: `${appLabel.app}-mackerel-clusterrolebinding`,
+            name: `mackerel-clusterrolebinding`,
         },
         roleRef: {
             apiGroup: 'rbac.authorization.k8s.io',
             kind: 'ClusterRole',
-            name: `${appLabel.app}-mackerel-container-agent-cluster-role`,
+            name: `mackerel-container-agent-clusterrole`,
         },
         subjects:[
             {
                 kind: 'ServiceAccount',
-                name: `${appLabel.app}-serviceaccount`,
+                name: `mackerel-serviceaccount`,
                 namespace: 'default',
             },
         ],
