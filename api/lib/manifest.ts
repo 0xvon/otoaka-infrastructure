@@ -39,7 +39,7 @@ export const deployment = (imageUrl: string, containerEnvironments: ContainerEnv
         kind: 'Deployment',
         metadata: { name: appLabel.app },
         spec: {
-            replicas: 0,
+            replicas: 1,
             selector: { matchLabels: appLabel },
             template: {
                 metadata: { labels: appLabel },
