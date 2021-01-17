@@ -185,10 +185,12 @@ export const clusterRoleBinding = () => {
             kind: 'ClusterRole',
             name: `${appLabel.app}-mackerel-container-agent-cluster-role`,
         },
-        subjects: {
-            kind: 'ServiceAccount',
-            name: `${appLabel.app}-serviceaccount`,
-            namespace: 'default',
-        }
+        subjects:[
+            {
+                kind: 'ServiceAccount',
+                name: `${appLabel.app}-serviceaccount`,
+                namespace: 'default',
+            },
+        ],
     };
 };
