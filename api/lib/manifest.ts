@@ -69,8 +69,6 @@ export const service = (acmCertificateArn: string) => {
                 'service.beta.kubernetes.io/aws-load-balancer-ssl-cert': acmCertificateArn,
                 'service.beta.kubernetes.io/aws-load-balancer-backend-protocol': 'http',
                 'service.beta.kubernetes.io/aws-load-balancer-ssl-ports': 'https',
-                'kubernetes.io/ingress.class': 'alb',
-                "service.beta.kubernetes.io/aws-load-balancer-type": "alb",
             },
         },
         spec: {
@@ -80,12 +78,6 @@ export const service = (acmCertificateArn: string) => {
                     name: 'https',
                     protocol: 'TCP',
                     port: 443,
-                    targetPort: 8080
-                },
-                {
-                    name: 'http',
-                    protocol: 'TCP',
-                    port: 80,
                     targetPort: 8080
                 },
             ],
