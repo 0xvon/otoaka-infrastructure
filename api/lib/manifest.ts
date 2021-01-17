@@ -59,13 +59,35 @@ export const deployment = (imageUrl: string, containerEnvironments: ContainerEnv
     };
 };
 
-export const service = {
-    apiVersion: 'v1',
-    kind: 'Service',
-    metadata: { name: appLabel.app },
-    spec: {
-        type: 'LoadBalancer',
-        ports: [{ port: 80, targetPort: 8080 }],
-        selector: appLabel,
-    },
+export const service = (acmCertificateArn: string) => {
+    return { 
+        apiVersion: 'v1',
+        kind: 'Service',
+        metadata: {
+            name: appLabel.app,
+            annotations: {
+                'service.beta.kubernetes.io/aws-load-balancer-ssl-cert': acmCertificateArn,
+                'service.beta.kubernetes.io/aws-load-balancer-backend-protocol': 'http',
+                'service.beta.kubernetes.io/aws-load-balancer-ssl-ports': 'https',
+            },
+        },
+        spec: {
+            type: 'LoadBalancer',
+            ports: [
+                {
+                    name: 'https',
+                    protocol: 'TCP',
+                    port: 443,
+                    targetPort: 8080
+                },
+                {
+                    name: 'http',
+                    protocol: 'TCP',
+                    port: 80,
+                    targetPort: 8080
+                },
+            ],
+            selector: appLabel,
+        },
+    };
 };

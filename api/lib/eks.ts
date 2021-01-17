@@ -51,6 +51,7 @@ interface EKSStackProps extends cdk.StackProps {
     awsAccessKeyId: string,
     awsSecretAccessKey: string,
     snsPlatformApplicationArn: string,
+    acmCertificateArn: string,
     // rdsSecurityGroupId: string,
     cognitoUserPoolId: string,
     awsRegion: string,
@@ -127,7 +128,7 @@ export class EKSStack extends cdk.Stack {
             clusterName: `${props.appName}-cluster`,
         });
         const ng = cluster.addNodegroupCapacity(`${props.appName}-capacity`, {
-            desiredSize: 1,
+            desiredSize: 2,
             subnets: {
                 subnets: props.vpc.publicSubnets,
             },
@@ -136,7 +137,7 @@ export class EKSStack extends cdk.Stack {
         ng.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName("service-role/AmazonEC2RoleforSSM"));
         ng.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName("AmazonEC2ContainerRegistryPowerUser"));
         const [ newStringData, newContainerEnvironments ] = this.injectContainerEnv();
-        cluster.addManifest(`${props.appName}-pod`, service, secret(newStringData), deployment(ecrRepository.repositoryUri, newContainerEnvironments));
+        cluster.addManifest(`${props.appName}-pod`, service(props.acmCertificateArn), secret(newStringData), deployment(ecrRepository.repositoryUri, newContainerEnvironments));
         const awsAuth = new AwsAuth(this, `${props.appName}-AwsAuth`, {
             cluster: cluster,
         });
@@ -159,8 +160,8 @@ export class EKSStack extends cdk.Stack {
 
         cluster.addAutoScalingGroupCapacity(`${props.appName}-nodes`, {
             autoScalingGroupName: `${props.appName}-EKS-ASG`,
-            instanceType: new InstanceType('t3.medium'),
-            minCapacity: 1,
+            instanceType: new InstanceType('t2.medium'),
+            minCapacity: 2,
             maxCapacity: 10,
             vpcSubnets: {
                 subnets: props.vpc.publicSubnets,
