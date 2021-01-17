@@ -145,9 +145,9 @@ export class EKSStack extends cdk.Stack {
             service(props.acmCertificateArn),
             secret(newStringData),
             deployment(ecrRepository.repositoryUri, newContainerEnvironments, props.mackerelApiKey),
-            serviceAccount(),
-            clusterRole(),
-            clusterRoleBinding(),
+            // serviceAccount(),
+            // clusterRole(),
+            // clusterRoleBinding(),
         );
         const awsAuth = new AwsAuth(this, `${props.appName}-AwsAuth`, {
             cluster: cluster,
