@@ -80,6 +80,12 @@ export const service = (acmCertificateArn: string) => {
                     port: 443,
                     targetPort: 8080
                 },
+                {
+                    name: 'http',
+                    protocol: 'TCP',
+                    port: 80,
+                    targetPort: 8080
+                },
             ],
             selector: appLabel,
         },
