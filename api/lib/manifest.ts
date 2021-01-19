@@ -45,6 +45,7 @@ export const deployment = (imageUrl: string, containerEnvironments: ContainerEnv
                 metadata: { labels: appLabel },
                 spec: {
                     restartPolicy: 'Always',
+                    serviceAccountName: 'mackerel-serviceaccount',
                     containers: [
                         {
                             name: appLabel.app,
@@ -180,6 +181,7 @@ export const clusterRoleBinding = () => {
         kind: 'ClusterRoleBinding',
         metadata: {
             name: `mackerel-clusterrolebinding`,
+            namespace: 'default',
         },
         roleRef: {
             apiGroup: 'rbac.authorization.k8s.io',
