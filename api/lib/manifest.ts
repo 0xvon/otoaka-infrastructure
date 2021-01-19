@@ -1,5 +1,6 @@
 import environment from './environment.json';
 import { SSMSecret } from '../typing';
+import { Container } from 'cdk8s-plus';
 
 export interface Obj {
     [index: string]: string;
@@ -33,7 +34,14 @@ export const secret = (stringData: Obj) => {
     };
 };
 
-export const deployment = (imageUrl: string, containerEnvironments: ContainerEnv[], mackerelApiKey: string) => {
+interface DeploymentConfig {
+    bucketName: string,
+    imageUrl: string,
+    containerEnvironments: ContainerEnv[],
+    mackerelApiKey: string,
+};
+
+export const deployment = (config: DeploymentConfig) => {
     return {
         apiVersion: 'apps/v1',
         kind: 'Deployment',
@@ -49,13 +57,13 @@ export const deployment = (imageUrl: string, containerEnvironments: ContainerEnv
                     containers: [
                         {
                             name: appLabel.app,
-                            image: `${imageUrl}:latest`,
+                            image: `${config.imageUrl}:latest`,
                             ports: [{ containerPort: 8080 }],
-                            env: containerEnvironments,
+                            env: config.containerEnvironments,
                         },
                         {
                             name: 'mackerel-container-agent',
-                            image: 'mackerel/mackerel-container-agent:latest',
+                            image: 'mackerel/mackerel-container-agent:plugins',
                             imagePullPolicy: 'Always',
                             resources: {
                                 limits: {
@@ -73,7 +81,11 @@ export const deployment = (imageUrl: string, containerEnvironments: ContainerEnv
                                 },
                                 {
                                     name: 'MACKEREL_APIKEY',
-                                    value: mackerelApiKey,
+                                    value: config.mackerelApiKey,
+                                },
+                                {
+                                    name: 'MACKEREL_AGENT_CONFIG',
+                                    value: `s3://${config.bucketName}/api/mackerel-config.yaml`,
                                 },
                                 {
                                     name: 'MACKEREL_KUBERNETES_NAMESPACE',

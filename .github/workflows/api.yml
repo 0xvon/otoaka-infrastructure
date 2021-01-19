@@ -25,6 +25,7 @@ jobs:
       - name: Deployment
         run: |
           cd ./api
+          aws s3 cp ./mackerel-config.yaml s3://${CONFIG_BUCKET_NAME}/api/mackerel-config.yaml
           npm install -g aws-cdk
           npm i
           sh container_environment.sh
@@ -49,4 +50,5 @@ jobs:
           BRANCH: master
           COGNITO_USER_POOL_ID: ap-northeast-1_9vZdbAQB5
           SNS_PLATFORM_APPLICATION_ARN: arn:aws:sns:ap-northeast-1:960722127407:app/APNS/rocket-ios-prod
+          CONFIG_BUCKET_NAME: rocket-config
 
