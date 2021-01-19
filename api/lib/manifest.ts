@@ -33,7 +33,7 @@ export const secret = (stringData: Obj) => {
     };
 };
 
-export const deployment = (imageUrl: string, containerEnvironments: ContainerEnv[]) => {
+export const deployment = (imageUrl: string, containerEnvironments: ContainerEnv[], mackerelApiKey: string) => {
     return {
         apiVersion: 'apps/v1',
         kind: 'Deployment',
@@ -45,6 +45,7 @@ export const deployment = (imageUrl: string, containerEnvironments: ContainerEnv
                 metadata: { labels: appLabel },
                 spec: {
                     restartPolicy: 'Always',
+                    serviceAccountName: 'mackerel-serviceaccount',
                     containers: [
                         {
                             name: appLabel.app,
@@ -52,6 +53,54 @@ export const deployment = (imageUrl: string, containerEnvironments: ContainerEnv
                             ports: [{ containerPort: 8080 }],
                             env: containerEnvironments,
                         },
+                        {
+                            name: 'mackerel-container-agent',
+                            image: 'mackerel/mackerel-container-agent:latest',
+                            imagePullPolicy: 'Always',
+                            resources: {
+                                limits: {
+                                    memory: '128Mi'
+                                },
+                            },
+                            env: [
+                                {
+                                    name: 'MACKEREL_KUBERNETES_KUBELET_READ_ONLY_PORT',
+                                    value: '0',
+                                },
+                                {
+                                    name: 'MACKEREL_CONTAINER_PLATFORM',
+                                    value: 'kubernetes',                                    
+                                },
+                                {
+                                    name: 'MACKEREL_APIKEY',
+                                    value: mackerelApiKey,
+                                },
+                                {
+                                    name: 'MACKEREL_KUBERNETES_NAMESPACE',
+                                    valueFrom: {
+                                        fieldRef: {
+                                            fieldPath: 'metadata.namespace'
+                                        },
+                                    },
+                                },
+                                {
+                                    name: 'MACKEREL_KUBERNETES_KUBELET_HOST',
+                                    valueFrom: {
+                                        fieldRef: {
+                                            fieldPath: 'status.hostIP'
+                                        },
+                                    },
+                                },
+                                {
+                                    name: 'MACKEREL_KUBERNETES_POD_NAME',
+                                    valueFrom: {
+                                        fieldRef: {
+                                            fieldPath: 'metadata.name'
+                                        },
+                                    },
+                                },
+                            ]
+                        }
                     ],
                 },
             },
@@ -89,5 +138,62 @@ export const service = (acmCertificateArn: string) => {
             ],
             selector: appLabel,
         },
+    };
+};
+
+export const serviceAccount = () => {
+    return {
+        apiVersion: 'v1',
+        kind: 'ServiceAccount',
+        metadata: {
+            name: `mackerel-serviceaccount`,
+            namespace: 'default',
+        },
+    };
+};
+
+export const clusterRole = () => {
+    return {
+        apiVersion: 'rbac.authorization.k8s.io/v1',
+        kind: 'ClusterRole',
+        metadata: {
+            name: `mackerel-container-agent-clusterrole`,
+        },
+        rules: [
+            {
+                apiGroups: [''],
+                resources: [
+                    'nodes/proxy',
+                    'nodes/stats',
+                    'nodes/spec',
+                ],
+                verbs: [
+                    'get',
+                ],
+            },
+        ],
+    };
+};
+
+export const clusterRoleBinding = () => {
+    return {
+        apiVersion: 'rbac.authorization.k8s.io/v1',
+        kind: 'ClusterRoleBinding',
+        metadata: {
+            name: `mackerel-clusterrolebinding`,
+            namespace: 'default',
+        },
+        roleRef: {
+            apiGroup: 'rbac.authorization.k8s.io',
+            kind: 'ClusterRole',
+            name: `mackerel-container-agent-clusterrole`,
+        },
+        subjects:[
+            {
+                kind: 'ServiceAccount',
+                name: `mackerel-serviceaccount`,
+                namespace: 'default',
+            },
+        ],
     };
 };
