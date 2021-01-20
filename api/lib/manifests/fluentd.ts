@@ -1,7 +1,3 @@
-export const appLabel = {
-    app: 'api',
-};
-
 interface DaemonSetConfig {
     appName: string,
 }
@@ -38,7 +34,7 @@ export const daemonSet = (config: DaemonSetConfig) => {
                 spec: {
                     serviceAccount: 'fluentd',
                     serviceAccountName: 'fluentd',
-                    torelations: [
+                    tolerations: [
                         {
                             key: 'node-role.kubernetes.io/master',
                             effect: 'NoSchedule',
@@ -56,7 +52,11 @@ export const daemonSet = (config: DaemonSetConfig) => {
                                 {
                                     name: 'AWS_REGION',
                                     value: 'ap-northeast-1',
-                                }
+                                },
+                                {
+                                    name: 'FLUENT_UID',
+                                    value: '0',
+                                },
                             ],
                             resources: {
                                 limits: {

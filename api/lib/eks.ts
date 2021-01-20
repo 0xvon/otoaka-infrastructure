@@ -10,6 +10,7 @@ import {
     EndpointAccess,
     KubernetesVersion,
     AwsAuth,
+    Nodegroup,
 } from '@aws-cdk/aws-eks';
 import {
     Role,
@@ -38,6 +39,7 @@ import {
     CodeBuildAction,
 } from '@aws-cdk/aws-codepipeline-actions';
 import * as ApplicationManifest from './manifests/application';
+import * as MackerelServiceAccount from './manifests/mackerel-serviceaccount';
 import * as FluentdManifest from './manifests/fluentd';
 import { users } from '../config';
 
@@ -72,6 +74,8 @@ export class EKSStack extends cdk.Stack {
     rdsPassword: string;
     awsAccessKeyId: string;
     awsSecretAccessKey: string;
+    acmCertificateArn: string;
+    configBucketName: string;
     snsPlatformApplicationArn: string;
     mackerelApiKey: string;
     cognitoUserPoolId: string;
@@ -88,6 +92,8 @@ export class EKSStack extends cdk.Stack {
         this.awsAccessKeyId = props.awsAccessKeyId;
         this.awsSecretAccessKey = props.awsSecretAccessKey;
         this.snsPlatformApplicationArn = props.snsPlatformApplicationArn;
+        this.acmCertificateArn = props.acmCertificateArn;
+        this.configBucketName = props.configBucketName;
         this.mackerelApiKey = props.mackerelApiKey;
         this.cognitoUserPoolId = props.cognitoUserPoolId;
         this.awsRegion = props.awsRegion;
@@ -145,45 +151,13 @@ export class EKSStack extends cdk.Stack {
         ng.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName("service-role/AmazonEC2RoleforSSM"));
         ng.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName("AmazonEC2ContainerRegistryPowerUser"));
         ng.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName("CloudWatchLogsFullAccess"));
+
+        // add manifest for cluster
+        this.addManifest(cluster, ecrRepository);
+
+        // add aws-auth for cluster
+        this.addAuth(cluster, adminRole, ng);
         
-        const [ newStringData, newContainerEnvironments ] = this.injectContainerEnv();
-        cluster.addManifest(
-            `${props.appName}-pod`,
-            ApplicationManifest.service(props.acmCertificateArn),
-            ApplicationManifest.secret(newStringData),
-            ApplicationManifest.deployment({
-                bucketName: props.configBucketName,
-                imageUrl: ecrRepository.repositoryUri,
-                containerEnvironments: newContainerEnvironments,
-                mackerelApiKey: props.mackerelApiKey,
-            }),
-            ApplicationManifest.serviceAccount(),
-            ApplicationManifest.clusterRole(),
-            ApplicationManifest.clusterRoleBinding(),
-            FluentdManifest.daemonSet({
-                appName: props.appName,
-            }),
-            FluentdManifest.serviceAccount,
-            FluentdManifest.clusterRole,
-            FluentdManifest.clusterRoleBinding,
-        );
-        const awsAuth = new AwsAuth(this, `${props.appName}-AwsAuth`, {
-            cluster: cluster,
-        });
-        awsAuth.addRoleMapping(ng.role, {
-            groups: ["system:bootstrappers", "system:nodes"],
-            username: "system:node:{{EC2PrivateDNSName}}",
-        });
-        awsAuth.addMastersRole(
-            adminRole,
-            adminRole.roleName
-        );
-        users.forEach(user => {
-            awsAuth.addUserMapping(User.fromUserName(this, user, user), {
-                username: user,
-                groups: ["system:masters"],
-            });
-        });
         this.eks = cluster;
         // this.injectSecurityGroup(cluster.clusterSecurityGroupId);
 
@@ -328,6 +302,50 @@ export class EKSStack extends cdk.Stack {
         })
 
         return [ newStringData, containerEnvironments ];
+    }
+
+    private addManifest(cluster: Cluster, ecrRepository: Repository) {
+        const [ newStringData, newContainerEnvironments ] = this.injectContainerEnv();
+        cluster.addManifest(
+            `${this.appName}-pod`,
+            ApplicationManifest.service(this.acmCertificateArn),
+            ApplicationManifest.secret(newStringData),
+            ApplicationManifest.deployment({
+                bucketName: this.configBucketName,
+                imageUrl: ecrRepository.repositoryUri,
+                containerEnvironments: newContainerEnvironments,
+                mackerelApiKey: this.mackerelApiKey,
+            }),
+            MackerelServiceAccount.serviceAccount,
+            MackerelServiceAccount.clusterRole,
+            MackerelServiceAccount.clusterRoleBinding,
+            FluentdManifest.daemonSet({
+                appName: this.appName,
+            }),
+            FluentdManifest.serviceAccount,
+            FluentdManifest.clusterRole,
+            FluentdManifest.clusterRoleBinding,
+        );
+    }
+
+    private addAuth(cluster: Cluster, adminRole: Role, ng: Nodegroup) {
+        const awsAuth = new AwsAuth(this, `${this.appName}-AwsAuth`, {
+            cluster: cluster,
+        });
+        awsAuth.addRoleMapping(ng.role, {
+            groups: ["system:bootstrappers", "system:nodes"],
+            username: "system:node:{{EC2PrivateDNSName}}",
+        });
+        awsAuth.addMastersRole(
+            adminRole,
+            adminRole.roleName
+        );
+        users.forEach(user => {
+            awsAuth.addUserMapping(User.fromUserName(this, user, user), {
+                username: user,
+                groups: ["system:masters"],
+            });
+        });
     }
 
     // injectSecurityGroup(appSGId: string) {
