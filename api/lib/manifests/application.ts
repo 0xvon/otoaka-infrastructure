@@ -1,5 +1,5 @@
 import environment from './environment.json';
-import { SSMSecret } from '../typing';
+import { SSMSecret } from '../../typing';
 import { Container } from 'cdk8s-plus';
 
 export interface Obj {

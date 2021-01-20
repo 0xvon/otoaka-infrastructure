@@ -7,4 +7,4 @@ aws ssm get-parameters-by-path \
     --region ap-northeast-1 \
     --output json | \
     jq --arg replace /${APP_NAME}/ 'walk(if type == "object" and has("name") then .name |= gsub($replace;"") else . end)' \
-    > ./lib/environment.json
+    > ./lib/manifests/environment.json

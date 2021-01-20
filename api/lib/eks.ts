@@ -37,7 +37,9 @@ import {
     GitHubSourceAction,
     CodeBuildAction,
 } from '@aws-cdk/aws-codepipeline-actions';
-import { appLabel, deployment, secret, service, serviceAccount, clusterRole, clusterRoleBinding, stringData, ContainerEnv, Obj } from './manifest';
+// import { appLabel, deployment, secret, service, serviceAccount, clusterRole, clusterRoleBinding, stringData, ContainerEnv, Obj } from './manifests/application';
+import * as ApplicationManifest from './manifests/application';
+import * as FluentdManifest from './manifests/fluentd';
 // import { SSMSecret } from '../typing';
 import { users } from '../config';
 
@@ -144,20 +146,27 @@ export class EKSStack extends cdk.Stack {
         });
         ng.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName("service-role/AmazonEC2RoleforSSM"));
         ng.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName("AmazonEC2ContainerRegistryPowerUser"));
+        ng.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName("CloudWatchLogsFullAccess"));
         const [ newStringData, newContainerEnvironments ] = this.injectContainerEnv();
         cluster.addManifest(
             `${props.appName}-pod`,
-            service(props.acmCertificateArn),
-            secret(newStringData),
-            deployment({
+            ApplicationManifest.service(props.acmCertificateArn),
+            ApplicationManifest.secret(newStringData),
+            ApplicationManifest.deployment({
                 bucketName: props.configBucketName,
                 imageUrl: ecrRepository.repositoryUri,
                 containerEnvironments: newContainerEnvironments,
                 mackerelApiKey: props.mackerelApiKey,
             }),
-            serviceAccount(),
-            clusterRole(),
-            clusterRoleBinding(),
+            ApplicationManifest.serviceAccount(),
+            ApplicationManifest.clusterRole(),
+            ApplicationManifest.clusterRoleBinding(),
+            FluentdManifest.daemonSet({
+                appName: props.appName,
+            }),
+            FluentdManifest.serviceAccount,
+            FluentdManifest.clusterRole,
+            FluentdManifest.clusterRoleBinding,
         );
         const awsAuth = new AwsAuth(this, `${props.appName}-AwsAuth`, {
             cluster: cluster,
@@ -215,7 +224,7 @@ export class EKSStack extends cdk.Stack {
                     value: `${ecrRepository.repositoryUri}`,
                 },
                 'APP_NAME': {
-                    value: `${appLabel.app}`,
+                    value: `${ApplicationManifest.appLabel.app}`,
                 },
                 'ROLE_ARN': {
                     value: `${adminRole.roleArn}`,
@@ -292,8 +301,8 @@ export class EKSStack extends cdk.Stack {
         });
     }
 
-    private injectContainerEnv(): [Obj, ContainerEnv[]] {
-        var newStringData = stringData;
+    private injectContainerEnv(): [ApplicationManifest.Obj, ApplicationManifest.ContainerEnv[]] {
+        var newStringData = ApplicationManifest.stringData;
 
         // newStringData["DATABASE_HOST"] = this.clusterEndpoint
         // newStringData["DATABASE_NAME"] = this.dbname
@@ -307,7 +316,7 @@ export class EKSStack extends cdk.Stack {
         newStringData["SNS_PLATFORM_APPLICATION_ARN"] = this.snsPlatformApplicationArn;
         newStringData["CONGNITO_IDP_USER_POOL_ID"] = this.cognitoUserPoolId;
 
-        const containerEnvironments: ContainerEnv[] = Object.keys(newStringData).map(key => {
+        const containerEnvironments: ApplicationManifest.ContainerEnv[] = Object.keys(newStringData).map(key => {
             return {
                 name: key,
                 valueFrom: {
