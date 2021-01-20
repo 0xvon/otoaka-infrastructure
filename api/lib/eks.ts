@@ -52,12 +52,10 @@ interface EKSStackProps extends cdk.StackProps {
     rdsPassword: string
     awsAccessKeyId: string,
     awsSecretAccessKey: string,
-    snsPlatformApplicationArn: string,
     acmCertificateArn: string,
     mackerelApiKey: string,
     configBucketName: string,
     // rdsSecurityGroupId: string,
-    cognitoUserPoolId: string,
     awsRegion: string,
     githubOwner: string
     githubRepo: string
@@ -76,9 +74,7 @@ export class EKSStack extends cdk.Stack {
     awsSecretAccessKey: string;
     acmCertificateArn: string;
     configBucketName: string;
-    snsPlatformApplicationArn: string;
     mackerelApiKey: string;
-    cognitoUserPoolId: string;
     awsRegion: string;
     constructor(scope: cdk.Construct, id: string, props: EKSStackProps) {
         super(scope, id, props);
@@ -91,11 +87,9 @@ export class EKSStack extends cdk.Stack {
         this.rdsPassword = props.rdsPassword;
         this.awsAccessKeyId = props.awsAccessKeyId;
         this.awsSecretAccessKey = props.awsSecretAccessKey;
-        this.snsPlatformApplicationArn = props.snsPlatformApplicationArn;
         this.acmCertificateArn = props.acmCertificateArn;
         this.configBucketName = props.configBucketName;
         this.mackerelApiKey = props.mackerelApiKey;
-        this.cognitoUserPoolId = props.cognitoUserPoolId;
         this.awsRegion = props.awsRegion;
 
         const instanceType = 'm5.large';
@@ -286,8 +280,6 @@ export class EKSStack extends cdk.Stack {
         newStringData["AWS_ACCESS_KEY_ID"] = this.awsAccessKeyId;
         newStringData["AWS_SECRET_ACCESS_KEY"] = this.awsSecretAccessKey;
         newStringData["AWS_REGION"] = this.awsRegion;
-        newStringData["SNS_PLATFORM_APPLICATION_ARN"] = this.snsPlatformApplicationArn;
-        newStringData["CONGNITO_IDP_USER_POOL_ID"] = this.cognitoUserPoolId;
 
         const containerEnvironments: ApplicationManifest.ContainerEnv[] = Object.keys(newStringData).map(key => {
             return {

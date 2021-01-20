@@ -47,7 +47,5 @@ jobs:
           ACM_CERTIFICATE_ARN: ${{ secrets.ACM_CERTIFICATE_ARN }}
           MACKEREL_APIKEY: ${{ secrets.MACKEREL_APIKEY }}
           BRANCH: master
-          COGNITO_USER_POOL_ID: ap-northeast-1_9vZdbAQB5
-          SNS_PLATFORM_APPLICATION_ARN: arn:aws:sns:ap-northeast-1:960722127407:app/APNS/rocket-ios-prod
           CONFIG_BUCKET_NAME: rocket-config
 
