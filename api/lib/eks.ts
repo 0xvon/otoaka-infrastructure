@@ -191,7 +191,6 @@ export class EKSStack extends cdk.Stack {
         });
 
         const githubToken = cdk.SecretValue.secretsManager('GITHUB_TOKEN')
-
         const sourceOutput = new Artifact();
         const sourceAction = new GitHubSourceAction({
             actionName: `${props.appName}-SourceAction`,
