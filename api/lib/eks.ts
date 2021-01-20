@@ -37,10 +37,8 @@ import {
     GitHubSourceAction,
     CodeBuildAction,
 } from '@aws-cdk/aws-codepipeline-actions';
-// import { appLabel, deployment, secret, service, serviceAccount, clusterRole, clusterRoleBinding, stringData, ContainerEnv, Obj } from './manifests/application';
 import * as ApplicationManifest from './manifests/application';
 import * as FluentdManifest from './manifests/fluentd';
-// import { SSMSecret } from '../typing';
 import { users } from '../config';
 
 interface EKSStackProps extends cdk.StackProps {
@@ -147,6 +145,7 @@ export class EKSStack extends cdk.Stack {
         ng.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName("service-role/AmazonEC2RoleforSSM"));
         ng.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName("AmazonEC2ContainerRegistryPowerUser"));
         ng.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName("CloudWatchLogsFullAccess"));
+        
         const [ newStringData, newContainerEnvironments ] = this.injectContainerEnv();
         cluster.addManifest(
             `${props.appName}-pod`,
