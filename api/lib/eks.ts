@@ -314,9 +314,9 @@ export class EKSStack extends cdk.Stack {
             FluentdManifest.daemonSet({
                 appName: this.appName,
             }),
-            FluentdManifest.serviceAccount,
-            FluentdManifest.clusterRole,
-            FluentdManifest.clusterRoleBinding,
+            // FluentdManifest.serviceAccount,
+            // FluentdManifest.clusterRole,
+            // FluentdManifest.clusterRoleBinding,
         );
     }
 
