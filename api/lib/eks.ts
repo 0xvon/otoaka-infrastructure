@@ -150,7 +150,7 @@ export class EKSStack extends cdk.Stack {
         this.addManifest(cluster, ecrRepository);
 
         // add aws-auth for cluster
-        this.addAuth(cluster, adminRole, ng);
+        // this.addAuth(cluster, adminRole, ng);
         
         this.eks = cluster;
         // this.injectSecurityGroup(cluster.clusterSecurityGroupId);
