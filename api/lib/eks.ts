@@ -308,12 +308,12 @@ export class EKSStack extends cdk.Stack {
                 containerEnvironments: newContainerEnvironments,
                 mackerelApiKey: this.mackerelApiKey,
             }),
-            MackerelServiceAccount.serviceAccount,
-            MackerelServiceAccount.clusterRole,
-            MackerelServiceAccount.clusterRoleBinding,
-            FluentdManifest.daemonSet({
-                appName: this.appName,
-            }),
+            // MackerelServiceAccount.serviceAccount,
+            // MackerelServiceAccount.clusterRole,
+            // MackerelServiceAccount.clusterRoleBinding,
+            // FluentdManifest.daemonSet({
+            //     appName: this.appName,
+            // }),
             // FluentdManifest.serviceAccount,
             // FluentdManifest.clusterRole,
             // FluentdManifest.clusterRoleBinding,
