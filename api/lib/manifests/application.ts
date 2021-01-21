@@ -62,10 +62,9 @@ export const deployment = (config: DeploymentConfig) => {
                             env: config.containerEnvironments,
                         },
                         {
-                            name: appLabel.app,
+                            name: 'hello-kubernetes',
                             image: `paulbouwer/hello-kubernetes:1.5`,
                             ports: [{ containerPort: 8081 }],
-                            env: config.containerEnvironments,
                         },
                         // {
                         //     name: 'mackerel-container-agent',
