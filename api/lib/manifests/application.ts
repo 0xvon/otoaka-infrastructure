@@ -55,12 +55,12 @@ export const deployment = (config: DeploymentConfig) => {
                     restartPolicy: 'Always',
                     // serviceAccountName: 'mackerel-serviceaccount',
                     containers: [
-                        // {
-                        //     name: appLabel.app,
-                        //     image: `${config.imageUrl}:latest`,
-                        //     ports: [{ containerPort: 8080 }],
-                        //     env: config.containerEnvironments,
-                        // },
+                        {
+                            name: appLabel.app,
+                            image: `${config.imageUrl}:latest`,
+                            ports: [{ containerPort: 8080 }],
+                            env: config.containerEnvironments,
+                        },
                         {
                             name: 'hello-kubernetes',
                             image: `paulbouwer/hello-kubernetes:1.5`,
