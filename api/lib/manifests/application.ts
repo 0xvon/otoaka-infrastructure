@@ -126,21 +126,21 @@ export const service = (acmCertificateArn: string) => {
         kind: 'Service',
         metadata: {
             name: appLabel.app,
-            annotations: {
-                'service.beta.kubernetes.io/aws-load-balancer-ssl-cert': acmCertificateArn,
-                'service.beta.kubernetes.io/aws-load-balancer-backend-protocol': 'http',
-                'service.beta.kubernetes.io/aws-load-balancer-ssl-ports': 'https',
-            },
+            // annotations: {
+            //     'service.beta.kubernetes.io/aws-load-balancer-ssl-cert': acmCertificateArn,
+            //     'service.beta.kubernetes.io/aws-load-balancer-backend-protocol': 'http',
+            //     'service.beta.kubernetes.io/aws-load-balancer-ssl-ports': 'https',
+            // },
         },
         spec: {
             type: 'LoadBalancer',
             ports: [
-                {
-                    name: 'https',
-                    protocol: 'TCP',
-                    port: 443,
-                    targetPort: 8080
-                },
+                // {
+                //     name: 'https',
+                //     protocol: 'TCP',
+                //     port: 443,
+                //     targetPort: 8080
+                // },
                 {
                     name: 'http',
                     protocol: 'TCP',
