@@ -12,6 +12,7 @@ const rdsPassword = process.env.RDS_PASSWORD ?? 'password';
 const githubOwner = process.env.OWNER ?? 'something';
 const githubRepo = process.env.REPO ?? 'something';
 const githubBranch = process.env.BRANCH ?? 'master';
+const accountId = process.env.AWS_ACCOUNT_ID ?? '900000';
 const awsAccessKeyId = process.env.AWS_ACCESS_KEY_ID ?? 'HOGE';
 const awsSecretAccessKey = process.env.AWS_SECRET_ACCESS_KEY ?? 'HOGE';
 const awsRegion = process.env.AWS_REGION ?? 'ap-northeast-1';
@@ -45,6 +46,7 @@ const eksStack = new EKSStack(app, `${appName}-eks`, {
     dbname: rdsdbname,
     rdsUsername: rdsUserName,
     rdsPassword: rdsPassword,
+    awsAccountId: accountId,
     awsAccessKeyId: awsAccessKeyId,
     awsSecretAccessKey: awsSecretAccessKey,
     mackerelApiKey: mackerelApiKey,
