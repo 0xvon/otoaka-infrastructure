@@ -65,6 +65,12 @@ export const deployment = (config: DeploymentConfig) => {
                             name: 'hello-kubernetes',
                             image: `paulbouwer/hello-kubernetes:1.5`,
                             ports: [{ containerPort: 8081 }],
+                            env: [
+                                {
+                                    name: 'PORT',
+                                    value: '8081',
+                                },
+                            ],
                         },
                         // {
                         //     name: 'mackerel-container-agent',
