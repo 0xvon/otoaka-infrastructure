@@ -28,7 +28,7 @@ import { GitHubSourceAction, CodeBuildAction } from '@aws-cdk/aws-codepipeline-a
 
 import * as ApplicationManifest from './manifests/application';
 import * as MackerelServiceAccount from './manifests/mackerel-serviceaccount';
-// import * as FluentdManifest from './manifests/fluentd';
+import * as FluentdManifest from './manifests/fluentd';
 import { users } from '../config';
 
 interface EKSStackProps extends cdk.StackProps {
@@ -192,12 +192,12 @@ export class EKSStack extends cdk.Stack {
             MackerelServiceAccount.serviceAccount,
             MackerelServiceAccount.clusterRole,
             MackerelServiceAccount.clusterRoleBinding,
-            // FluentdManifest.daemonSet({
-            //     appName: this.appName,
-            // }),
-            // FluentdManifest.serviceAccount,
-            // FluentdManifest.clusterRole,
-            // FluentdManifest.clusterRoleBinding,
+            FluentdManifest.daemonSet({
+                appName: this.props.appName,
+            }),
+            FluentdManifest.serviceAccount,
+            FluentdManifest.clusterRole,
+            FluentdManifest.clusterRoleBinding,
         );
     }
 
