@@ -6,7 +6,9 @@ export interface Obj {
     [index: string]: string;
 }
 export const stringData: Obj = {}
-environment.Secrets.map(function(secret: SSMSecret) { stringData[secret.name]=secret.value });
+if (environment.Secrets && environment.Secrets.length !== 0) {
+    environment.Secrets.map(function(secret: SSMSecret) { stringData[secret.name]=secret.value });
+}
 
 interface KeyRef {
     name: string;
