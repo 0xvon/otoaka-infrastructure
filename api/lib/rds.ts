@@ -11,17 +11,19 @@ import {
     Credentials,
     ParameterGroup,
 } from '@aws-cdk/aws-rds';
+import { Config } from '../typing';
 
 interface RDSStackProps extends cdk.StackProps {
-    appName: string
-    vpc: Vpc
-    dbname: string
-    username: string
-    password: string
-}
+    appName: string,
+    vpc: Vpc,
+    config: Config,
+
+    rdsUserName: string,
+    rdsDBName: string,
+};
 
 export class RDSStack extends cdk.Stack {
-    rds: DatabaseCluster;
+    mysqlUrl: string;
     rdsSecurityGroupId: string;
 
     constructor(scope: cdk.Construct, id: string, props: RDSStackProps) {
@@ -60,8 +62,8 @@ export class RDSStack extends cdk.Stack {
             engine: DatabaseClusterEngine.auroraMysql({
                 version: AuroraMysqlEngineVersion.VER_2_08_1,
             }),
-            credentials: Credentials.fromPassword(props.username, new cdk.SecretValue(props.password)),
-            defaultDatabaseName: props.dbname,
+            credentials: Credentials.fromPassword(props.rdsUserName, new cdk.SecretValue(props.config.rdsPassword)),
+            defaultDatabaseName: props.rdsDBName,
             instanceProps: {
                 vpcSubnets: {
                     subnets: props.vpc.isolatedSubnets,
@@ -79,6 +81,6 @@ export class RDSStack extends cdk.Stack {
             removalPolicy: cdk.RemovalPolicy.DESTROY,
         });
 
-        this.rds = cluster;
+        this.mysqlUrl = `mysql://${props.rdsUserName}:${props.config.rdsPassword}@${cluster.clusterEndpoint.hostname}:${cluster.clusterEndpoint.port}/${props.rdsDBName}`;
     }
 }

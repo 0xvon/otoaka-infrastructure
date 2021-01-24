@@ -30,34 +30,19 @@ import * as ApplicationManifest from './manifests/application';
 import * as MackerelServiceAccount from './manifests/mackerel-serviceaccount';
 import * as FluentdManifest from './manifests/fluentd';
 import { users } from '../config';
+import { Config } from '../typing';
 
 interface EKSStackProps extends cdk.StackProps {
-    appName: string
-    vpc: Vpc
-
-    // clusterEndpoint: string
-    // rdsSecurityGroupId: string,
-    dbname: string
-    rdsUsername: string
-    rdsPassword: string
-
-    awsRegion: string,
-    awsAccessKeyId: string,
-    awsSecretAccessKey: string,
-    awsAccountId: string,
-    
-    githubOwner: string,
-    githubRepo: string,
-    githubBranch: string,
-
-    acmCertificateArn: string,
-    mackerelApiKey: string,
-    configBucketName: string,
+    appName: string,
+    config: Config,
+    vpc: Vpc,
+    mysqlUrl?: string,
 }
 
 export class EKSStack extends cdk.Stack {
     eks: Cluster;
     props: EKSStackProps;
+
     constructor(scope: cdk.Construct, id: string, props: EKSStackProps) {
         super(scope, id, props);
         this.props = props
@@ -151,16 +136,15 @@ export class EKSStack extends cdk.Stack {
 
     private injectContainerEnv(): [ApplicationManifest.Obj, ApplicationManifest.ContainerEnv[]] {
         var newStringData = ApplicationManifest.stringData;
-
-        // newStringData["DATABASE_HOST"] = this.clusterEndpoint
-        // newStringData["DATABASE_NAME"] = this.dbname
-        // newStringData["DATABASE_PASSWORD"] = this.rdsPassword;
-        // newStringData["DATABASE_USERNAME"] = this.rdsUsername;
-        // newStringData["DATABASE_URL"] = `mysql://${this.rdsUsername}:${this.rdsPassword}@${this.clusterEndpoint}:3306/${this.dbname}`;
-        newStringData['DATABASE_URL'] = 'mysql://mqmxmrqzd9ju4jrx:l53q2rdezr37fbvp@s0znzigqvfehvff5.cbetxkdyhwsb.us-east-1.rds.amazonaws.com:3306/k6wzwtd2rxfh67wk'
-        newStringData["AWS_ACCESS_KEY_ID"] = this.props.awsAccessKeyId;
-        newStringData["AWS_SECRET_ACCESS_KEY"] = this.props.awsSecretAccessKey;
-        newStringData["AWS_REGION"] = this.props.awsRegion;
+        
+        // inject open/dynamic environment variables
+        newStringData["DATABASE_URL"] = this.props.mysqlUrl ?? 'mysql://mqmxmrqzd9ju4jrx:l53q2rdezr37fbvp@s0znzigqvfehvff5.cbetxkdyhwsb.us-east-1.rds.amazonaws.com:3306/k6wzwtd2rxfh67wk';
+        newStringData["AWS_ACCESS_KEY_ID"] = this.props.config.awsAccessKeyId;
+        newStringData["AWS_SECRET_ACCESS_KEY"] = this.props.config.awsSecretAccessKey;
+        newStringData["AWS_REGION"] = this.props.config.awsRegion;
+        newStringData["LOG_LEVEL"] = 'INFO';
+        newStringData["CONGNITO_IDP_USER_POOL_ID"] = this.props.config.environment === 'prd' ? 'ap-northeast-1_9vZdbAQB5' : 'ap-northeast-1_cZhPmp0Td';
+        newStringData["SNS_PLATFORM_APPLICATION_ARN"] = this.props.config.environment === 'prd' ? 'arn:aws:sns:ap-northeast-1:960722127407:app/APNS/rocket-ios-prod' : 'arn:aws:sns:ap-northeast-1:960722127407:app/APNS_SANDBOX/rocket-ios-dev';
 
         const containerEnvironments: ApplicationManifest.ContainerEnv[] = Object.keys(newStringData).map(key => {
             return {
@@ -181,13 +165,13 @@ export class EKSStack extends cdk.Stack {
         const [ newStringData, newContainerEnvironments ] = this.injectContainerEnv();
         cluster.addManifest(
             `${this.props.appName}-pod`,
-            ApplicationManifest.service(this.props.acmCertificateArn),
+            ApplicationManifest.service(this.props.config.acmCertificateArn),
             ApplicationManifest.secret(newStringData),
             ApplicationManifest.deployment({
-                bucketName: this.props.configBucketName,
+                mackerelConfigPath: 's3:/rocket-config/api/mackerel-config.yaml',
                 imageUrl: ecrRepository.repositoryUri,
                 containerEnvironments: newContainerEnvironments,
-                mackerelApiKey: this.props.mackerelApiKey,
+                mackerelApiKey: this.props.config.mackerelApiKey,
             }),
             MackerelServiceAccount.serviceAccount,
             MackerelServiceAccount.clusterRole,
@@ -220,15 +204,19 @@ export class EKSStack extends cdk.Stack {
     };
 
     private buildPipeline(cluster: Cluster, ecrRepository: Repository) {
+        const githubOwner = 'wall-of-death';
+        const githubRepo = 'rocket-api';
+        const githubBranch = this.props.config.environment === 'prd' ? 'master' : 'master';
         const githubToken = cdk.SecretValue.secretsManager('GITHUB_TOKEN')
+
         const sourceOutput = new Artifact();
         const sourceAction = new GitHubSourceAction({
             actionName: `${this.props.appName}-SourceAction`,
-            owner: this.props.githubOwner,
-            repo: this.props.githubRepo,
+            owner: githubOwner,
+            repo: githubRepo,
             oauthToken: githubToken,
             output: sourceOutput,
-            branch: this.props.githubBranch,
+            branch: githubBranch,
         });
 
         const codeBuildProject = new PipelineProject(this, `${this.props.appName}-CodeBuildProj`, {
