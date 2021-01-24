@@ -14,7 +14,6 @@ import {
 import { Config } from '../typing';
 
 interface RDSStackProps extends cdk.StackProps {
-    appName: string,
     vpc: Vpc,
     config: Config,
 
@@ -28,14 +27,14 @@ export class RDSStack extends cdk.Stack {
 
     constructor(scope: cdk.Construct, id: string, props: RDSStackProps) {
         super(scope, id, props);
-        const rdsSecurityGroup = new SecurityGroup(this, `${props.appName}-DB-SG`, {
+        const rdsSecurityGroup = new SecurityGroup(this, `${props.config.appName}-DB-SG`, {
             allowAllOutbound: true,
             vpc: props.vpc,
-            securityGroupName: `${props.appName}-DB-SG`,
+            securityGroupName: `${props.config.appName}-DB-SG`,
         });
         this.rdsSecurityGroupId = rdsSecurityGroup.securityGroupId;
 
-        const rdsParameterGroup = new ParameterGroup(this, `${props.appName}-PG`, {
+        const rdsParameterGroup = new ParameterGroup(this, `${props.config.appName}-PG`, {
             engine: DatabaseClusterEngine.auroraMysql({
                 version: AuroraMysqlEngineVersion.VER_2_08_1,
             }),
@@ -58,7 +57,7 @@ export class RDSStack extends cdk.Stack {
             },
         });
 
-        const cluster = new DatabaseCluster(this, `${props.appName}-DB-cluster`, {
+        const cluster = new DatabaseCluster(this, `${props.config.appName}-DB-cluster`, {
             engine: DatabaseClusterEngine.auroraMysql({
                 version: AuroraMysqlEngineVersion.VER_2_08_1,
             }),

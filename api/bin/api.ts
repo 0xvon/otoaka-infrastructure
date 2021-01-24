@@ -8,6 +8,7 @@ import { Config } from '../typing';
 
 
 const config: Config = {
+    appName: process.env.APP_NAME ?? 'sample-app',
     environment: process.env.ENVIRONMENT ?? 'dev',
     rdsPassword: process.env.RDS_PASSWORD ?? 'password',
     awsAccountId:  process.env.AWS_ACCOUNT_ID ?? '900000',
@@ -17,18 +18,16 @@ const config: Config = {
     mackerelApiKey: process.env.MACKEREL_APIKEY ?? 'hogehoge',
     acmCertificateArn: 'arn:aws:acm:ap-northeast-1:960722127407:certificate/a32583f3-ec6e-420a-8dd4-9c5aa26a3215', // need to create in the same region as a Load Balancer
 };
-const appName = config.environment === 'prd' ? 'rocket-api' : 'rocket-api-dev';
 
 const app = new cdk.App();
-const vpcStack = new VPCStack(app, `${appName}-vpc`, {
-    appName,
+const vpcStack = new VPCStack(app, `${config.appName}-vpc`, {
+    appName: config.appName,
     env: {
         region: config.awsRegion,
     },
 });
 
 // const rdsStack = new RDSStack(app, `${appName}-rds`, {
-//     appName,
 //     config: config,
 //     vpc: vpcStack.vpc,
 //     rdsDBName: 'database',
@@ -38,8 +37,7 @@ const vpcStack = new VPCStack(app, `${appName}-vpc`, {
 //     },
 // });
 
-const eksStack = new EKSStack(app, `${appName}-eks`, {
-    appName,
+const eksStack = new EKSStack(app, `${config.appName}-eks`, {
     config: config,
     vpc: vpcStack.vpc,
     // mysqlUrl: rdsStack.mysqlUrl,

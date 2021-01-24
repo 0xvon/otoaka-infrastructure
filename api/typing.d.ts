@@ -13,6 +13,7 @@ declare module '*/environment.json' {
 }
 
 export interface Config {
+    appName: string,
     environment: string,
     rdsPassword: string,
     awsAccountId: string,

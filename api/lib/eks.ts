@@ -33,7 +33,6 @@ import { users } from '../config';
 import { Config } from '../typing';
 
 interface EKSStackProps extends cdk.StackProps {
-    appName: string,
     config: Config,
     vpc: Vpc,
     mysqlUrl?: string,
@@ -53,7 +52,7 @@ export class EKSStack extends cdk.Stack {
 
         // IAM Role for EKS
         const eksRole: Role = (() => {
-            const eksRole = new Role(this, `${props.appName}-EKSRole`, {
+            const eksRole = new Role(this, `${props.config.appName}-EKSRole`, {
                 assumedBy: new ServicePrincipal('eks.amazonaws.com'),
                 managedPolicies: [
                     ManagedPolicy.fromAwsManagedPolicyName('AmazonEKSClusterPolicy'),
@@ -76,17 +75,17 @@ export class EKSStack extends cdk.Stack {
         })()
         
         // Admin IAM Role for EKS
-        const adminRole: Role = new Role(this, `${props.appName}-EKSAdminRole`, {
+        const adminRole: Role = new Role(this, `${props.config.appName}-EKSAdminRole`, {
             assumedBy: new AccountRootPrincipal(),
         });
 
         // ECR Repository
-        const ecrRepository = new Repository(this, `${props.appName}-ECR`, {
-            repositoryName: `${props.appName}`,
+        const ecrRepository = new Repository(this, `${props.config.appName}-ECR`, {
+            repositoryName: `${props.config.appName}`,
         });
 
         // EKS Cluster
-        const cluster = new Cluster(this, `${props.appName}-cluster`, {
+        const cluster = new Cluster(this, `${props.config.appName}-cluster`, {
             vpc: props.vpc,
             vpcSubnets: [
                 { subnets: props.vpc.publicSubnets },
@@ -96,11 +95,11 @@ export class EKSStack extends cdk.Stack {
             role: eksRole,
             mastersRole: adminRole,
             version: KubernetesVersion.V1_18,
-            clusterName: `${props.appName}-cluster`,
+            clusterName: `${props.config.appName}-cluster`,
         });
 
         // Node Group
-        const ng = cluster.addNodegroupCapacity(`${props.appName}-capacity`, {
+        const ng = cluster.addNodegroupCapacity(`${props.config.appName}-capacity`, {
             desiredSize: minCapacity,
             subnets: { subnetType: SubnetType.PUBLIC },
             instanceType: new InstanceType(instanceType),
@@ -119,8 +118,8 @@ export class EKSStack extends cdk.Stack {
         // this.injectSecurityGroup(cluster.clusterSecurityGroupId);
 
         // Auto Scaling Policy
-        cluster.addAutoScalingGroupCapacity(`${props.appName}-nodes`, {
-            autoScalingGroupName: `${props.appName}-EKS-ASG`,
+        cluster.addAutoScalingGroupCapacity(`${props.config.appName}-nodes`, {
+            autoScalingGroupName: `${props.config.appName}-EKS-ASG`,
             instanceType: new InstanceType(instanceType),
             minCapacity: minCapacity,
             maxCapacity: maxCapacity,
@@ -164,7 +163,7 @@ export class EKSStack extends cdk.Stack {
     private addManifest(cluster: Cluster, ecrRepository: Repository) {
         const [ newStringData, newContainerEnvironments ] = this.injectContainerEnv();
         cluster.addManifest(
-            `${this.props.appName}-pod`,
+            `${this.props.config.appName}-pod`,
             ApplicationManifest.service(this.props.config.acmCertificateArn),
             ApplicationManifest.secret(newStringData),
             ApplicationManifest.deployment({
@@ -177,7 +176,7 @@ export class EKSStack extends cdk.Stack {
             MackerelServiceAccount.clusterRole,
             MackerelServiceAccount.clusterRoleBinding,
             FluentdManifest.daemonSet({
-                appName: this.props.appName,
+                appName: this.props.config.appName,
             }),
             FluentdManifest.serviceAccount,
             FluentdManifest.clusterRole,
@@ -186,7 +185,7 @@ export class EKSStack extends cdk.Stack {
     }
 
     private addAuth(cluster: Cluster, adminRole: Role, ng: Nodegroup) {
-        const awsAuth = new AwsAuth(this, `${this.props.appName}-AwsAuth`, { cluster: cluster });
+        const awsAuth = new AwsAuth(this, `${this.props.config.appName}-AwsAuth`, { cluster: cluster });
         awsAuth.addRoleMapping(ng.role, {
             groups: ["system:bootstrappers", "system:nodes"],
             username: "system:node:{{EC2PrivateDNSName}}",
@@ -196,7 +195,7 @@ export class EKSStack extends cdk.Stack {
     }
 
     private injectSecurityGroup(appSGId: string, rdsSecurityGroupId: string) {
-        const rdsSecurityGroup = SecurityGroup.fromSecurityGroupId(this, `${this.props.appName}-DB-SG`, rdsSecurityGroupId);
+        const rdsSecurityGroup = SecurityGroup.fromSecurityGroupId(this, `${this.props.config.appName}-DB-SG`, rdsSecurityGroupId);
         rdsSecurityGroup.addIngressRule(
             SecurityGroup.fromSecurityGroupId(this, `APP-SG`, appSGId),
             Port.tcp(3306),
@@ -211,7 +210,7 @@ export class EKSStack extends cdk.Stack {
 
         const sourceOutput = new Artifact();
         const sourceAction = new GitHubSourceAction({
-            actionName: `${this.props.appName}-SourceAction`,
+            actionName: `${this.props.config.appName}-SourceAction`,
             owner: githubOwner,
             repo: githubRepo,
             oauthToken: githubToken,
@@ -219,8 +218,8 @@ export class EKSStack extends cdk.Stack {
             branch: githubBranch,
         });
 
-        const codeBuildProject = new PipelineProject(this, `${this.props.appName}-CodeBuildProj`, {
-            projectName: `${this.props.appName}-CodeBuildProj`,
+        const codeBuildProject = new PipelineProject(this, `${this.props.config.appName}-CodeBuildProj`, {
+            projectName: `${this.props.config.appName}-CodeBuildProj`,
             environment: {
                 buildImage: LinuxBuildImage.AMAZON_LINUX_2_3,
                 privileged: true,
@@ -289,14 +288,14 @@ export class EKSStack extends cdk.Stack {
         }));
 
         const buildAction = new CodeBuildAction({
-            actionName: `${this.props.appName}-BuildAction`,
+            actionName: `${this.props.config.appName}-BuildAction`,
             project: codeBuildProject,
             input: sourceOutput,
             outputs: [new Artifact()],
         })
 
-        new Pipeline(this, `${this.props.appName}-Pipeline`, {
-            pipelineName: `${this.props.appName}-Pipeline`,
+        new Pipeline(this, `${this.props.config.appName}-Pipeline`, {
+            pipelineName: `${this.props.config.appName}-Pipeline`,
             stages: [
                 {
                     stageName: 'Source',
