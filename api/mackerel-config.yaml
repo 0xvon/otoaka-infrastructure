@@ -1,0 +1,4 @@
+plugin:
+  checks:
+    access_log:
+      command: ["check-log", "--file", "/var/log/*", "--pattern", "ERROR", "--return"]

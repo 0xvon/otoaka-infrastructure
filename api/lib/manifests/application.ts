@@ -1,5 +1,6 @@
 import environment from './environment.json';
-import { SSMSecret } from '../typing';
+import { SSMSecret } from '../../typing';
+import { Container } from 'cdk8s-plus';
 
 export interface Obj {
     [index: string]: string;
@@ -33,7 +34,14 @@ export const secret = (stringData: Obj) => {
     };
 };
 
-export const deployment = (imageUrl: string, containerEnvironments: ContainerEnv[], mackerelApiKey: string) => {
+interface DeploymentConfig {
+    bucketName: string,
+    imageUrl: string,
+    containerEnvironments: ContainerEnv[],
+    mackerelApiKey: string,
+};
+
+export const deployment = (config: DeploymentConfig) => {
     return {
         apiVersion: 'apps/v1',
         kind: 'Deployment',
@@ -49,13 +57,24 @@ export const deployment = (imageUrl: string, containerEnvironments: ContainerEnv
                     containers: [
                         {
                             name: appLabel.app,
-                            image: `${imageUrl}:latest`,
+                            image: `${config.imageUrl}:latest`,
                             ports: [{ containerPort: 8080 }],
-                            env: containerEnvironments,
+                            env: config.containerEnvironments,
+                        },
+                        {
+                            name: 'hello-kubernetes',
+                            image: `paulbouwer/hello-kubernetes:1.5`,
+                            ports: [{ containerPort: 8081 }],
+                            env: [
+                                {
+                                    name: 'PORT',
+                                    value: '8081',
+                                },
+                            ],
                         },
                         {
                             name: 'mackerel-container-agent',
-                            image: 'mackerel/mackerel-container-agent:latest',
+                            image: 'mackerel/mackerel-container-agent:plugins',
                             imagePullPolicy: 'Always',
                             resources: {
                                 limits: {
@@ -73,8 +92,12 @@ export const deployment = (imageUrl: string, containerEnvironments: ContainerEnv
                                 },
                                 {
                                     name: 'MACKEREL_APIKEY',
-                                    value: mackerelApiKey,
+                                    value: config.mackerelApiKey,
                                 },
+                                // {
+                                //     name: 'MACKEREL_AGENT_CONFIG',
+                                //     value: `s3://${config.bucketName}/api/mackerel-config.yaml`,
+                                // },
                                 {
                                     name: 'MACKEREL_KUBERNETES_NAMESPACE',
                                     valueFrom: {
@@ -114,21 +137,21 @@ export const service = (acmCertificateArn: string) => {
         kind: 'Service',
         metadata: {
             name: appLabel.app,
-            annotations: {
-                'service.beta.kubernetes.io/aws-load-balancer-ssl-cert': acmCertificateArn,
-                'service.beta.kubernetes.io/aws-load-balancer-backend-protocol': 'http',
-                'service.beta.kubernetes.io/aws-load-balancer-ssl-ports': 'https',
-            },
+            // annotations: {
+            //     'service.beta.kubernetes.io/aws-load-balancer-ssl-cert': acmCertificateArn,
+            //     'service.beta.kubernetes.io/aws-load-balancer-backend-protocol': 'http',
+            //     'service.beta.kubernetes.io/aws-load-balancer-ssl-ports': 'https',
+            // },
         },
         spec: {
             type: 'LoadBalancer',
             ports: [
-                {
-                    name: 'https',
-                    protocol: 'TCP',
-                    port: 443,
-                    targetPort: 8080
-                },
+                // {
+                //     name: 'https',
+                //     protocol: 'TCP',
+                //     port: 443,
+                //     targetPort: 8080
+                // },
                 {
                     name: 'http',
                     protocol: 'TCP',
@@ -138,62 +161,5 @@ export const service = (acmCertificateArn: string) => {
             ],
             selector: appLabel,
         },
-    };
-};
-
-export const serviceAccount = () => {
-    return {
-        apiVersion: 'v1',
-        kind: 'ServiceAccount',
-        metadata: {
-            name: `mackerel-serviceaccount`,
-            namespace: 'default',
-        },
-    };
-};
-
-export const clusterRole = () => {
-    return {
-        apiVersion: 'rbac.authorization.k8s.io/v1',
-        kind: 'ClusterRole',
-        metadata: {
-            name: `mackerel-container-agent-clusterrole`,
-        },
-        rules: [
-            {
-                apiGroups: [''],
-                resources: [
-                    'nodes/proxy',
-                    'nodes/stats',
-                    'nodes/spec',
-                ],
-                verbs: [
-                    'get',
-                ],
-            },
-        ],
-    };
-};
-
-export const clusterRoleBinding = () => {
-    return {
-        apiVersion: 'rbac.authorization.k8s.io/v1',
-        kind: 'ClusterRoleBinding',
-        metadata: {
-            name: `mackerel-clusterrolebinding`,
-            namespace: 'default',
-        },
-        roleRef: {
-            apiGroup: 'rbac.authorization.k8s.io',
-            kind: 'ClusterRole',
-            name: `mackerel-container-agent-clusterrole`,
-        },
-        subjects:[
-            {
-                kind: 'ServiceAccount',
-                name: `mackerel-serviceaccount`,
-                namespace: 'default',
-            },
-        ],
     };
 };
