@@ -40,4 +40,5 @@ jobs:
           RDS_PASSWORD: ${{ secrets.RDS_PASSWORD }}
           OAUTH_TOKEN: ${{ secrets.OAUTH_TOKEN }}
           MACKEREL_APIKEY: ${{ secrets.MACKEREL_APIKEY }}
+          APP_NAME: rocket-api-dev
           ENVIRONMENT: dev
