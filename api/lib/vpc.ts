@@ -5,8 +5,8 @@ import {
 } from '@aws-cdk/aws-ec2';
 
 interface VPCStackProps extends cdk.StackProps {
-    appName: string
-}
+    appName: string,
+};
 
 export class VPCStack extends cdk.Stack {
     vpc: Vpc;

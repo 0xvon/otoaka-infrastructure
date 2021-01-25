@@ -6,7 +6,9 @@ export interface Obj {
     [index: string]: string;
 }
 export const stringData: Obj = {}
-environment.Secrets.map(function(secret: SSMSecret) { stringData[secret.name]=secret.value });
+if (environment.Secrets && environment.Secrets.length !== 0) {
+    environment.Secrets.map(function(secret: SSMSecret) { stringData[secret.name]=secret.value });
+}
 
 interface KeyRef {
     name: string;
@@ -35,7 +37,7 @@ export const secret = (stringData: Obj) => {
 };
 
 interface DeploymentConfig {
-    bucketName: string,
+    mackerelConfigPath: string,
     imageUrl: string,
     containerEnvironments: ContainerEnv[],
     mackerelApiKey: string,
@@ -96,7 +98,7 @@ export const deployment = (config: DeploymentConfig) => {
                                 },
                                 // {
                                 //     name: 'MACKEREL_AGENT_CONFIG',
-                                //     value: `s3://${config.bucketName}/api/mackerel-config.yaml`,
+                                //     value: mackerelConfigPath,
                                 // },
                                 {
                                     name: 'MACKEREL_KUBERNETES_NAMESPACE',
