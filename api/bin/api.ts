@@ -30,8 +30,8 @@ const vpcStack = new VPCStack(app, `${config.appName}-vpc`, {
 const rdsStack = new RDSStack(app, `${config.appName}-rds`, {
     config: config,
     vpc: vpcStack.vpc,
-    rdsDBName: 'database',
-    rdsUserName: 'username',
+    rdsDBName: 'rocketdatabase',
+    rdsUserName: 'rocketuser',
     env: {
         region: config.awsRegion,
     },
