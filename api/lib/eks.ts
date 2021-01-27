@@ -36,6 +36,7 @@ interface EKSStackProps extends cdk.StackProps {
     config: Config,
     vpc: Vpc,
     mysqlUrl?: string,
+    mysqlSecurityGroupId?: string,
 }
 
 export class EKSStack extends cdk.Stack {
@@ -115,7 +116,9 @@ export class EKSStack extends cdk.Stack {
         this.addAuth(cluster, adminRole, ng);
         
         // Inject RDS Inbound Security Group Rule
-        // this.injectSecurityGroup(cluster.clusterSecurityGroupId);
+        if (props.mysqlSecurityGroupId) {
+            this.injectSecurityGroup(cluster.clusterSecurityGroupId, props.mysqlSecurityGroupId);
+        }
 
         // Auto Scaling Policy
         cluster.addAutoScalingGroupCapacity(`${props.config.appName}-nodes`, {
