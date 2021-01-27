@@ -65,11 +65,11 @@ export const deployment = (config: DeploymentConfig) => {
                             resources: {
                                 requests: {
                                     memory: '128Mi',
-                                    cpu: 2,
+                                    cpu: '0.25',
                                 },
                                 limits: {
                                     memory: '128Mi',
-                                    cpu: 2,
+                                    cpu: '0.25',
                                 },
                             }
                         },
@@ -86,11 +86,11 @@ export const deployment = (config: DeploymentConfig) => {
                             resources: {
                                 requests: {
                                     memory: '128Mi',
-                                    cpu: 2,
+                                    cpu: '0.25',
                                 },
                                 limits: {
                                     memory: '128Mi',
-                                    cpu: 2,
+                                    cpu: '0.25',
                                 },
                             }
                         },
@@ -101,7 +101,7 @@ export const deployment = (config: DeploymentConfig) => {
                             resources: {
                                 limits: {
                                     memory: '128Mi',
-                                    cpu: 2,
+                                    cpu: '0.25',
                                 },
                             },
                             env: [
