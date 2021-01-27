@@ -27,20 +27,21 @@ const vpcStack = new VPCStack(app, `${config.appName}-vpc`, {
     },
 });
 
-// const rdsStack = new RDSStack(app, `${appName}-rds`, {
-//     config: config,
-//     vpc: vpcStack.vpc,
-//     rdsDBName: 'database',
-//     rdsUserName: 'username',
-//     env: {
-//         region: config.awsRegion,
-//     },
-// });
+const rdsStack = new RDSStack(app, `${config.appName}-rds`, {
+    config: config,
+    vpc: vpcStack.vpc,
+    rdsDBName: 'rocketdatabase',
+    rdsUserName: 'rocketuser',
+    env: {
+        region: config.awsRegion,
+    },
+});
 
 const eksStack = new EKSStack(app, `${config.appName}-eks`, {
     config: config,
     vpc: vpcStack.vpc,
-    // mysqlUrl: rdsStack.mysqlUrl,
+    mysqlUrl: rdsStack.mysqlUrl,
+    mysqlSecurityGroupId: rdsStack.rdsSecurityGroupId,
     env: {
         region: config.awsRegion,
     },
