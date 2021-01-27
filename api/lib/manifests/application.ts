@@ -62,6 +62,16 @@ export const deployment = (config: DeploymentConfig) => {
                             image: `${config.imageUrl}:latest`,
                             ports: [{ containerPort: 8080 }],
                             env: config.containerEnvironments,
+                            resources: {
+                                requests: {
+                                    memory: '128Mi',
+                                    cpu: 2,
+                                },
+                                limits: {
+                                    memory: '128Mi',
+                                    cpu: 2,
+                                },
+                            }
                         },
                         {
                             name: 'hello-kubernetes',
@@ -73,6 +83,16 @@ export const deployment = (config: DeploymentConfig) => {
                                     value: '8081',
                                 },
                             ],
+                            resources: {
+                                requests: {
+                                    memory: '128Mi',
+                                    cpu: 2,
+                                },
+                                limits: {
+                                    memory: '128Mi',
+                                    cpu: 2,
+                                },
+                            }
                         },
                         {
                             name: 'mackerel-container-agent',
@@ -80,7 +100,8 @@ export const deployment = (config: DeploymentConfig) => {
                             imagePullPolicy: 'Always',
                             resources: {
                                 limits: {
-                                    memory: '128Mi'
+                                    memory: '128Mi',
+                                    cpu: 2,
                                 },
                             },
                             env: [
