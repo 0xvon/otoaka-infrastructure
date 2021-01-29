@@ -46,10 +46,10 @@ export class CognitoStack extends cdk.Stack {
             },
             passwordPolicy: {
                 minLength: 8,
-                requireDigits: true,
+                requireDigits: false,
                 requireLowercase: true,
-                requireUppercase: true,
-                requireSymbols: true,
+                requireUppercase: false,
+                requireSymbols: false,
             },
             standardAttributes: {
                 email: {
@@ -58,10 +58,10 @@ export class CognitoStack extends cdk.Stack {
                 },
             },
             userVerification: {
-                emailSubject: 'Rocket for Bandsログイン認証コード',
+                emailSubject: 'Rocket for Bands II ログイン認証コード',
                 emailBody: '認証コードは{####}です',
                 emailStyle: VerificationEmailStyle.CODE,
-                smsMessage: 'Rocket for Bandsの認証コードは{####}です',
+                smsMessage: 'Rocket for Bands IIの認証コードは{####}です',
             }
         });
 
