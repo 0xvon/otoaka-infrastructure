@@ -121,14 +121,15 @@ export class EKSStack extends cdk.Stack {
         }
 
         // Auto Scaling Policy
-        cluster.addAutoScalingGroupCapacity(`${props.config.appName}-nodes`, {
-            autoScalingGroupName: `${props.config.appName}-EKS-ASG`,
-            instanceType: new InstanceType(instanceType),
-            minCapacity: minCapacity,
-            maxCapacity: maxCapacity,
-            vpcSubnets: { subnetType: SubnetType.PUBLIC },
-            updatePolicy: UpdatePolicy.rollingUpdate(),
-        });
+        // const asg = cluster.addAutoScalingGroupCapacity(`${props.config.appName}-nodes`, {
+        //     autoScalingGroupName: `${props.config.appName}-EKS-ASG`,
+        //     instanceType: new InstanceType(instanceType),
+        //     minCapacity: minCapacity,
+        //     maxCapacity: maxCapacity,
+        //     vpcSubnets: { subnetType: SubnetType.PUBLIC },
+        //     updatePolicy: UpdatePolicy.rollingUpdate(),
+        // });
+        // cluster.connectAutoScalingGroupCapacity(asg, {});
 
         // Code Pipeline
         this.buildPipeline(cluster, ecrRepository);
