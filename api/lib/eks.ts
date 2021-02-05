@@ -265,8 +265,7 @@ export class EKSStack extends cdk.Stack {
                     },
                     post_build: {
                         commands: [
-                            'kubectl get no',
-                            'kubectl set image deployment $APP_NAME $APP_NAME=$ECR_REPO_URI:$TAG',
+                            'kubectl rollout restart deployments/api',
                         ],
                     },
                 },
