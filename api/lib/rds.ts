@@ -28,6 +28,7 @@ interface RDSStackProps extends cdk.StackProps {
 export class RDSStack extends cdk.Stack {
     props: RDSStackProps;
     mysqlUrl: string;
+    dbProxyUrl: string;
     rdsSecurityGroupId: string;
     dbProxy: DatabaseProxy;
     dbSecret: Secret;
@@ -93,18 +94,19 @@ export class RDSStack extends cdk.Stack {
         this.mysqlUrl = `mysql://${props.rdsUserName}:${props.config.rdsPassword}@${cluster.clusterEndpoint.hostname}:${cluster.clusterEndpoint.port}/${props.rdsDBName}`;
         this.dbSecret = dbSecret;
         this.dbProxy = dbProxy;
+        this.dbProxyUrl = `mysql://${props.rdsUserName}:${props.config.rdsPassword}@${dbProxy.endpoint}:${cluster.clusterEndpoint.port}/${props.rdsDBName}`;
     }
 
     addProxy(dbCluster: DatabaseCluster, dbSecurityGroup: SecurityGroup): [Secret, DatabaseProxy] {
         const databaseCredentialsSecret = new Secret(this, 'DBCredentialsSecret', {
-                secretName: `${this.props.config.appName}-dbcredentials`,
-                generateSecretString: {
+            secretName: `${this.props.config.appName}-dbcredentials`,
+            generateSecretString: {
                 secretStringTemplate: JSON.stringify({
-                    username: this.props.rdsUserName,
-                    password: this.props.config.rdsPassword,
+                    username: this.props.rdsUserName,                    
                 }),
                 excludePunctuation: true,
                 includeSpace: false,
+                generateStringKey: 'password',
             },
         });
 

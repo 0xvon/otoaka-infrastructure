@@ -9,12 +9,14 @@ import { Vpc } from '@aws-cdk/aws-ec2';
 import { Secret } from '@aws-cdk/aws-secretsmanager';
 import { Config } from '../typing';
 import { DatabaseInstance, DatabaseProxy } from '@aws-cdk/aws-rds';
+import { privateDecrypt } from 'crypto';
 
 interface LambdaStackProps extends cdk.StackProps {
     config: Config,
     vpc: Vpc,
     dbSecret: Secret,
     dbProxy: DatabaseProxy,
+    dbSecurityGroupId: string,
     rdsInstancde: DatabaseInstance,
     rdsDBName: string,
     rdsUserName: string,
@@ -29,12 +31,19 @@ export class LambdaStack extends cdk.Stack {
 
         const bucketName: string = 'rocket-dev-lambda'
 
+        const adminLambdaSG = new ec2.SecurityGroup(this, `${props.config.appName}-adminLambdaSG`, {
+            vpc: props.vpc,
+        });
+
+        const rdsSecurityGroup = ec2.SecurityGroup.fromSecurityGroupId(this, `${this.props.config.appName}-DB-SG`, props.dbSecurityGroupId);
+        rdsSecurityGroup.addIngressRule(adminLambdaSG, ec2.Port.tcp(3306), `allow ${props.config.appName} admin lambda connection`);
+
         const adminLambda = new lambda.Function(this, `${props.config.appName}-adminLambda`, {
             runtime: lambda.Runtime.PROVIDED_AL2,
             code: new lambda.S3Code(s3.Bucket.fromBucketName(this, `${props.config.appName}-bucket`, bucketName), 'RocketAdmin.zip'),
             handler: 'Handler',
             vpc: props.vpc,
-            securityGroups: [],
+            securityGroups: [adminLambdaSG],
             environment: {
                 AWS_ACCESS_KEY_ID: props.config.awsAccessKeyId,
                 AWS_SECRET_ACCESS_KEY: props.config.awsSecretAccessKey,
