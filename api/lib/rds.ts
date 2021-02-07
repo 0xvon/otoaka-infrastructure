@@ -10,7 +10,11 @@ import {
     AuroraMysqlEngineVersion,
     Credentials,
     ParameterGroup,
+    DatabaseInstance,
+    DatabaseProxy,
+    ProxyTarget,
 } from '@aws-cdk/aws-rds';
+import { Secret } from '@aws-cdk/aws-secretsmanager';
 import { Config } from '../typing';
 
 interface RDSStackProps extends cdk.StackProps {
@@ -22,11 +26,16 @@ interface RDSStackProps extends cdk.StackProps {
 };
 
 export class RDSStack extends cdk.Stack {
+    props: RDSStackProps;
     mysqlUrl: string;
     rdsSecurityGroupId: string;
+    dbProxy: DatabaseProxy;
+    dbSecret: Secret;
 
     constructor(scope: cdk.Construct, id: string, props: RDSStackProps) {
         super(scope, id, props);
+        this.props = props
+
         const rdsSecurityGroup = new SecurityGroup(this, `${props.config.appName}-DB-SG`, {
             allowAllOutbound: true,
             vpc: props.vpc,
@@ -79,7 +88,33 @@ export class RDSStack extends cdk.Stack {
             parameterGroup: rdsParameterGroup,
             removalPolicy: cdk.RemovalPolicy.DESTROY,
         });
+        const [dbSecret, dbProxy] = this.addProxy(cluster, rdsSecurityGroup);
 
         this.mysqlUrl = `mysql://${props.rdsUserName}:${props.config.rdsPassword}@${cluster.clusterEndpoint.hostname}:${cluster.clusterEndpoint.port}/${props.rdsDBName}`;
+        this.dbSecret = dbSecret;
+        this.dbProxy = dbProxy;
+    }
+
+    addProxy(dbCluster: DatabaseCluster, dbSecurityGroup: SecurityGroup): [Secret, DatabaseProxy] {
+        const databaseCredentialsSecret = new Secret(this, 'DBCredentialsSecret', {
+                secretName: `${this.props.config.appName}-dbcredentials`,
+                generateSecretString: {
+                secretStringTemplate: JSON.stringify({
+                    username: this.props.rdsUserName,
+                    password: this.props.config.rdsPassword,
+                }),
+                excludePunctuation: true,
+                includeSpace: false,
+            },
+        });
+
+        const dbProxy = dbCluster.addProxy(`${this.props.config.appName}-proxy`, {
+            secrets: [databaseCredentialsSecret],
+            debugLogging: true,
+            vpc: this.props.vpc,
+            securityGroups: [dbSecurityGroup],
+        });
+
+        return [databaseCredentialsSecret, dbProxy];
     }
 }
