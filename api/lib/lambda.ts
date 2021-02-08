@@ -2,24 +2,15 @@ import * as cdk from '@aws-cdk/core';
 import * as ec2 from '@aws-cdk/aws-ec2';
 import * as lambda from '@aws-cdk/aws-lambda';
 import * as apigw from '@aws-cdk/aws-apigateway';
-import * as rds from '@aws-cdk/aws-rds';
 import * as s3 from '@aws-cdk/aws-s3';
-import * as secrets from '@aws-cdk/aws-secretsmanager';
 import { Vpc } from '@aws-cdk/aws-ec2';
-import { Secret } from '@aws-cdk/aws-secretsmanager';
 import { Config } from '../typing';
-import { DatabaseInstance, DatabaseProxy } from '@aws-cdk/aws-rds';
-import { privateDecrypt } from 'crypto';
 
 interface LambdaStackProps extends cdk.StackProps {
     config: Config,
     vpc: Vpc,
-    dbSecret: Secret,
-    dbProxy: DatabaseProxy,
+    dbProxyUrl: string,
     dbSecurityGroupId: string,
-    rdsInstancde: DatabaseInstance,
-    rdsDBName: string,
-    rdsUserName: string,
 }
 
 export class LambdaStack extends cdk.Stack {
@@ -34,7 +25,6 @@ export class LambdaStack extends cdk.Stack {
         const adminLambdaSG = new ec2.SecurityGroup(this, `${props.config.appName}-adminLambdaSG`, {
             vpc: props.vpc,
         });
-
         const rdsSecurityGroup = ec2.SecurityGroup.fromSecurityGroupId(this, `${this.props.config.appName}-DB-SG`, props.dbSecurityGroupId);
         rdsSecurityGroup.addIngressRule(adminLambdaSG, ec2.Port.tcp(3306), `allow ${props.config.appName} admin lambda connection`);
 
@@ -49,11 +39,9 @@ export class LambdaStack extends cdk.Stack {
                 AWS_SECRET_ACCESS_KEY: props.config.awsSecretAccessKey,
                 AWS_REGION: props.config.awsRegion,
                 SNS_PLATFORM_APPLICATION_ARN: this.props.config.environment === 'prd' ? 'arn:aws:sns:ap-northeast-1:960722127407:app/APNS/rocket-ios-prod' : 'arn:aws:sns:ap-northeast-1:960722127407:app/APNS_SANDBOX/rocket-ios-dev',
-                DATABASE_URL: props.dbProxy.endpoint,
+                DATABASE_URL: props.dbProxyUrl,
             }
         });
-
-        props.dbSecret.grantRead(adminLambda);
 
         const restApi = new apigw.RestApi(this, 'RestApi', {
             restApiName: `${props.config.appName}-admin`,
