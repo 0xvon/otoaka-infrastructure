@@ -112,7 +112,7 @@ export class RDSStack extends cdk.Stack {
         });
         dbProxyRole.addToPolicy(
             new PolicyStatement({
-                resources: [databaseCredentialsSecret.secretArn],
+                resources: ['*'],
                 effect: Effect.ALLOW,
                 actions: [
                     "secretsmanager:GetSecretValue",
@@ -122,7 +122,9 @@ export class RDSStack extends cdk.Stack {
         );
 
         const dbProxy = new DatabaseProxy(this, `${this.props.config.appName}-rdsproxy`, {
+            dbProxyName: `${this.props.config.appName}-rdsproxy`,
             proxyTarget: ProxyTarget.fromCluster(dbCluster),
+            requireTLS: false,
             secrets: [databaseCredentialsSecret],
             vpc: this.props.vpc,
             role: dbProxyRole,

@@ -11,7 +11,7 @@ import { Config } from '../typing';
 const config: Config = {
     appName: process.env.APP_NAME ?? 'sample-app',
     environment: process.env.ENVIRONMENT ?? 'dev',
-    rdsPassword: process.env.RDS_PASSWORD ?? 'password',
+    rdsPassword: process.env.RDS_PASSWORD ?? 'rocketpassword',
     awsAccountId:  process.env.AWS_ACCOUNT_ID ?? '900000',
     awsAccessKeyId: process.env.AWS_ACCESS_KEY_ID ?? 'HOGE',
     awsSecretAccessKey: process.env.AWS_SECRET_ACCESS_KEY ?? 'HOGE',
