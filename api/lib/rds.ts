@@ -107,7 +107,7 @@ export class RDSStack extends cdk.Stack {
         const databaseCredentialsSecret = Secret.fromSecretNameV2(this, `${this.props.config.appName}-rdsSecret`, `${this.props.config.appName}/rds`);
         
         const dbProxyRole = new Role(this, `${this.props.config.appName}-rdsproxyrole`, {
-            assumedBy: new AccountPrincipal(this.account),
+            assumedBy: new ServicePrincipal('rds.amazonaws.com'),
         });
         dbProxyRole.addToPolicy(
             new PolicyStatement({
@@ -124,7 +124,7 @@ export class RDSStack extends cdk.Stack {
             proxyTarget: ProxyTarget.fromCluster(dbCluster),
             secrets: [databaseCredentialsSecret],
             vpc: this.props.vpc,
-            // role: dbProxyRole,
+            role: dbProxyRole,
             vpcSubnets: {
                 subnets: this.props.vpc.publicSubnets,
             },
