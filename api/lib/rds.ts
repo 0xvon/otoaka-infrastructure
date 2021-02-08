@@ -119,12 +119,12 @@ export class RDSStack extends cdk.Stack {
                 ],
             })
         );
-        
+
         const dbProxy = new DatabaseProxy(this, `${this.props.config.appName}-rdsproxy`, {
             proxyTarget: ProxyTarget.fromCluster(dbCluster),
             secrets: [databaseCredentialsSecret],
             vpc: this.props.vpc,
-            role: dbProxyRole,
+            // role: dbProxyRole,
             vpcSubnets: {
                 subnets: this.props.vpc.publicSubnets,
             },
