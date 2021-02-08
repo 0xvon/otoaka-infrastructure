@@ -49,6 +49,7 @@ export class RDSStack extends cdk.Stack {
             vpc: props.vpc,
             securityGroupName: `${props.config.appName}-DB-SG`,
         });
+        rdsSecurityGroup.addIngressRule(rdsSecurityGroup, Port.tcp(3306), `allow ${props.config.appName} admin db connection`);
         this.rdsSecurityGroupId = rdsSecurityGroup.securityGroupId;
 
         const rdsParameterGroup = new ParameterGroup(this, `${props.config.appName}-PG`, {
@@ -97,7 +98,6 @@ export class RDSStack extends cdk.Stack {
             removalPolicy: cdk.RemovalPolicy.DESTROY,
         });
         const [dbSecret, dbProxy] = this.addProxy(cluster, rdsSecurityGroup);
-        rdsSecurityGroup.addIngressRule(rdsSecurityGroup, Port.tcp(3306), `allow ${props.config.appName} admin db connection`);
 
         this.mysqlUrl = `mysql://${props.rdsUserName}:${props.config.rdsPassword}@${cluster.clusterEndpoint.hostname}:${cluster.clusterEndpoint.port}/${props.rdsDBName}`;
         this.dbSecret = dbSecret;
