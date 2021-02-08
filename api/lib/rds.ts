@@ -14,7 +14,7 @@ import {
     DatabaseProxy,
     ProxyTarget,
 } from '@aws-cdk/aws-rds';
-import { Secret } from '@aws-cdk/aws-secretsmanager';
+import { Secret, ISecret } from '@aws-cdk/aws-secretsmanager';
 import { Config } from '../typing';
 
 interface RDSStackProps extends cdk.StackProps {
@@ -30,7 +30,7 @@ export class RDSStack extends cdk.Stack {
     mysqlUrl: string;
     dbProxyUrl: string;
     rdsSecurityGroupId: string;
-    dbSecret: Secret;
+    dbSecret: ISecret;
 
     constructor(scope: cdk.Construct, id: string, props: RDSStackProps) {
         super(scope, id, props);
@@ -95,20 +95,9 @@ export class RDSStack extends cdk.Stack {
         this.dbProxyUrl = `mysql://${props.rdsUserName}:${props.config.rdsPassword}@${dbProxy.endpoint}:${cluster.clusterEndpoint.port}/${props.rdsDBName}`;
     }
 
-    addProxy(dbCluster: DatabaseCluster, dbSecurityGroup: SecurityGroup): [Secret, DatabaseProxy] {
-        const databaseCredentialsSecret = new Secret(this, 'DBCredentialsSecret', {
-            secretName: `${this.props.config.appName}-dbcredentials`,
-            generateSecretString: {
-                secretStringTemplate: JSON.stringify({
-                    username: this.props.rdsUserName,
-                    password: this.props.config.rdsPassword,
-                }),
-                excludePunctuation: true,
-                includeSpace: false,
-                generateStringKey: 'something',
-            },
-        });
-
+    addProxy(dbCluster: DatabaseCluster, dbSecurityGroup: SecurityGroup): [ISecret, DatabaseProxy] {
+        const databaseCredentialsSecret = Secret.fromSecretNameV2(this, `${this.props.config.appName}-rdsSecret`, `${this.props.config.appName}/rds`);
+        
         const dbProxy = dbCluster.addProxy(`${this.props.config.appName}-proxy`, {
             secrets: [databaseCredentialsSecret],
             debugLogging: true,
