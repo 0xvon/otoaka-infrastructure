@@ -125,9 +125,6 @@ export class RDSStack extends cdk.Stack {
             secrets: [databaseCredentialsSecret],
             vpc: this.props.vpc,
             role: dbProxyRole,
-            vpcSubnets: {
-                subnets: this.props.vpc.publicSubnets,
-            },
         });
         // const dbProxy = dbCluster.addProxy(`${this.props.config.appName}-proxy`, {
         //     secrets: [databaseCredentialsSecret],
@@ -138,7 +135,6 @@ export class RDSStack extends cdk.Stack {
         //     },
         //     securityGroups: [dbSecurityGroup],
         // });
-        dbProxy.connections.allowFromAnyIpv4(Port.tcp(3306));
 
         return [databaseCredentialsSecret, dbProxy];
     }
