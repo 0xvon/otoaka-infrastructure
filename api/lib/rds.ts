@@ -3,6 +3,7 @@ import {
     Vpc,
     SecurityGroup,
     Port,
+    ,
 } from '@aws-cdk/aws-ec2';
 import {
     DatabaseCluster,
@@ -14,6 +15,13 @@ import {
     DatabaseProxy,
     ProxyTarget,
 } from '@aws-cdk/aws-rds';
+import {
+    Role,
+    ServicePrincipal,
+    AccountRootPrincipal,
+    ManagedPolicy,
+    PolicyStatement,
+} from '@aws-cdk/aws-iam';
 import { Secret, ISecret } from '@aws-cdk/aws-secretsmanager';
 import { Config } from '../typing';
 
@@ -98,12 +106,24 @@ export class RDSStack extends cdk.Stack {
     addProxy(dbCluster: DatabaseCluster, dbSecurityGroup: SecurityGroup): [ISecret, DatabaseProxy] {
         const databaseCredentialsSecret = Secret.fromSecretNameV2(this, `${this.props.config.appName}-rdsSecret`, `${this.props.config.appName}/rds`);
         
-        const dbProxy = dbCluster.addProxy(`${this.props.config.appName}-proxy`, {
+        const dbProxy = new DatabaseProxy(this, `${this.props.config.appName}-rdsproxy`, {
+            proxyTarget: ProxyTarget.fromCluster(dbCluster),
             secrets: [databaseCredentialsSecret],
-            debugLogging: true,
             vpc: this.props.vpc,
-            securityGroups: [dbSecurityGroup],
+            vpcSubnets: {
+                subnets: this.props.vpc.publicSubnets,
+            },
         });
+        // const dbProxy = dbCluster.addProxy(`${this.props.config.appName}-proxy`, {
+        //     secrets: [databaseCredentialsSecret],
+        //     debugLogging: true,
+        //     vpc: this.props.vpc,
+        //     vpcSubnets: {
+        //         subnets: this.props.vpc.publicSubnets,
+        //     },
+        //     securityGroups: [dbSecurityGroup],
+        // });
+        dbProxy.connections.allowFromAnyIpv4(Port.tcp(3306));
 
         return [databaseCredentialsSecret, dbProxy];
     }
