@@ -105,7 +105,11 @@ export class RDSStack extends cdk.Stack {
     }
 
     addProxy(dbCluster: DatabaseCluster, dbSecurityGroup: SecurityGroup): [ISecret, DatabaseProxy] {
-        const databaseCredentialsSecret = Secret.fromSecretNameV2(this, `${this.props.config.appName}-rdsSecret`, `${this.props.config.appName}/rds`);
+        const databaseCredentialsSecret = Secret.fromSecretCompleteArn(
+            this,
+            `${this.props.config.appName}-rdsSecret`,
+            this.props.config.environment === 'prd' ? 'arn:aws:secretsmanager:ap-northeast-1:960722127407:secret:rocket-api/rds-CBs3zG' : 'arn:aws:secretsmanager:ap-northeast-1:960722127407:secret:rocket-api-dev/rds-E0r1ph',
+        );
         
         const dbProxyRole = new Role(this, `${this.props.config.appName}-rdsproxyrole`, {
             assumedBy: new ServicePrincipal('rds.amazonaws.com'),
@@ -128,6 +132,7 @@ export class RDSStack extends cdk.Stack {
             secrets: [databaseCredentialsSecret],
             vpc: this.props.vpc,
             role: dbProxyRole,
+            securityGroups: [dbSecurityGroup],
         });
         // const dbProxy = dbCluster.addProxy(`${this.props.config.appName}-proxy`, {
         //     secrets: [databaseCredentialsSecret],
