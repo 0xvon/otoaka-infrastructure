@@ -3,7 +3,6 @@ import {
     Vpc,
     SecurityGroup,
     Port,
-    ,
 } from '@aws-cdk/aws-ec2';
 import {
     DatabaseCluster,
@@ -11,7 +10,6 @@ import {
     AuroraMysqlEngineVersion,
     Credentials,
     ParameterGroup,
-    DatabaseInstance,
     DatabaseProxy,
     ProxyTarget,
 } from '@aws-cdk/aws-rds';
