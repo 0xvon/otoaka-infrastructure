@@ -19,6 +19,8 @@ import {
     AccountRootPrincipal,
     ManagedPolicy,
     PolicyStatement,
+    AccountPrincipal,
+    Effect,
 } from '@aws-cdk/aws-iam';
 import { Secret, ISecret } from '@aws-cdk/aws-secretsmanager';
 import { Config } from '../typing';
@@ -104,10 +106,25 @@ export class RDSStack extends cdk.Stack {
     addProxy(dbCluster: DatabaseCluster, dbSecurityGroup: SecurityGroup): [ISecret, DatabaseProxy] {
         const databaseCredentialsSecret = Secret.fromSecretNameV2(this, `${this.props.config.appName}-rdsSecret`, `${this.props.config.appName}/rds`);
         
+        const dbProxyRole = new Role(this, `${this.props.config.appName}-rdsproxyrole`, {
+            assumedBy: new AccountPrincipal(this.account),
+        });
+        dbProxyRole.addToPolicy(
+            new PolicyStatement({
+                resources: [databaseCredentialsSecret.secretArn],
+                effect: Effect.ALLOW,
+                actions: [
+                    "secretsmanager:GetSecretValue",
+                    "secretsmanager:DescribeSecret",
+                ],
+            })
+        );
+        
         const dbProxy = new DatabaseProxy(this, `${this.props.config.appName}-rdsproxy`, {
             proxyTarget: ProxyTarget.fromCluster(dbCluster),
             secrets: [databaseCredentialsSecret],
             vpc: this.props.vpc,
+            role: dbProxyRole,
             vpcSubnets: {
                 subnets: this.props.vpc.publicSubnets,
             },
