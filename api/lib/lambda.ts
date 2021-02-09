@@ -3,12 +3,11 @@ import * as ec2 from '@aws-cdk/aws-ec2';
 import * as lambda from '@aws-cdk/aws-lambda';
 import * as apigw from '@aws-cdk/aws-apigateway';
 import * as s3 from '@aws-cdk/aws-s3';
-import { Vpc } from '@aws-cdk/aws-ec2';
 import { Config } from '../typing';
 
 interface LambdaStackProps extends cdk.StackProps {
     config: Config,
-    vpc: Vpc,
+    vpc: ec2.Vpc,
     dbProxyUrl: string,
     dbSecurityGroupId: string,
 }
@@ -33,6 +32,7 @@ export class LambdaStack extends cdk.Stack {
             code: new lambda.S3Code(s3.Bucket.fromBucketName(this, `${props.config.appName}-bucket`, bucketName), 'RocketAdmin.zip'),
             handler: 'Handler',
             vpc: props.vpc,
+            timeout: cdk.Duration.seconds(300),
             securityGroups: [adminLambdaSG],
             environment: {
                 SNS_PLATFORM_APPLICATION_ARN: this.props.config.environment === 'prd' ? 'arn:aws:sns:ap-northeast-1:960722127407:app/APNS/rocket-ios-prod' : 'arn:aws:sns:ap-northeast-1:960722127407:app/APNS_SANDBOX/rocket-ios-dev',

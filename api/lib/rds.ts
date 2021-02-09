@@ -16,10 +16,7 @@ import {
 import {
     Role,
     ServicePrincipal,
-    AccountRootPrincipal,
-    ManagedPolicy,
     PolicyStatement,
-    AccountPrincipal,
     Effect,
 } from '@aws-cdk/aws-iam';
 import { Secret, ISecret } from '@aws-cdk/aws-secretsmanager';
@@ -99,9 +96,9 @@ export class RDSStack extends cdk.Stack {
         });
         const [dbSecret, dbProxy] = this.addProxy(cluster, rdsSecurityGroup);
 
-        this.mysqlUrl = `mysql://${props.rdsUserName}:${props.config.rdsPassword}@${cluster.clusterEndpoint.hostname}:${cluster.clusterEndpoint.port}/${props.rdsDBName}`;
+        this.mysqlUrl = `mysql://${props.rdsUserName}:${props.config.rdsPassword}@${cluster.clusterEndpoint.hostname}:3306/${props.rdsDBName}`;
         this.dbSecret = dbSecret;
-        this.dbProxyUrl = `mysql://${props.rdsUserName}:${props.config.rdsPassword}@${dbProxy.endpoint}:${cluster.clusterEndpoint.port}/${props.rdsDBName}`;
+        this.dbProxyUrl = `mysql://${props.rdsUserName}:${props.config.rdsPassword}@${dbProxy.endpoint}:3306/${props.rdsDBName}`;
     }
 
     addProxy(dbCluster: DatabaseCluster, dbSecurityGroup: SecurityGroup): [ISecret, DatabaseProxy] {
