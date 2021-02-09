@@ -20,13 +20,26 @@ export class LambdaStack extends cdk.Stack {
         super(scope, id, props);
         this.props = props;
 
-        const bucketName: string = 'rocket-dev-lambda'
+        const bucketName: string = 'rocket-dev-lambda';
+        const snsPlatformArn: string = this.props.config.environment === 'prd' ? 'arn:aws:sns:ap-northeast-1:960722127407:app/APNS/rocket-ios-prod' : 'arn:aws:sns:ap-northeast-1:960722127407:app/APNS_SANDBOX/rocket-ios-dev';
 
         const adminLambdaSG = new ec2.SecurityGroup(this, `${props.config.appName}-adminLambdaSG`, {
             vpc: props.vpc,
         });
         const rdsSecurityGroup = ec2.SecurityGroup.fromSecurityGroupId(this, `${this.props.config.appName}-DB-SG`, props.dbSecurityGroupId);
         rdsSecurityGroup.addIngressRule(adminLambdaSG, ec2.Port.tcp(3306), `allow ${props.config.appName} admin lambda connection`);
+
+        const adminLambdaRole = new iam.Role(this, `${props.config.appName}-adminLambdaRole`, {
+            assumedBy: new iam.ServicePrincipal('lambda.amazonaws.com'),
+            managedPolicies: [
+                iam.ManagedPolicy.fromAwsManagedPolicyName('AWSLambdaBasicExecutionRole'),
+                iam.ManagedPolicy.fromAwsManagedPolicyName('AWSLambdaVPCAccessExecutionRole'),
+            ],
+        });
+        adminLambdaRole.addToPolicy(new iam.PolicyStatement({
+            actions: ['SNS:Publish'],
+            resources: [snsPlatformArn],
+        }))
 
         const adminLambda = new lambda.Function(this, `${props.config.appName}-adminLambda`, {
             runtime: lambda.Runtime.PROVIDED_AL2,
@@ -38,8 +51,9 @@ export class LambdaStack extends cdk.Stack {
             },
             timeout: cdk.Duration.seconds(300),
             securityGroups: [adminLambdaSG],
+            role: adminLambdaRole,
             environment: {
-                SNS_PLATFORM_APPLICATION_ARN: this.props.config.environment === 'prd' ? 'arn:aws:sns:ap-northeast-1:960722127407:app/APNS/rocket-ios-prod' : 'arn:aws:sns:ap-northeast-1:960722127407:app/APNS_SANDBOX/rocket-ios-dev',
+                SNS_PLATFORM_APPLICATION_ARN: snsPlatformArn,
                 DATABASE_URL: props.dbProxyUrl,
             }
         });
