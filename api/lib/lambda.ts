@@ -35,9 +35,6 @@ export class LambdaStack extends cdk.Stack {
             vpc: props.vpc,
             securityGroups: [adminLambdaSG],
             environment: {
-                AWS_ACCESS_KEY_ID: props.config.awsAccessKeyId,
-                AWS_SECRET_ACCESS_KEY: props.config.awsSecretAccessKey,
-                AWS_REGION: props.config.awsRegion,
                 SNS_PLATFORM_APPLICATION_ARN: this.props.config.environment === 'prd' ? 'arn:aws:sns:ap-northeast-1:960722127407:app/APNS/rocket-ios-prod' : 'arn:aws:sns:ap-northeast-1:960722127407:app/APNS_SANDBOX/rocket-ios-dev',
                 DATABASE_URL: props.dbProxyUrl,
             }
