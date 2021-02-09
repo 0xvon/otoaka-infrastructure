@@ -34,7 +34,7 @@ export class LambdaStack extends cdk.Stack {
             handler: 'Handler',
             vpc: props.vpc,
             vpcSubnets: {
-                subnets: props.vpc.isolatedSubnets,
+                subnets: props.vpc.privateSubnets,
             },
             timeout: cdk.Duration.seconds(300),
             securityGroups: [adminLambdaSG],

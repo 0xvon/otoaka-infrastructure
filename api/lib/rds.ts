@@ -80,7 +80,7 @@ export class RDSStack extends cdk.Stack {
             defaultDatabaseName: props.rdsDBName,
             instanceProps: {
                 vpcSubnets: {
-                    subnets: props.vpc.isolatedSubnets,
+                    subnets: props.vpc.privateSubnets,
                 },
                 vpc: props.vpc,
                 securityGroups: [rdsSecurityGroup],
@@ -129,7 +129,7 @@ export class RDSStack extends cdk.Stack {
             secrets: [databaseCredentialsSecret],
             vpc: this.props.vpc,
             vpcSubnets: {
-                subnets: this.props.vpc.isolatedSubnets,
+                subnets: this.props.vpc.privateSubnets,
             },
             role: dbProxyRole,
             securityGroups: [dbSecurityGroup],

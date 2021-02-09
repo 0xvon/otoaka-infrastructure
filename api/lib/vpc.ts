@@ -29,7 +29,7 @@ export class VPCStack extends cdk.Stack {
                 {
                     cidrMask: 24,
                     name: `${props.appName}-rds`,
-                    subnetType: SubnetType.ISOLATED,
+                    subnetType: SubnetType.PRIVATE,
                 },
             ],
         });
