@@ -10,7 +10,16 @@ import {
     AuroraMysqlEngineVersion,
     Credentials,
     ParameterGroup,
+    DatabaseProxy,
+    ProxyTarget,
 } from '@aws-cdk/aws-rds';
+import {
+    Role,
+    ServicePrincipal,
+    PolicyStatement,
+    Effect,
+} from '@aws-cdk/aws-iam';
+import { Secret, ISecret } from '@aws-cdk/aws-secretsmanager';
 import { Config } from '../typing';
 
 interface RDSStackProps extends cdk.StackProps {
@@ -22,16 +31,22 @@ interface RDSStackProps extends cdk.StackProps {
 };
 
 export class RDSStack extends cdk.Stack {
+    props: RDSStackProps;
     mysqlUrl: string;
+    dbProxyUrl: string;
     rdsSecurityGroupId: string;
+    dbSecret: ISecret;
 
     constructor(scope: cdk.Construct, id: string, props: RDSStackProps) {
         super(scope, id, props);
+        this.props = props
+
         const rdsSecurityGroup = new SecurityGroup(this, `${props.config.appName}-DB-SG`, {
             allowAllOutbound: true,
             vpc: props.vpc,
             securityGroupName: `${props.config.appName}-DB-SG`,
         });
+        rdsSecurityGroup.addIngressRule(rdsSecurityGroup, Port.tcp(3306), `allow ${props.config.appName} admin db connection`);
         this.rdsSecurityGroupId = rdsSecurityGroup.securityGroupId;
 
         const rdsParameterGroup = new ParameterGroup(this, `${props.config.appName}-PG`, {
@@ -65,7 +80,7 @@ export class RDSStack extends cdk.Stack {
             defaultDatabaseName: props.rdsDBName,
             instanceProps: {
                 vpcSubnets: {
-                    subnets: props.vpc.isolatedSubnets,
+                    subnets: props.vpc.privateSubnets,
                 },
                 vpc: props.vpc,
                 securityGroups: [rdsSecurityGroup],
@@ -79,7 +94,47 @@ export class RDSStack extends cdk.Stack {
             parameterGroup: rdsParameterGroup,
             removalPolicy: cdk.RemovalPolicy.DESTROY,
         });
+        const [dbSecret, dbProxy] = this.addProxy(cluster, rdsSecurityGroup);
 
-        this.mysqlUrl = `mysql://${props.rdsUserName}:${props.config.rdsPassword}@${cluster.clusterEndpoint.hostname}:${cluster.clusterEndpoint.port}/${props.rdsDBName}`;
+        this.mysqlUrl = `mysql://${props.rdsUserName}:${props.config.rdsPassword}@${cluster.clusterEndpoint.hostname}:3306/${props.rdsDBName}`;
+        this.dbSecret = dbSecret;
+        this.dbProxyUrl = `mysql://${props.rdsUserName}:${props.config.rdsPassword}@${dbProxy.endpoint}:3306/${props.rdsDBName}`;
+    }
+
+    addProxy(dbCluster: DatabaseCluster, dbSecurityGroup: SecurityGroup): [ISecret, DatabaseProxy] {
+        const databaseCredentialsSecret = Secret.fromSecretCompleteArn(
+            this,
+            `${this.props.config.appName}-rdsSecret`,
+            this.props.config.environment === 'prd' ? 'arn:aws:secretsmanager:ap-northeast-1:960722127407:secret:rocket-api/rds-CBs3zG' : 'arn:aws:secretsmanager:ap-northeast-1:960722127407:secret:rocket-api-dev/rds-E0r1ph',
+        );
+        
+        const dbProxyRole = new Role(this, `${this.props.config.appName}-rdsproxyrole`, {
+            assumedBy: new ServicePrincipal('rds.amazonaws.com'),
+        });
+        dbProxyRole.addToPolicy(
+            new PolicyStatement({
+                resources: ['*'],
+                effect: Effect.ALLOW,
+                actions: [
+                    "secretsmanager:GetSecretValue",
+                    "secretsmanager:DescribeSecret",
+                ],
+            })
+        );
+
+        const dbProxy = new DatabaseProxy(this, `${this.props.config.appName}-rdsproxy`, {
+            dbProxyName: `${this.props.config.appName}-rdsproxy`,
+            proxyTarget: ProxyTarget.fromCluster(dbCluster),
+            requireTLS: false,
+            secrets: [databaseCredentialsSecret],
+            vpc: this.props.vpc,
+            vpcSubnets: {
+                subnets: this.props.vpc.privateSubnets,
+            },
+            role: dbProxyRole,
+            securityGroups: [dbSecurityGroup],
+        });
+
+        return [databaseCredentialsSecret, dbProxy];
     }
 }
