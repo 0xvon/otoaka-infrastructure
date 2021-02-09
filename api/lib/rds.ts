@@ -134,15 +134,6 @@ export class RDSStack extends cdk.Stack {
             role: dbProxyRole,
             securityGroups: [dbSecurityGroup],
         });
-        // const dbProxy = dbCluster.addProxy(`${this.props.config.appName}-proxy`, {
-        //     secrets: [databaseCredentialsSecret],
-        //     debugLogging: true,
-        //     vpc: this.props.vpc,
-        //     vpcSubnets: {
-        //         subnets: this.props.vpc.publicSubnets,
-        //     },
-        //     securityGroups: [dbSecurityGroup],
-        // });
 
         return [databaseCredentialsSecret, dbProxy];
     }
