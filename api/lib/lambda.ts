@@ -31,14 +31,23 @@ export class LambdaStack extends cdk.Stack {
 
         const adminLambdaRole = new iam.Role(this, `${props.config.appName}-adminLambdaRole`, {
             assumedBy: new iam.ServicePrincipal('lambda.amazonaws.com'),
-            managedPolicies: [
-                iam.ManagedPolicy.fromAwsManagedPolicyName('AWSLambdaBasicExecutionRole'),
-                iam.ManagedPolicy.fromAwsManagedPolicyName('AWSLambdaVPCAccessExecutionRole'),
-            ],
         });
         adminLambdaRole.addToPolicy(new iam.PolicyStatement({
             actions: ['SNS:Publish'],
             resources: [snsPlatformArn],
+        }))
+        adminLambdaRole.addToPolicy(new iam.PolicyStatement({
+            actions: [
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents",
+                "ec2:CreateNetworkInterface",
+                "ec2:DescribeNetworkInterfaces",
+                "ec2:DeleteNetworkInterface",
+                "ec2:AssignPrivateIpAddresses",
+                "ec2:UnassignPrivateIpAddresses",
+            ],
+            resources: ['*'],
         }))
 
         const adminLambda = new lambda.Function(this, `${props.config.appName}-adminLambda`, {
