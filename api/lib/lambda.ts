@@ -2,6 +2,7 @@ import * as cdk from '@aws-cdk/core';
 import * as ec2 from '@aws-cdk/aws-ec2';
 import * as lambda from '@aws-cdk/aws-lambda';
 import * as apigw from '@aws-cdk/aws-apigateway';
+import * as iam from '@aws-cdk/aws-iam';
 import * as s3 from '@aws-cdk/aws-s3';
 import { Config } from '../typing';
 
@@ -32,6 +33,9 @@ export class LambdaStack extends cdk.Stack {
             code: new lambda.S3Code(s3.Bucket.fromBucketName(this, `${props.config.appName}-bucket`, bucketName), 'RocketAdmin.zip'),
             handler: 'Handler',
             vpc: props.vpc,
+            vpcSubnets: {
+                subnets: props.vpc.isolatedSubnets,
+            },
             timeout: cdk.Duration.seconds(300),
             securityGroups: [adminLambdaSG],
             environment: {
@@ -51,5 +55,6 @@ export class LambdaStack extends cdk.Stack {
         const adminLambdaIntegration = new apigw.LambdaIntegration(adminLambda);
         const adminResource = restApi.root.addResource('admin');
         adminResource.addMethod('POST', adminLambdaIntegration);
+        adminResource
     }
 }

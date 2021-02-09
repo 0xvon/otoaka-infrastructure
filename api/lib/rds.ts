@@ -128,6 +128,9 @@ export class RDSStack extends cdk.Stack {
             requireTLS: false,
             secrets: [databaseCredentialsSecret],
             vpc: this.props.vpc,
+            vpcSubnets: {
+                subnets: this.props.vpc.isolatedSubnets,
+            },
             role: dbProxyRole,
             securityGroups: [dbSecurityGroup],
         });

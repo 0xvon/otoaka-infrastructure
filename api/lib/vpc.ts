@@ -2,6 +2,7 @@ import * as cdk from '@aws-cdk/core';
 import {
     Vpc,
     SubnetType,
+    NatProvider,
 } from '@aws-cdk/aws-ec2';
 
 interface VPCStackProps extends cdk.StackProps {
@@ -16,7 +17,9 @@ export class VPCStack extends cdk.Stack {
 
         const vpc: Vpc = new Vpc(this, `${props.appName}-vpc`, {
             cidr: '192.168.0.0/16',
-            natGateways: 0,
+            maxAzs: 2,
+            natGateways: 1,
+            natGatewayProvider: NatProvider.gateway(),
             subnetConfiguration: [
                 {
                     cidrMask: 24,
