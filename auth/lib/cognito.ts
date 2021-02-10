@@ -52,10 +52,10 @@ export class CognitoStack extends cdk.Stack {
                 requireSymbols: false,
             },
             standardAttributes: {
-                email: {
-                    mutable: true,
-                    required: true,
-                },
+                // email: {
+                //     mutable: true,
+                //     required: true,
+                // },
             },
             userVerification: {
                 emailSubject: 'Rocket for Bands II ログイン認証コード',
