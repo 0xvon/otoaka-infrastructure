@@ -53,7 +53,7 @@ export class CognitoStack extends cdk.Stack {
             },
             standardAttributes: {
                 email: {
-                    mutable: false,
+                    mutable: true,
                     required: true,
                 },
             },
