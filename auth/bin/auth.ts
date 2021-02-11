@@ -20,7 +20,7 @@ const s3Stack = new S3Stack(app, `${appName}-s3`, {
     },
 });
 
-const cognitoUserPoolStack = new CognitoStack(app, `${appName}-cognito`, {
+const cognitoUserPoolStack = new CognitoStack(app, `${appName}-cognito-user-pool`, {
     appName,
     bucketName: s3Stack.bucket.bucketName,
     signinCallbackUrl: signinCallbackUrl,

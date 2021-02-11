@@ -33,8 +33,8 @@ export class CognitoStack extends cdk.Stack {
     constructor(scope: cdk.App, id: string, props: CognitoStackProps) {
         super(scope, id, props);
 
-        const userPool = new UserPool(this, `${props.appName}-userPool`, {
-            userPoolName: `${props.appName}-UserPool`,
+        const userPool = new UserPool(this, `${props.appName}-user-pool`, {
+            userPoolName: `${props.appName}-user-pool`,
             mfa: Mfa.OFF,
             selfSignUpEnabled: true,
             accountRecovery: AccountRecovery.EMAIL_ONLY,
@@ -54,7 +54,7 @@ export class CognitoStack extends cdk.Stack {
             },
             standardAttributes: {
                 email: {
-                    mutable: false,
+                    mutable: true,
                     required: true,
                 },
             },
@@ -65,10 +65,8 @@ export class CognitoStack extends cdk.Stack {
                 smsMessage: 'Rocket for Bands IIの認証コードは{####}です',
             }
         });
-        const cfnUserPool = userPool.node.defaultChild as CfnUserPool;
-        cfnUserPool.addPropertyOverride("Schema.0.Mutable", true);
 
-        const userPoolDomain = new UserPoolDomain(this, `${props.appName}-userPoolDomain`, {
+        const userPoolDomain = new UserPoolDomain(this, `${props.appName}-UserPoolDomain`, {
             userPool: userPool,
             cognitoDomain: {
                 domainPrefix: props.appName,
@@ -102,8 +100,8 @@ export class CognitoStack extends cdk.Stack {
             },
         });
 
-        const appClient = userPool.addClient(`${props.appName}-appClient`, {
-            userPoolClientName: `${props.appName}-appClient`,
+        const appClient = userPool.addClient(`${props.appName}-AppClient`, {
+            userPoolClientName: `${props.appName}-app-client`,
             generateSecret: true,
             oAuth: {
                 flows: {
@@ -160,7 +158,7 @@ export class CognitoStack extends cdk.Stack {
         const idPool = new IdentityPool(this, `${props.appName}-idPool`, {
             unauthenticatedPolicyDocument: unauthenticatedPolicyDocument,
             allowUnauthenticatedIdentities: true,
-            identityPoolName: `${props.appName}-idPool`,
+            identityPoolName: `${props.appName}-id-pool`,
         });
     }
 }
