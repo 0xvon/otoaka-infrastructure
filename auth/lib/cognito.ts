@@ -9,6 +9,7 @@ import {
     VerificationEmailStyle,
     ProviderAttribute,
     OAuthScope,
+    CfnUserPool,
 } from '@aws-cdk/aws-cognito';
 import {
     PolicyDocument,
@@ -52,10 +53,10 @@ export class CognitoStack extends cdk.Stack {
                 requireSymbols: false,
             },
             standardAttributes: {
-                // email: {
-                //     mutable: true,
-                //     required: true,
-                // },
+                email: {
+                    mutable: false,
+                    required: true,
+                },
             },
             userVerification: {
                 emailSubject: 'Rocket for Bands II ログイン認証コード',
@@ -64,6 +65,8 @@ export class CognitoStack extends cdk.Stack {
                 smsMessage: 'Rocket for Bands IIの認証コードは{####}です',
             }
         });
+        const cfnUserPool = userPool.node.defaultChild as CfnUserPool;
+        cfnUserPool.addPropertyOverride("Schema.0.Mutable", true);
 
         const userPoolDomain = new UserPoolDomain(this, `${props.appName}-userPoolDomain`, {
             userPool: userPool,
