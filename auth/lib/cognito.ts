@@ -69,7 +69,7 @@ export class CognitoStack extends cdk.Stack {
         const userPoolDomain = new UserPoolDomain(this, `${props.appName}-UserPoolDomain`, {
             userPool: userPool,
             cognitoDomain: {
-                domainPrefix: props.appName,
+                domainPrefix: `cognito-${props.appName}`,
             },
         });
 
