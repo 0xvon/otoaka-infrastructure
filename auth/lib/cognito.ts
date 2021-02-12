@@ -107,6 +107,7 @@ export class CognitoStack extends cdk.Stack {
                 flows: {
                     authorizationCodeGrant: true,
                     implicitCodeGrant: true,
+                    clientCredentials: true,
                 },
                 scopes: [
                     OAuthScope.PHONE,
