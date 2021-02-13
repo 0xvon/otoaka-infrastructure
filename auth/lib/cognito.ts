@@ -63,13 +63,13 @@ export class CognitoStack extends cdk.Stack {
                 emailBody: '認証コードは{####}です',
                 emailStyle: VerificationEmailStyle.CODE,
                 smsMessage: 'Rocket for Bands IIの認証コードは{####}です',
-            }
+            },
         });
 
         const userPoolDomain = new UserPoolDomain(this, `${props.appName}-UserPoolDomain`, {
             userPool: userPool,
             cognitoDomain: {
-                domainPrefix: `${props.appName}-tmp`,
+                domainPrefix: `${props.appName}-v2`,
             },
         });
 
@@ -103,6 +103,12 @@ export class CognitoStack extends cdk.Stack {
         const appClient = userPool.addClient(`${props.appName}-AppClient`, {
             userPoolClientName: `${props.appName}-app-client`,
             generateSecret: true,
+            authFlows: {
+                userPassword: true,
+                userSrp: true,
+                custom: true,
+                adminUserPassword: true,
+            },
             oAuth: {
                 flows: {
                     authorizationCodeGrant: true,
