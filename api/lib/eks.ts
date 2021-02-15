@@ -252,7 +252,7 @@ export class EKSStack extends cdk.Stack {
                         commands: [
                             'env',
                             'export TAG=latest',
-                            '$(aws ecr get-login --no-include-email)',
+                            'aws ecr get-login-password --region ap-northeast-1 | docker login --username AWS --password-stdin 960722127407.dkr.ecr.ap-northeast-1.amazonaws.com',
                             'aws eks update-kubeconfig --name $CLUSTER_NAME --role-arn $ROLE_ARN',
                             'kubectl get no',
                         ],
