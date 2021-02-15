@@ -33,6 +33,7 @@ const rdsStack = new RDSStack(app, `${config.appName}-rds`, {
     vpc: vpcStack.vpc,
     rdsDBName: 'rocketdatabase',
     rdsUserName: 'rocketuser',
+    useSnapshot: config.environment === 'prd',
     env: {
         region: config.awsRegion,
     },

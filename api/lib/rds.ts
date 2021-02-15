@@ -6,6 +6,7 @@ import {
 } from '@aws-cdk/aws-ec2';
 import {
     DatabaseCluster,
+    DatabaseClusterFromSnapshot,
     DatabaseClusterEngine,
     AuroraMysqlEngineVersion,
     Credentials,
@@ -28,6 +29,7 @@ interface RDSStackProps extends cdk.StackProps {
 
     rdsUserName: string,
     rdsDBName: string,
+    useSnapshot: boolean,
 };
 
 export class RDSStack extends cdk.Stack {
@@ -72,7 +74,7 @@ export class RDSStack extends cdk.Stack {
             },
         });
 
-        const cluster = new DatabaseCluster(this, `${props.config.appName}-DB-cluster`, {
+        const cluster = props.useSnapshot ? this.createClusterFromSnapshots(rdsSecurityGroup, rdsParameterGroup) : new DatabaseCluster(this, `${props.config.appName}-DB-cluster`, {
             engine: DatabaseClusterEngine.auroraMysql({
                 version: AuroraMysqlEngineVersion.VER_2_08_1,
             }),
@@ -101,7 +103,7 @@ export class RDSStack extends cdk.Stack {
         this.dbProxyUrl = `mysql://${props.rdsUserName}:${props.config.rdsPassword}@${dbProxy.endpoint}:3306/${props.rdsDBName}`;
     }
 
-    addProxy(dbCluster: DatabaseCluster, dbSecurityGroup: SecurityGroup): [ISecret, DatabaseProxy] {
+    addProxy(dbCluster: DatabaseCluster | DatabaseClusterFromSnapshot, dbSecurityGroup: SecurityGroup): [ISecret, DatabaseProxy] {
         const databaseCredentialsSecret = Secret.fromSecretCompleteArn(
             this,
             `${this.props.config.appName}-rdsSecret`,
@@ -136,5 +138,34 @@ export class RDSStack extends cdk.Stack {
         });
 
         return [databaseCredentialsSecret, dbProxy];
+    }
+
+    createClusterFromSnapshots(rdsSecurityGroup: SecurityGroup, rdsParameterGroup: ParameterGroup): DatabaseClusterFromSnapshot {
+        const snapshotID = 'arn:aws:rds:ap-northeast-1:960722127407:cluster-snapshot:rds:rocket-api-rds-rocketapidbcluster7112b37a-9i1mt2fus6ib-2021-02-14-14-20';
+
+        const cluster = new DatabaseClusterFromSnapshot(this, `${this.props.config.appName}-clusterFromSnapShot`, {
+            engine: DatabaseClusterEngine.auroraMysql({
+                version: AuroraMysqlEngineVersion.VER_2_08_1,
+            }),
+            snapshotIdentifier: snapshotID,
+            defaultDatabaseName: this.props.rdsDBName,
+            instanceProps: {
+                vpcSubnets: {
+                    subnets: this.props.vpc.privateSubnets,
+                },
+                vpc: this.props.vpc,
+                securityGroups: [rdsSecurityGroup],
+                autoMinorVersionUpgrade: true,
+                
+            },
+            cloudwatchLogsExports: [
+                'slowquery',
+                'error',
+            ],
+            parameterGroup: rdsParameterGroup,
+            removalPolicy: cdk.RemovalPolicy.DESTROY,
+        });
+
+        return cluster;
     }
 }

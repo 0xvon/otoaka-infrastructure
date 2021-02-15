@@ -146,7 +146,7 @@ export class EKSStack extends cdk.Stack {
         newStringData["AWS_SECRET_ACCESS_KEY"] = this.props.config.awsSecretAccessKey;
         newStringData["AWS_REGION"] = this.props.config.awsRegion;
         newStringData["LOG_LEVEL"] = 'INFO';
-        newStringData["CONGNITO_IDP_USER_POOL_ID"] = this.props.config.environment === 'prd' ? 'ap-northeast-1_6SJ90evpD' : 'ap-northeast-1_NVMXP3C8W';
+        newStringData["CONGNITO_IDP_USER_POOL_ID"] = this.props.config.environment === 'prd' ? 'ap-northeast-1_6SJ90evpD' : 'ap-northeast-1_JgZtZFWS8';
         newStringData["SNS_PLATFORM_APPLICATION_ARN"] = this.props.config.environment === 'prd' ? 'arn:aws:sns:ap-northeast-1:960722127407:app/APNS/rocket-ios-prod' : 'arn:aws:sns:ap-northeast-1:960722127407:app/APNS_SANDBOX/rocket-ios-dev';
 
         const containerEnvironments: ApplicationManifest.ContainerEnv[] = Object.keys(newStringData).map(key => {
