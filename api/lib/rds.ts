@@ -35,7 +35,7 @@ interface RDSStackProps extends cdk.StackProps {
 export class RDSStack extends cdk.Stack {
     props: RDSStackProps;
     mysqlUrl: string;
-    // dbProxyUrl: string;
+    dbProxyUrl: string;
     rdsSecurityGroupId: string;
 
     constructor(scope: cdk.Construct, id: string, props: RDSStackProps) {
@@ -95,10 +95,10 @@ export class RDSStack extends cdk.Stack {
             parameterGroup: rdsParameterGroup,
             removalPolicy: cdk.RemovalPolicy.DESTROY,
         });
-        // const [dbSecret, dbProxy] = this.addProxy(cluster, rdsSecurityGroup);
+        const [dbSecret, dbProxy] = this.addProxy(cluster, rdsSecurityGroup);
 
         this.mysqlUrl = `mysql://${props.rdsUserName}:${props.config.rdsPassword}@${cluster.clusterEndpoint.hostname}:3306/${props.rdsDBName}`;
-        // this.dbProxyUrl = `mysql://${props.rdsUserName}:${props.config.rdsPassword}@${dbProxy.endpoint}:3306/${props.rdsDBName}`;
+        this.dbProxyUrl = `mysql://${props.rdsUserName}:${props.config.rdsPassword}@${dbProxy.endpoint}:3306/${props.rdsDBName}`;
     }
 
     addProxy(dbCluster: DatabaseCluster | DatabaseClusterFromSnapshot, dbSecurityGroup: SecurityGroup): [ISecret, DatabaseProxy] {
