@@ -97,8 +97,6 @@ export const deployment = (config: DeploymentConfig) => {
                         {
                             name: 'mackerel-container-agent',
                             image: 'mackerel/mackerel-container-agent:plugins',
-                            restartPolicy: 'Always',
-
                             imagePullPolicy: 'Always',
                             resources: {
                                 limits: {
