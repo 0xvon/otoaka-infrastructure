@@ -54,8 +54,8 @@ export const deployment = (config: DeploymentConfig) => {
             template: {
                 metadata: { labels: appLabel },
                 spec: {
-                    restartPolicy: 'Never',
-                    // serviceAccountName: 'mackerel-serviceaccount',
+                    restartPolicy: 'Always',
+                    serviceAccountName: 'mackerel-serviceaccount',
                     containers: [
                         {
                             name: appLabel.app,
@@ -94,61 +94,61 @@ export const deployment = (config: DeploymentConfig) => {
                                 },
                             }
                         },
-                        // {
-                        //     name: 'mackerel-container-agent',
-                        //     image: 'mackerel/mackerel-container-agent:plugins',
-                        //     restartPolicy: 'Always',
+                        {
+                            name: 'mackerel-container-agent',
+                            image: 'mackerel/mackerel-container-agent:plugins',
+                            restartPolicy: 'Always',
 
-                        //     imagePullPolicy: 'Always',
-                        //     resources: {
-                        //         limits: {
-                        //             memory: '128Mi',
-                        //             cpu: '0.25',
-                        //         },
-                        //     },
-                        //     env: [
-                        //         {
-                        //             name: 'MACKEREL_KUBERNETES_KUBELET_READ_ONLY_PORT',
-                        //             value: '0',
-                        //         },
-                        //         {
-                        //             name: 'MACKEREL_CONTAINER_PLATFORM',
-                        //             value: 'kubernetes',                                    
-                        //         },
-                        //         {
-                        //             name: 'MACKEREL_APIKEY',
-                        //             value: config.mackerelApiKey,
-                        //         },
-                        //         // {
-                        //         //     name: 'MACKEREL_AGENT_CONFIG',
-                        //         //     value: mackerelConfigPath,
-                        //         // },
-                        //         {
-                        //             name: 'MACKEREL_KUBERNETES_NAMESPACE',
-                        //             valueFrom: {
-                        //                 fieldRef: {
-                        //                     fieldPath: 'metadata.namespace'
-                        //                 },
-                        //             },
-                        //         },
-                        //         {
-                        //             name: 'MACKEREL_KUBERNETES_KUBELET_HOST',
-                        //             valueFrom: {
-                        //                 fieldRef: {
-                        //                     fieldPath: 'status.hostIP'
-                        //                 },
-                        //             },
-                        //         },
-                        //         {
-                        //             name: 'MACKEREL_KUBERNETES_POD_NAME',
-                        //             valueFrom: {
-                        //                 fieldRef: {
-                        //                     fieldPath: 'metadata.name'
-                        //                 },
-                        //             },
-                        //         },
-                        //     ]
-                        // }
+                            imagePullPolicy: 'Always',
+                            resources: {
+                                limits: {
+                                    memory: '128Mi',
+                                    cpu: '0.25',
+                                },
+                            },
+                            env: [
+                                {
+                                    name: 'MACKEREL_KUBERNETES_KUBELET_READ_ONLY_PORT',
+                                    value: '0',
+                                },
+                                {
+                                    name: 'MACKEREL_CONTAINER_PLATFORM',
+                                    value: 'kubernetes',                                    
+                                },
+                                {
+                                    name: 'MACKEREL_APIKEY',
+                                    value: config.mackerelApiKey,
+                                },
+                                // {
+                                //     name: 'MACKEREL_AGENT_CONFIG',
+                                //     value: mackerelConfigPath,
+                                // },
+                                {
+                                    name: 'MACKEREL_KUBERNETES_NAMESPACE',
+                                    valueFrom: {
+                                        fieldRef: {
+                                            fieldPath: 'metadata.namespace'
+                                        },
+                                    },
+                                },
+                                {
+                                    name: 'MACKEREL_KUBERNETES_KUBELET_HOST',
+                                    valueFrom: {
+                                        fieldRef: {
+                                            fieldPath: 'status.hostIP'
+                                        },
+                                    },
+                                },
+                                {
+                                    name: 'MACKEREL_KUBERNETES_POD_NAME',
+                                    valueFrom: {
+                                        fieldRef: {
+                                            fieldPath: 'metadata.name'
+                                        },
+                                    },
+                                },
+                            ]
+                        }
                     ],
                 },
             },
