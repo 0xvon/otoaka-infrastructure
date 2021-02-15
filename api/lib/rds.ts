@@ -139,7 +139,7 @@ export class RDSStack extends cdk.Stack {
     }
 
     createClusterFromSnapshots(rdsSecurityGroup: SecurityGroup, rdsParameterGroup: ParameterGroup): DatabaseClusterFromSnapshot {
-        const snapshotID = 'aarn:aws:rds:ap-northeast-1:960722127407:cluster-snapshot:rds-snapshot';
+        const snapshotID = 'arn:aws:rds:ap-northeast-1:960722127407:cluster-snapshot:rds-snapshot';
 
         const cluster = new DatabaseClusterFromSnapshot(this, `${this.props.config.appName}-clusterFromSnapShot`, {
             engine: DatabaseClusterEngine.auroraMysql({
