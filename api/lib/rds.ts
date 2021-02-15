@@ -35,9 +35,8 @@ interface RDSStackProps extends cdk.StackProps {
 export class RDSStack extends cdk.Stack {
     props: RDSStackProps;
     mysqlUrl: string;
-    dbProxyUrl: string;
+    // dbProxyUrl: string;
     rdsSecurityGroupId: string;
-    dbSecret: ISecret;
 
     constructor(scope: cdk.Construct, id: string, props: RDSStackProps) {
         super(scope, id, props);
@@ -96,11 +95,10 @@ export class RDSStack extends cdk.Stack {
             parameterGroup: rdsParameterGroup,
             removalPolicy: cdk.RemovalPolicy.DESTROY,
         });
-        const [dbSecret, dbProxy] = this.addProxy(cluster, rdsSecurityGroup);
+        // const [dbSecret, dbProxy] = this.addProxy(cluster, rdsSecurityGroup);
 
         this.mysqlUrl = `mysql://${props.rdsUserName}:${props.config.rdsPassword}@${cluster.clusterEndpoint.hostname}:3306/${props.rdsDBName}`;
-        this.dbSecret = dbSecret;
-        this.dbProxyUrl = `mysql://${props.rdsUserName}:${props.config.rdsPassword}@${dbProxy.endpoint}:3306/${props.rdsDBName}`;
+        // this.dbProxyUrl = `mysql://${props.rdsUserName}:${props.config.rdsPassword}@${dbProxy.endpoint}:3306/${props.rdsDBName}`;
     }
 
     addProxy(dbCluster: DatabaseCluster | DatabaseClusterFromSnapshot, dbSecurityGroup: SecurityGroup): [ISecret, DatabaseProxy] {
@@ -141,7 +139,7 @@ export class RDSStack extends cdk.Stack {
     }
 
     createClusterFromSnapshots(rdsSecurityGroup: SecurityGroup, rdsParameterGroup: ParameterGroup): DatabaseClusterFromSnapshot {
-        const snapshotID = 'arn:aws:rds:ap-northeast-1:960722127407:cluster-snapshot:rds:rocket-api-rds-rocketapidbcluster7112b37a-9i1mt2fus6ib-2021-02-14-14-20';
+        const snapshotID = 'aarn:aws:rds:ap-northeast-1:960722127407:cluster-snapshot:rds-snapshot';
 
         const cluster = new DatabaseClusterFromSnapshot(this, `${this.props.config.appName}-clusterFromSnapShot`, {
             engine: DatabaseClusterEngine.auroraMysql({

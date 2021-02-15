@@ -39,24 +39,24 @@ const rdsStack = new RDSStack(app, `${config.appName}-rds`, {
     },
 });
 
-const eksStack = new EKSStack(app, `${config.appName}-eks`, {
-    config: config,
-    vpc: vpcStack.vpc,
-    mysqlUrl: rdsStack.mysqlUrl,
-    mysqlSecurityGroupId: rdsStack.rdsSecurityGroupId,
-    env: {
-        region: config.awsRegion,
-    },
-});
+// const eksStack = new EKSStack(app, `${config.appName}-eks`, {
+//     config: config,
+//     vpc: vpcStack.vpc,
+//     mysqlUrl: rdsStack.mysqlUrl,
+//     mysqlSecurityGroupId: rdsStack.rdsSecurityGroupId,
+//     env: {
+//         region: config.awsRegion,
+//     },
+// });
 
-const lambdaStack = new LambdaStack(app, `${config.appName}-lambda`, {
-    config: config,
-    vpc: vpcStack.vpc,
-    dbProxyUrl: rdsStack.dbProxyUrl,
-    dbSecurityGroupId: rdsStack.rdsSecurityGroupId,
-    env: {
-        region: config.awsRegion,
-    },
-});
+// const lambdaStack = new LambdaStack(app, `${config.appName}-lambda`, {
+//     config: config,
+//     vpc: vpcStack.vpc,
+//     dbProxyUrl: rdsStack.dbProxyUrl,
+//     dbSecurityGroupId: rdsStack.rdsSecurityGroupId,
+//     env: {
+//         region: config.awsRegion,
+//     },
+// });
 
 app.synth();
