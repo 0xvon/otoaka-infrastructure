@@ -54,7 +54,7 @@ export const deployment = (config: DeploymentConfig) => {
             template: {
                 metadata: { labels: appLabel },
                 spec: {
-                    restartPolicy: 'Always',
+                    restartPolicy: 'Never',
                     serviceAccountName: 'mackerel-serviceaccount',
                     containers: [
                         {
