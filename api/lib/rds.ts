@@ -145,7 +145,7 @@ export class RDSStack extends cdk.Stack {
 
         const cluster = new DatabaseClusterFromSnapshot(this, `${this.props.config.appName}-clusterFromSnapShot`, {
             engine: DatabaseClusterEngine.auroraMysql({
-                version: AuroraMysqlEngineVersion.VER_2_08_1,
+                version: AuroraMysqlEngineVersion.VER_2_08_2,
             }),
             clusterIdentifier: `${this.props.config.appName}-rds-cluster`,
             snapshotIdentifier: snapshotID,
@@ -157,7 +157,6 @@ export class RDSStack extends cdk.Stack {
                 vpc: this.props.vpc,
                 securityGroups: [rdsSecurityGroup],
                 autoMinorVersionUpgrade: true,
-                
             },
             cloudwatchLogsExports: [
                 'slowquery',
