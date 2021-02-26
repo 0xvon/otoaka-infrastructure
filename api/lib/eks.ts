@@ -209,7 +209,7 @@ export class EKSStack extends cdk.Stack {
     private buildPipeline(cluster: Cluster, ecrRepository: Repository) {
         const githubOwner = 'wall-of-death';
         const githubRepo = 'rocket-api';
-        const githubBranch = this.props.config.environment === 'prd' ? 'master' : 'master';
+        const githubBranch = this.props.config.environment === 'prd' ? 'master' : 'develop';
         const githubToken = cdk.SecretValue.secretsManager('GITHUB_TOKEN')
 
         const sourceOutput = new Artifact();
@@ -252,7 +252,7 @@ export class EKSStack extends cdk.Stack {
                         commands: [
                             'env',
                             'export TAG=latest',
-                            '$(aws ecr get-login --no-include-email)',
+                            'aws ecr get-login-password --region ap-northeast-1 | docker login --username AWS --password-stdin 960722127407.dkr.ecr.ap-northeast-1.amazonaws.com',
                             'aws eks update-kubeconfig --name $CLUSTER_NAME --role-arn $ROLE_ARN',
                             'kubectl get no',
                         ],
