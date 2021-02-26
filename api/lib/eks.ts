@@ -209,7 +209,7 @@ export class EKSStack extends cdk.Stack {
     private buildPipeline(cluster: Cluster, ecrRepository: Repository) {
         const githubOwner = 'wall-of-death';
         const githubRepo = 'rocket-api';
-        const githubBranch = this.props.config.environment === 'prd' ? 'master' : 'master';
+        const githubBranch = this.props.config.environment === 'prd' ? 'master' : 'develop';
         const githubToken = cdk.SecretValue.secretsManager('GITHUB_TOKEN')
 
         const sourceOutput = new Artifact();
