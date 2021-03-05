@@ -78,6 +78,6 @@ export class LambdaStack extends cdk.Stack {
         const adminLambdaIntegration = new apigw.LambdaIntegration(adminLambda);
         const adminResource = restApi.root.addResource('admin');
         adminResource.addMethod('POST', adminLambdaIntegration, { apiKeyRequired: true });
-        restApi.addApiKey('ApiKey', { apiKeyName: 'gas' });
+        restApi.addApiKey('ApiKey', { apiKeyName: `${props.config.appName}-gas` });
     }
 }
