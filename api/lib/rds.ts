@@ -70,6 +70,7 @@ export class RDSStack extends cdk.Stack {
                 slow_query_log: '1',
                 long_query_time: '1',
                 innodb_print_all_deadlocks: '1',
+                lower_case_table_names: '1',
             },
         });
 
