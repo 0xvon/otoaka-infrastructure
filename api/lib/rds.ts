@@ -59,7 +59,8 @@ export class RDSStack extends cdk.Stack {
                 character_set_database: 'utf8mb4',
                 character_set_client: 'utf8mb4',
                 character_set_results: 'utf8mb4',
-                collation_server: 'utf8mb4_bin',
+                collation_server: 'utf8mb4_general_ci',
+                collation_connection: 'utf8mb4_general_ci',
                 log_warnings: '1',
                 performance_schema: '1',
                 log_queries_not_using_indexes: '0',
@@ -70,6 +71,7 @@ export class RDSStack extends cdk.Stack {
                 slow_query_log: '1',
                 long_query_time: '1',
                 innodb_print_all_deadlocks: '1',
+                lower_case_table_names: '1',
             },
         });
 
