@@ -60,6 +60,7 @@ export class RDSStack extends cdk.Stack {
                 character_set_client: 'utf8mb4',
                 character_set_results: 'utf8mb4',
                 collation_server: 'utf8mb4_general_ci',
+                collation_connection: 'utf8mb4_general_ci',
                 log_warnings: '1',
                 performance_schema: '1',
                 log_queries_not_using_indexes: '0',
