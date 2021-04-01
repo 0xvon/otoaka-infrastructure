@@ -64,6 +64,8 @@ export class LambdaStack extends cdk.Stack {
             environment: {
                 SNS_PLATFORM_APPLICATION_ARN: snsPlatformArn,
                 DATABASE_URL: props.dbProxyUrl,
+                AWS_ACCESS_KEY_ID_TMP: props.config.awsAccessKeyId,
+                AWS_SECRET_ACCESS_KEY_TMP: props.config.awsSecretAccessKey,
             }
         });
 
