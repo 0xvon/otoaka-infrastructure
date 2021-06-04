@@ -8,6 +8,7 @@ import {
 } from '@aws-cdk/aws-ec2';
 import {
     Cluster,
+    FargateCluster,
     EndpointAccess,
     KubernetesVersion,
     AwsAuth,
@@ -86,18 +87,38 @@ export class EKSStack extends cdk.Stack {
         });
 
         // EKS Cluster
-        const cluster = new Cluster(this, `${props.config.appName}-cluster`, {
+        const cluster = new FargateCluster(this, `${props.config.appName}-cluster`, {
             vpc: props.vpc,
             vpcSubnets: [
                 { subnets: props.vpc.publicSubnets },
             ],
             endpointAccess: EndpointAccess.PUBLIC,
-            defaultCapacity: 0,
             role: eksRole,
             mastersRole: adminRole,
             version: KubernetesVersion.V1_18,
-            clusterName: `${props.config.appName}-cluster`,
+            clusterName:  `${props.config.appName}-cluster`,
         });
+
+        cluster.addFargateProfile(`${props.config.appName}-fargate-profile`, {
+            selectors: [
+                { namespace: 'default' },
+            ],
+            subnetSelection: { subnetType: SubnetType.PUBLIC },
+            vpc: props.vpc,
+        })
+
+        // const cluster = new Cluster(this, `${props.config.appName}-cluster`, {
+        //     vpc: props.vpc,
+        //     vpcSubnets: [
+        //         { subnets: props.vpc.publicSubnets },
+        //     ],
+        //     endpointAccess: EndpointAccess.PUBLIC,
+        //     defaultCapacity: 0,
+        //     role: eksRole,
+        //     mastersRole: adminRole,
+        //     version: KubernetesVersion.V1_18,
+        //     clusterName: `${props.config.appName}-cluster`,
+        // });
 
         // Node Group
         const ng = cluster.addNodegroupCapacity(`${props.config.appName}-capacity`, {
