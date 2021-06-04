@@ -102,8 +102,9 @@ export class EKSStack extends cdk.Stack {
         cluster.addFargateProfile(`${props.config.appName}-fargate-profile`, {
             selectors: [
                 { namespace: 'default' },
+                { namespace: 'kube-system' },
             ],
-            subnetSelection: { subnetType: SubnetType.PUBLIC },
+            subnetSelection: { subnets: props.vpc.publicSubnets },
             vpc: props.vpc,
         })
 
