@@ -1,7 +1,7 @@
 import * as cdk from '@aws-cdk/core';
 import {
     Vpc,
-    InstanceType,
+    // InstanceType,
     SecurityGroup,
     Port,
     SubnetType,
@@ -11,8 +11,8 @@ import {
     FargateCluster,
     EndpointAccess,
     KubernetesVersion,
-    AwsAuth,
-    Nodegroup,
+    // AwsAuth,
+    // Nodegroup,
 } from '@aws-cdk/aws-eks';
 import {
     Role,
@@ -21,7 +21,7 @@ import {
     ManagedPolicy,
     PolicyStatement,
 } from '@aws-cdk/aws-iam';
-import { UpdatePolicy } from '@aws-cdk/aws-autoscaling';
+// import { UpdatePolicy } from '@aws-cdk/aws-autoscaling';
 import { Repository } from '@aws-cdk/aws-ecr';
 import { LinuxBuildImage, BuildSpec, PipelineProject } from '@aws-cdk/aws-codebuild';
 import { Artifact, Pipeline } from '@aws-cdk/aws-codepipeline';
@@ -30,7 +30,7 @@ import { GitHubSourceAction, CodeBuildAction } from '@aws-cdk/aws-codepipeline-a
 import * as ApplicationManifest from './manifests/application';
 import * as MackerelServiceAccount from './manifests/mackerel-serviceaccount';
 import * as FluentdManifest from './manifests/fluentd';
-import { users } from '../config';
+// import { users } from '../config';
 import { Config } from '../typing';
 
 interface EKSStackProps extends cdk.StackProps {
@@ -90,7 +90,7 @@ export class EKSStack extends cdk.Stack {
         const cluster = new FargateCluster(this, `${props.config.appName}-cluster`, {
             vpc: props.vpc,
             vpcSubnets: [
-                { subnets: props.vpc.privateSubnets },
+                { subnetType: SubnetType.PRIVATE },
             ],
             endpointAccess: EndpointAccess.PUBLIC,
             role: eksRole,
@@ -104,8 +104,9 @@ export class EKSStack extends cdk.Stack {
                 { namespace: 'default' },
                 { namespace: 'kube-system' },
             ],
-            subnetSelection: { subnets: props.vpc.privateSubnets },
+            subnetSelection: { subnetType: SubnetType.PRIVATE },
             vpc: props.vpc,
+            podExecutionRole: adminRole,
         })
 
         // const cluster = new Cluster(this, `${props.config.appName}-cluster`, {
