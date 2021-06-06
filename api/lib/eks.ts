@@ -81,6 +81,13 @@ export class EKSStack extends cdk.Stack {
             assumedBy: new AccountRootPrincipal(),
         });
 
+        const podExecutionRole = new Role(this, `${props.config.appName}-PodExecutionRole`, {
+            assumedBy: new ServicePrincipal('eks-fargate-pods.amazonaws.com'),
+                managedPolicies: [
+                    ManagedPolicy.fromAwsManagedPolicyName('AmazonEKSFargatePodExecutionRolePolicy'),
+                ],
+        })
+
         // ECR Repository
         const ecrRepository = new Repository(this, `${props.config.appName}-ECR`, {
             repositoryName: `${props.config.appName}`,
@@ -106,7 +113,7 @@ export class EKSStack extends cdk.Stack {
             ],
             subnetSelection: { subnetType: SubnetType.PRIVATE },
             vpc: props.vpc,
-            podExecutionRole: adminRole,
+            podExecutionRole: podExecutionRole,
         })
 
         // const cluster = new Cluster(this, `${props.config.appName}-cluster`, {
