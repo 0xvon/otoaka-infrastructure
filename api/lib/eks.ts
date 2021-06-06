@@ -90,7 +90,7 @@ export class EKSStack extends cdk.Stack {
         const cluster = new FargateCluster(this, `${props.config.appName}-cluster`, {
             vpc: props.vpc,
             vpcSubnets: [
-                { subnets: props.vpc.publicSubnets },
+                { subnets: props.vpc.privateSubnets },
             ],
             endpointAccess: EndpointAccess.PUBLIC,
             role: eksRole,
@@ -104,7 +104,7 @@ export class EKSStack extends cdk.Stack {
                 { namespace: 'default' },
                 { namespace: 'kube-system' },
             ],
-            subnetSelection: { subnets: props.vpc.publicSubnets },
+            subnetSelection: { subnets: props.vpc.privateSubnets },
             vpc: props.vpc,
         })
 
@@ -122,20 +122,20 @@ export class EKSStack extends cdk.Stack {
         // });
 
         // Node Group
-        const ng = cluster.addNodegroupCapacity(`${props.config.appName}-capacity`, {
-            desiredSize: minCapacity,
-            subnets: { subnetType: SubnetType.PUBLIC },
-            instanceType: new InstanceType(instanceType),
-        });
-        ["service-role/AmazonEC2RoleforSSM", "AmazonEC2ContainerRegistryPowerUser", "CloudWatchLogsFullAccess"].forEach((policyName) => {
-            ng.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName(policyName));
-        });
+        // const ng = cluster.addNodegroupCapacity(`${props.config.appName}-capacity`, {
+        //     desiredSize: minCapacity,
+        //     subnets: { subnetType: SubnetType.PUBLIC },
+        //     instanceType: new InstanceType(instanceType),
+        // });
+        // ["service-role/AmazonEC2RoleforSSM", "AmazonEC2ContainerRegistryPowerUser", "CloudWatchLogsFullAccess"].forEach((policyName) => {
+        //     ng.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName(policyName));
+        // });
 
         // add manifest for cluster
         this.addManifest(cluster, ecrRepository);
 
         // add aws-auth for cluster
-        this.addAuth(cluster, adminRole, ng);
+        // this.addAuth(cluster, adminRole, ng);
         
         // Inject RDS Inbound Security Group Rule
         if (props.mysqlSecurityGroupId) {
@@ -210,15 +210,15 @@ export class EKSStack extends cdk.Stack {
         );
     }
 
-    private addAuth(cluster: Cluster, adminRole: Role, ng: Nodegroup) {
-        const awsAuth = new AwsAuth(this, `${this.props.config.appName}-AwsAuth`, { cluster: cluster });
-        awsAuth.addRoleMapping(ng.role, {
-            groups: ["system:bootstrappers", "system:nodes"],
-            username: "system:node:{{EC2PrivateDNSName}}",
-        });
-        awsAuth.addMastersRole(adminRole, adminRole.roleName);
-        users.forEach(user => { awsAuth.addMastersRole(adminRole, user) });
-    }
+    // private addAuth(cluster: Cluster, adminRole: Role, ng: Nodegroup) {
+    //     const awsAuth = new AwsAuth(this, `${this.props.config.appName}-AwsAuth`, { cluster: cluster });
+    //     awsAuth.addRoleMapping(ng.role, {
+    //         groups: ["system:bootstrappers", "system:nodes"],
+    //         username: "system:node:{{EC2PrivateDNSName}}",
+    //     });
+    //     awsAuth.addMastersRole(adminRole, adminRole.roleName);
+    //     users.forEach(user => { awsAuth.addMastersRole(adminRole, user) });
+    // }
 
     private injectSecurityGroup(appSGId: string, rdsSecurityGroupId: string) {
         const rdsSecurityGroup = SecurityGroup.fromSecurityGroupId(this, `${this.props.config.appName}-DB-SG`, rdsSecurityGroupId);
