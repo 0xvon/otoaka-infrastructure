@@ -160,6 +160,11 @@ export const service = (acmCertificateArn: string) => {
         kind: 'Service',
         metadata: {
             name: appLabel.app,
+            annotations: {
+                'service.beta.kubernetes.io/aws-load-balancer-type': "external",
+                'service.beta.kubernetes.io/aws-load-balancer-nlb-target-type': "ip",
+                'service.beta.kubernetes.io/aws-load-balancer-scheme': "internet-facing",
+            },
             // annotations: {
             //     'service.beta.kubernetes.io/aws-load-balancer-ssl-cert': acmCertificateArn,
             //     'service.beta.kubernetes.io/aws-load-balancer-backend-protocol': 'http',
