@@ -27,6 +27,7 @@ const vpcStack = new VPCStack(app, `${config.appName}-vpc`, {
     appName: config.appName,
     env: {
         region: config.awsRegion,
+        account: process.env.CDK_DEFAULT_ACCOUNT,
     },
 });
 
@@ -38,6 +39,7 @@ const rdsStack = new RDSStack(app, `${config.appName}-rds`, {
     useSnapshot: config.environment === 'prd',
     env: {
         region: config.awsRegion,
+        account: process.env.CDK_DEFAULT_ACCOUNT,
     },
 });
 
@@ -69,6 +71,7 @@ const lambdaStack = new LambdaStack(app, `${config.appName}-lambda`, {
     dbSecurityGroupId: rdsStack.rdsSecurityGroupId,
     env: {
         region: config.awsRegion,
+        account: process.env.CDK_DEFAULT_ACCOUNT,
     },
 });
 
