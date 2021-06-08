@@ -2,7 +2,7 @@ name: Deployment Rocket API
 
 on:
   push:
-    branches: ["master"]
+    branches: ["master", "develop"]
 
 jobs:
   deploy:
