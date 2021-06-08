@@ -34,12 +34,18 @@ export class ECSStack extends cdk.Stack {
             repositoryName: `${props.config.appName}`,
         });
 
+        const serviceSecurityGroup = new ec2.SecurityGroup(this, `ServiceSecurityGroup`, {
+            allowAllOutbound: true,
+            vpc: props.vpc,
+            securityGroupName: `${props.config.appName}-APP-SG`,
+        });
+
         const application = new ecsPatterns.ApplicationLoadBalancedFargateService(this, 'ecs-service', {
             vpc: props.vpc,
             platformVersion: ecs.FargatePlatformVersion.VERSION1_4,
             memoryLimitMiB: memorySize,
             cpu: cpuSize,
-
+            securityGroups: [serviceSecurityGroup],
             assignPublicIp: true,
             publicLoadBalancer: true,
             taskImageOptions: {
@@ -62,7 +68,7 @@ export class ECSStack extends cdk.Stack {
         });
 
         if (props.mysqlSecurityGroupId) {
-            this.injectSecurityGroup(application.loadBalancer.loadBalancerSecurityGroups, props.mysqlSecurityGroupId);
+            this.injectSecurityGroup([serviceSecurityGroup.securityGroupId], props.mysqlSecurityGroupId);
         }
 
         this.buildPipeline(application.service, ecrRepository);
