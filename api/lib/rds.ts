@@ -3,6 +3,7 @@ import {
     Vpc,
     SecurityGroup,
     Port,
+    IVpc,
 } from '@aws-cdk/aws-ec2';
 import {
     DatabaseCluster,
@@ -24,7 +25,7 @@ import { Secret, ISecret } from '@aws-cdk/aws-secretsmanager';
 import { Config } from '../typing';
 
 interface RDSStackProps extends cdk.StackProps {
-    vpc: Vpc,
+    vpcId: string,
     config: Config,
 
     rdsUserName: string,
@@ -34,6 +35,7 @@ interface RDSStackProps extends cdk.StackProps {
 
 export class RDSStack extends cdk.Stack {
     props: RDSStackProps;
+    vpc: IVpc;
     mysqlUrl: string;
     dbProxyUrl: string;
     rdsSecurityGroupId: string;
@@ -42,9 +44,12 @@ export class RDSStack extends cdk.Stack {
         super(scope, id, props);
         this.props = props
 
+        const vpc = Vpc.fromLookup(this, 'vpc', { vpcId: props.vpcId });
+        this.vpc = vpc;
+
         const rdsSecurityGroup = new SecurityGroup(this, `${props.config.appName}-DB-SG`, {
             allowAllOutbound: true,
-            vpc: props.vpc,
+            vpc: vpc,
             securityGroupName: `${props.config.appName}-DB-SG`,
         });
         rdsSecurityGroup.addIngressRule(rdsSecurityGroup, Port.tcp(3306), `allow ${props.config.appName} admin db connection`);
@@ -83,9 +88,9 @@ export class RDSStack extends cdk.Stack {
             defaultDatabaseName: props.rdsDBName,
             instanceProps: {
                 vpcSubnets: {
-                    subnets: props.vpc.privateSubnets,
+                    subnets: vpc.privateSubnets,
                 },
-                vpc: props.vpc,
+                vpc: this.vpc,
                 securityGroups: [rdsSecurityGroup],
                 autoMinorVersionUpgrade: true,
                 
@@ -129,9 +134,9 @@ export class RDSStack extends cdk.Stack {
             proxyTarget: ProxyTarget.fromCluster(dbCluster),
             requireTLS: false,
             secrets: [databaseCredentialsSecret],
-            vpc: this.props.vpc,
+            vpc: this.vpc,
             vpcSubnets: {
-                subnets: this.props.vpc.privateSubnets,
+                subnets: this.vpc.privateSubnets,
             },
             role: dbProxyRole,
             securityGroups: [dbSecurityGroup],
@@ -152,9 +157,9 @@ export class RDSStack extends cdk.Stack {
             defaultDatabaseName: this.props.rdsDBName,
             instanceProps: {
                 vpcSubnets: {
-                    subnets: this.props.vpc.privateSubnets,
+                    subnets: this.vpc.privateSubnets,
                 },
-                vpc: this.props.vpc,
+                vpc: this.vpc,
                 securityGroups: [rdsSecurityGroup],
                 autoMinorVersionUpgrade: true,
             },

@@ -32,7 +32,7 @@ const vpcStack = new VPCStack(app, `${config.appName}-vpc`, {
 
 const rdsStack = new RDSStack(app, `${config.appName}-rds`, {
     config: config,
-    vpc: vpcStack.vpc,
+    vpcId: vpcStack.vpcId,
     rdsDBName: 'rocketdatabase',
     rdsUserName: 'rocketuser',
     useSnapshot: config.environment === 'prd',
@@ -43,7 +43,7 @@ const rdsStack = new RDSStack(app, `${config.appName}-rds`, {
 
 const ecsStack = new ECSStack(app, `${config.appName}-ecs`, {
     config: config,
-    vpc: vpcStack.vpc,
+    vpcId: vpcStack.vpcId,
     mysqlUrl: rdsStack.mysqlUrl,
     mysqlSecurityGroupId: rdsStack.rdsSecurityGroupId,
 });
@@ -60,7 +60,7 @@ const ecsStack = new ECSStack(app, `${config.appName}-ecs`, {
 
 const lambdaStack = new LambdaStack(app, `${config.appName}-lambda`, {
     config: config,
-    vpc: vpcStack.vpc,
+    vpcId: vpcStack.vpcId,
     dbProxyUrl: rdsStack.dbProxyUrl,
     dbSecurityGroupId: rdsStack.rdsSecurityGroupId,
     env: {

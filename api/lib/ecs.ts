@@ -16,13 +16,14 @@ import { HostedZone } from '@aws-cdk/aws-route53';
 
 interface ECSStackProps extends cdk.StackProps {
     config: Config,
-    vpc: ec2.Vpc,
+    vpcId: string,
     mysqlUrl?: string,
     mysqlSecurityGroupId?: string,
 }
 
 export class ECSStack extends cdk.Stack {
     props: ECSStackProps;
+    vpc: ec2.IVpc;
 
     constructor(scope: cdk.Construct, id: string, props: ECSStackProps) {
         super(scope, id, props);
@@ -30,6 +31,8 @@ export class ECSStack extends cdk.Stack {
 
         const cpuSize = 1;
         const memorySize = 2;
+        const vpc = ec2.Vpc.fromLookup(this, 'vpc', { vpcId: props.vpcId });
+        this.vpc = vpc;
 
         // const executionRole = new iam.Role(this, `ECSTackExecutionRole`, {
         //     roleName: `${props.config.appName}-TaskExecutionRole`,
@@ -86,7 +89,7 @@ export class ECSStack extends cdk.Stack {
         // });
 
         const cluster = new ecs.Cluster(this, 'cluster', {
-            vpc: props.vpc,
+            vpc: vpc,
         })
 
         const application = new ecsPatterns.ApplicationLoadBalancedFargateService(this, 'ecs-service', {
