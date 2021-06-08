@@ -48,6 +48,7 @@ export class ECSStack extends cdk.Stack {
             securityGroups: [serviceSecurityGroup],
             assignPublicIp: true,
             publicLoadBalancer: true,
+            
             taskImageOptions: {
                 image: ecs.ContainerImage.fromEcrRepository(ecrRepository),
                 containerPort: 8080,
@@ -65,6 +66,7 @@ export class ECSStack extends cdk.Stack {
             domainZone: HostedZone.fromLookup(this, 'hostZone', { domainName: props.config.domainZone }),
             domainName: props.config.domainName,
             certificate: Certificate.fromCertificateArn(this, 'certificate', props.config.acmCertificateArn),
+            redirectHTTP: true,
         });
 
         if (props.mysqlSecurityGroupId) {
