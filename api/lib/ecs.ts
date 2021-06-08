@@ -85,13 +85,7 @@ export class ECSStack extends cdk.Stack {
         //     repositoryName: `${props.config.appName}`,
         // });
 
-        const cluster = new ecs.Cluster(this, 'cluster', {
-            vpc: props.vpc,
-            clusterName: `${props.config.appName}-cluster`,
-        });
-
         const application = new ecsPatterns.ApplicationLoadBalancedFargateService(this, 'ecs-service', {
-            cluster,
             vpc: props.vpc,
             platformVersion: ecs.FargatePlatformVersion.VERSION1_4,
             memoryLimitMiB: memorySize,
