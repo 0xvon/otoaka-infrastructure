@@ -48,6 +48,7 @@ const ecsStack = new ECSStack(app, `${config.appName}-ecs`, {
     mysqlSecurityGroupId: rdsStack.rdsSecurityGroupId,
     env: {
         region: config.awsRegion,
+        account: process.env.CDK_DEFAULT_ACCOUNT,
     },
 });
 
