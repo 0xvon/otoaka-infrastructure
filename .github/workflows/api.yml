@@ -55,6 +55,7 @@ jobs:
       - name: Deploy Dev
         if: github.ref == 'refs/heads/develop'
         run: |
+          ls
           sh container_environment.sh
           npm run build
           cdk bootstrap aws://${AWS_ACCOUNT_ID}/${AWS_DEFAULT_REGION}
