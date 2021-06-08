@@ -28,8 +28,8 @@ export class ECSStack extends cdk.Stack {
         super(scope, id, props);
         this.props = props;
 
-        const cpuSize = 1;
-        const memorySize = 2;
+        const cpuSize = 256;
+        const memorySize = 1024;
 
         // const executionRole = new iam.Role(this, `ECSTackExecutionRole`, {
         //     roleName: `${props.config.appName}-TaskExecutionRole`,
