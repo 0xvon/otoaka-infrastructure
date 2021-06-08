@@ -62,9 +62,9 @@ export class ECSStack extends cdk.Stack {
                 },
             },
 
-            // domainZone: HostedZone.fromLookup(this, 'hostZone', {domainName: props.config.domainZone}),
-            // domainName: props.config.domainName,
-            // certificate: Certificate.fromCertificateArn(this, 'certificate', props.config.acmCertificateArn),
+            domainZone: HostedZone.fromLookup(this, 'hostZone', { domainName: props.config.domainZone }),
+            domainName: props.config.domainName,
+            certificate: Certificate.fromCertificateArn(this, 'certificate', props.config.acmCertificateArn),
         });
 
         if (props.mysqlSecurityGroupId) {
@@ -138,6 +138,7 @@ export class ECSStack extends cdk.Stack {
                     post_build: {
                         commands: [
                             'echo "[{\"name\":\"${APP_NAME}\",\"imageUri\":\"${ECR_REPO_URI}:${TAG}\"}]" > imagedefinitions.json',
+                            'cat imagedefinitions.json',
                         ],
                     },
                 },
