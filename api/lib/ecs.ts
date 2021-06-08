@@ -16,14 +16,13 @@ import { HostedZone } from '@aws-cdk/aws-route53';
 
 interface ECSStackProps extends cdk.StackProps {
     config: Config,
-    vpcId: string,
+    vpc: ec2.Vpc,
     mysqlUrl?: string,
     mysqlSecurityGroupId?: string,
 }
 
 export class ECSStack extends cdk.Stack {
     props: ECSStackProps;
-    vpc: ec2.IVpc;
 
     constructor(scope: cdk.Construct, id: string, props: ECSStackProps) {
         super(scope, id, props);
@@ -31,8 +30,6 @@ export class ECSStack extends cdk.Stack {
 
         const cpuSize = 1;
         const memorySize = 2;
-        const vpc = ec2.Vpc.fromLookup(this, 'vpc', { vpcId: props.vpcId });
-        this.vpc = vpc;
 
         // const executionRole = new iam.Role(this, `ECSTackExecutionRole`, {
         //     roleName: `${props.config.appName}-TaskExecutionRole`,
@@ -89,11 +86,13 @@ export class ECSStack extends cdk.Stack {
         // });
 
         const cluster = new ecs.Cluster(this, 'cluster', {
-            vpc: vpc,
-        })
+            vpc: props.vpc,
+            clusterName: `${props.config.appName}-cluster`,
+        });
 
         const application = new ecsPatterns.ApplicationLoadBalancedFargateService(this, 'ecs-service', {
             cluster,
+            vpc: props.vpc,
             platformVersion: ecs.FargatePlatformVersion.VERSION1_4,
             memoryLimitMiB: memorySize,
             cpu: cpuSize,
@@ -102,27 +101,27 @@ export class ECSStack extends cdk.Stack {
             publicLoadBalancer: true,
             taskImageOptions: {
                 image: ecs.ContainerImage.fromRegistry("amazon/amazon-ecs-sample"),
-            }
+            },
 
-            // domainZone: HostedZone.fromLookup(this, 'hostZone', {domainName: props.config.domainZone}),
-            // domainName: props.config.domainName,
-            // certificate: Certificate.fromCertificateArn(this, 'certificate', props.config.acmCertificateArn),
+            domainZone: HostedZone.fromLookup(this, 'hostZone', {domainName: props.config.domainZone}),
+            domainName: props.config.domainName,
+            certificate: Certificate.fromCertificateArn(this, 'certificate', props.config.acmCertificateArn),
         });
 
-        if (props.mysqlSecurityGroupId) {
-            this.injectSecurityGroup(application.loadBalancer.loadBalancerSecurityGroups, props.mysqlSecurityGroupId);
-        }
+        // if (props.mysqlSecurityGroupId) {
+        //     this.injectSecurityGroup(application.loadBalancer.loadBalancerSecurityGroups, props.mysqlSecurityGroupId);
+        // }
     }
 
-    private injectSecurityGroup(appSGIds: string[], rdsSecurityGroupId: string) {
-        const rdsSecurityGroup = ec2.SecurityGroup.fromSecurityGroupId(this, `${this.props.config.appName}-DB-SG`, rdsSecurityGroupId);
-        appSGIds.forEach((appSGId) => {
-            rdsSecurityGroup.addIngressRule(
-                ec2.SecurityGroup.fromSecurityGroupId(this, `APP-SG`, appSGId),
-                ec2.Port.tcp(3306),
-            );
-        })
-    };
+    // private injectSecurityGroup(appSGIds: string[], rdsSecurityGroupId: string) {
+    //     const rdsSecurityGroup = ec2.SecurityGroup.fromSecurityGroupId(this, `${this.props.config.appName}-DB-SG`, rdsSecurityGroupId);
+    //     appSGIds.forEach((appSGId) => {
+    //         rdsSecurityGroup.addIngressRule(
+    //             ec2.SecurityGroup.fromSecurityGroupId(this, `APP-SG`, appSGId),
+    //             ec2.Port.tcp(3306),
+    //         );
+    //     })
+    // };
 
     // private buildPipeline(cluster: ecs.Cluster, ecrRepository: Repository) {
     //     const githubOwner = 'wall-of-death';

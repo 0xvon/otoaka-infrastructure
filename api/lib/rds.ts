@@ -25,7 +25,7 @@ import { Secret, ISecret } from '@aws-cdk/aws-secretsmanager';
 import { Config } from '../typing';
 
 interface RDSStackProps extends cdk.StackProps {
-    vpcId: string,
+    vpc: Vpc,
     config: Config,
 
     rdsUserName: string,
@@ -44,12 +44,9 @@ export class RDSStack extends cdk.Stack {
         super(scope, id, props);
         this.props = props
 
-        const vpc = Vpc.fromLookup(this, 'vpc', { vpcId: props.vpcId });
-        this.vpc = vpc;
-
         const rdsSecurityGroup = new SecurityGroup(this, `${props.config.appName}-DB-SG`, {
             allowAllOutbound: true,
-            vpc: vpc,
+            vpc: props.vpc,
             securityGroupName: `${props.config.appName}-DB-SG`,
         });
         rdsSecurityGroup.addIngressRule(rdsSecurityGroup, Port.tcp(3306), `allow ${props.config.appName} admin db connection`);
@@ -88,7 +85,7 @@ export class RDSStack extends cdk.Stack {
             defaultDatabaseName: props.rdsDBName,
             instanceProps: {
                 vpcSubnets: {
-                    subnets: vpc.privateSubnets,
+                    subnets: props.vpc.privateSubnets,
                 },
                 vpc: this.vpc,
                 securityGroups: [rdsSecurityGroup],

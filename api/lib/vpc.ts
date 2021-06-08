@@ -10,7 +10,7 @@ interface VPCStackProps extends cdk.StackProps {
 };
 
 export class VPCStack extends cdk.Stack {
-    vpcId: string;
+    vpc: Vpc;
 
     constructor(scope: cdk.Construct, id: string, props: VPCStackProps) {
         super(scope, id, props);
@@ -33,10 +33,10 @@ export class VPCStack extends cdk.Stack {
                 },
             ],
         });
-        vpc.publicSubnets.forEach(subnet => {
-            cdk.Tags.of(subnet).add(`kubernetes.io/cluster/${props.appName}-cluster`, 'shared');
-            cdk.Tags.of(subnet).add(`kubernetes.io/role/elb`, '1');
-        });
-        this.vpcId = vpc.vpcId;
+        // vpc.publicSubnets.forEach(subnet => {
+        //     cdk.Tags.of(subnet).add(`kubernetes.io/cluster/${props.appName}-cluster`, 'shared');
+        //     cdk.Tags.of(subnet).add(`kubernetes.io/role/elb`, '1');
+        // });
+        this.vpc = vpc;
     }
 }

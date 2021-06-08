@@ -8,7 +8,7 @@ import { Config } from '../typing';
 
 interface LambdaStackProps extends cdk.StackProps {
     config: Config,
-    vpcId: string,
+    vpc: ec2.Vpc,
     dbProxyUrl: string,
     dbSecurityGroupId: string,
 }
@@ -22,10 +22,9 @@ export class LambdaStack extends cdk.Stack {
 
         const bucketName: string = 'rocket-dev-lambda';
         const snsPlatformArn: string = this.props.config.environment === 'prd' ? 'arn:aws:sns:ap-northeast-1:960722127407:app/APNS/rocket-ios-prod' : 'arn:aws:sns:ap-northeast-1:960722127407:app/APNS_SANDBOX/rocket-ios-dev';
-        const vpc = ec2.Vpc.fromLookup(this, 'vpc', { vpcId: props.vpcId });
 
         const adminLambdaSG = new ec2.SecurityGroup(this, `${props.config.appName}-adminLambdaSG`, {
-            vpc: vpc,
+            vpc: props.vpc,
         });
         const rdsSecurityGroup = ec2.SecurityGroup.fromSecurityGroupId(this, `${this.props.config.appName}-DB-SG`, props.dbSecurityGroupId);
         rdsSecurityGroup.addIngressRule(adminLambdaSG, ec2.Port.tcp(3306), `allow ${props.config.appName} admin lambda connection`);
@@ -55,9 +54,9 @@ export class LambdaStack extends cdk.Stack {
             runtime: lambda.Runtime.PROVIDED_AL2,
             code: new lambda.S3Code(s3.Bucket.fromBucketName(this, `${props.config.appName}-bucket`, bucketName), 'RocketAdmin.zip'),
             handler: 'Handler',
-            vpc: vpc,
+            vpc: props.vpc,
             vpcSubnets: {
-                subnets: vpc.privateSubnets,
+                subnets: props.vpc.privateSubnets,
             },
             timeout: cdk.Duration.seconds(300),
             securityGroups: [adminLambdaSG],
