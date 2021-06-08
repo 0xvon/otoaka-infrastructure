@@ -41,12 +41,12 @@ const rdsStack = new RDSStack(app, `${config.appName}-rds`, {
     },
 });
 
-const ecsStack = new ECSStack(app, `${config.appName}-ecs`, {
-    config: config,
-    vpc: vpcStack.vpc,
-    mysqlUrl: rdsStack.mysqlUrl,
-    mysqlSecurityGroupId: rdsStack.rdsSecurityGroupId,
-})
+// const ecsStack = new ECSStack(app, `${config.appName}-ecs`, {
+//     config: config,
+//     vpc: vpcStack.vpc,
+//     mysqlUrl: rdsStack.mysqlUrl,
+//     mysqlSecurityGroupId: rdsStack.rdsSecurityGroupId,
+// });
 
 // const eksStack = new EKSStack(app, `${config.appName}-eks`, {
 //     config: config,
