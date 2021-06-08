@@ -103,9 +103,9 @@ export class ECSStack extends cdk.Stack {
                 image: ecs.ContainerImage.fromRegistry("amazon/amazon-ecs-sample"),
             },
 
-            domainZone: HostedZone.fromLookup(this, 'hostZone', {domainName: props.config.domainZone}),
-            domainName: props.config.domainName,
-            certificate: Certificate.fromCertificateArn(this, 'certificate', props.config.acmCertificateArn),
+            // domainZone: HostedZone.fromLookup(this, 'hostZone', {domainName: props.config.domainZone}),
+            // domainName: props.config.domainName,
+            // certificate: Certificate.fromCertificateArn(this, 'certificate', props.config.acmCertificateArn),
         });
 
         // if (props.mysqlSecurityGroupId) {
