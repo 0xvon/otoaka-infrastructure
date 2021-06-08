@@ -87,7 +87,7 @@ export class RDSStack extends cdk.Stack {
                 vpcSubnets: {
                     subnets: props.vpc.privateSubnets,
                 },
-                vpc: this.vpc,
+                vpc: props.vpc,
                 securityGroups: [rdsSecurityGroup],
                 autoMinorVersionUpgrade: true,
                 
@@ -131,9 +131,9 @@ export class RDSStack extends cdk.Stack {
             proxyTarget: ProxyTarget.fromCluster(dbCluster),
             requireTLS: false,
             secrets: [databaseCredentialsSecret],
-            vpc: this.vpc,
+            vpc: this.props.vpc,
             vpcSubnets: {
-                subnets: this.vpc.privateSubnets,
+                subnets: this.props.vpc.privateSubnets,
             },
             role: dbProxyRole,
             securityGroups: [dbSecurityGroup],
@@ -154,9 +154,9 @@ export class RDSStack extends cdk.Stack {
             defaultDatabaseName: this.props.rdsDBName,
             instanceProps: {
                 vpcSubnets: {
-                    subnets: this.vpc.privateSubnets,
+                    subnets: this.props.vpc.privateSubnets,
                 },
-                vpc: this.vpc,
+                vpc: this.props.vpc,
                 securityGroups: [rdsSecurityGroup],
                 autoMinorVersionUpgrade: true,
             },
