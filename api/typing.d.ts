@@ -22,4 +22,6 @@ export interface Config {
     awsRegion: string,
     mackerelApiKey: string,
     acmCertificateArn: string,
+    domainZone: string,
+    domainName: string,
 }
