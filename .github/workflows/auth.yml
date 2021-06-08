@@ -22,15 +22,12 @@ jobs:
           sudo curl -o /usr/bin/jq -L https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 && sudo chmod +x /usr/bin/jq
           pip3 install awscli
           npm install -g aws-cdk
-
-      - name: Prepare
-        run: |
-          cd ./auth
-          npm i
           
       - name: Deploy Prd
         if: github.ref == 'refs/heads/master'
         run: |
+          cd ./auth
+          npm i
           npm run build
           cdk bootstrap aws://${AWS_ACCOUNT_ID}/${AWS_DEFAULT_REGION}
           cdk deploy '*' --require-approval never
@@ -50,6 +47,8 @@ jobs:
       - name: Deploy Dev
         if: github.ref == 'refs/heads/develop'
         run: |
+          cd ./auth
+          npm i
           npm run build
           cdk bootstrap aws://${AWS_ACCOUNT_ID}/${AWS_DEFAULT_REGION}
           cdk deploy '*' --require-approval never
