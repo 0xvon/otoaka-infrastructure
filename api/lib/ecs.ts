@@ -155,7 +155,6 @@ export class ECSStack extends cdk.Stack {
             actionName: `${this.props.config.appName}-DeployAction`,
             service: service,
             input: buildOutput,
-            imageFile: buildOutput.atPath('imagedefinitions.json'),
         });
 
         const pipeline = new Pipeline(this, `${this.props.config.appName}-Pipeline`, {
