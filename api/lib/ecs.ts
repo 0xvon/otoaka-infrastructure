@@ -11,6 +11,7 @@ import * as ecsPatterns from '@aws-cdk/aws-ecs-patterns';
 import { Certificate } from '@aws-cdk/aws-certificatemanager';
 import { HostedZone } from '@aws-cdk/aws-route53';
 import { service } from './manifests/application';
+import environment from './manifests/environment.json';
 
 interface ECSStackProps extends cdk.StackProps {
     config: Config,
@@ -44,6 +45,15 @@ export class ECSStack extends cdk.Stack {
             taskImageOptions: {
                 image: ecs.ContainerImage.fromEcrRepository(ecrRepository),
                 containerPort: 8080,
+                environment: {
+                    DATABASE_URL: this.props.mysqlUrl ?? 'mysql://mqmxmrqzd9ju4jrx:l53q2rdezr37fbvp@s0znzigqvfehvff5.cbetxkdyhwsb.us-east-1.rds.amazonaws.com:3306/k6wzwtd2rxfh67wk',
+                    AWS_ACCESS_KEY_ID: this.props.config.awsAccessKeyId,
+                    AWS_SECRET_ACCESS_KEY: this.props.config.awsSecretAccessKey,
+                    AWS_REGION: this.props.config.awsRegion,
+                    LOG_LEVEL: 'DEBUG',
+                    CONGNITO_IDP_USER_POOL_ID: this.props.config.environment === 'prd' ? 'ap-northeast-1_6SJ90evpD' : 'ap-northeast-1_JgZtZFWS8',
+                    SNS_PLATFORM_APPLICATION_ARN: this.props.config.environment === 'prd' ? 'arn:aws:sns:ap-northeast-1:960722127407:app/APNS/rocket-ios-prod' : 'arn:aws:sns:ap-northeast-1:960722127407:app/APNS_SANDBOX/rocket-ios-dev',
+                },
             },
 
             // domainZone: HostedZone.fromLookup(this, 'hostZone', {domainName: props.config.domainZone}),

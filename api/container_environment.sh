@@ -1,5 +1,4 @@
 #!bin/sh
-
 aws ssm get-parameters-by-path \
     --path /${APP_NAME}/ \
     --with-decryption \
