@@ -46,6 +46,9 @@ const ecsStack = new ECSStack(app, `${config.appName}-ecs`, {
     vpc: vpcStack.vpc,
     mysqlUrl: rdsStack.mysqlUrl,
     mysqlSecurityGroupId: rdsStack.rdsSecurityGroupId,
+    env: {
+        region: config.awsRegion,
+    },
 });
 
 // const eksStack = new EKSStack(app, `${config.appName}-eks`, {
