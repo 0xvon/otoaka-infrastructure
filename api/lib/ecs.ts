@@ -68,7 +68,6 @@ export class ECSStack extends cdk.Stack {
             // tmp
             // certificate: Certificate.fromCertificateArn(this, 'certificate', props.config.acmCertificateArn),
             // redirectHTTP: true,
-            listenerPort: 80,
         });
 
         if (props.mysqlSecurityGroupId) {
