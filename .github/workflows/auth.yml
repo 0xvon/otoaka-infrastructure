@@ -2,7 +2,7 @@ name: Deployment Rocket API
 
 on:
   push:
-    branches: ["master"]
+    branches: ["master", "develop"]
 
 jobs:
   deploy:
@@ -23,7 +23,8 @@ jobs:
           pip3 install awscli
           npm install -g aws-cdk
           
-      - name: Deployment
+      - name: Deploy Prd
+        if: github.ref == 'refs/heads/master'
         run: |
           cd ./auth
           npm i
@@ -42,4 +43,25 @@ jobs:
           GOOGLE_WEB_APP_SECRET: ${{ secrets.GOOGLE_WEB_APP_SECRET }}
           FACEBOOK_APP_ID: ${{ secrets.FACEBOOK_APP_ID }}
           FACEBOOK_APP_SECRET: ${{ secrets.FACEBOOK_APP_SECRET }}
+
+      - name: Deploy Dev
+        if: github.ref == 'refs/heads/develop'
+        run: |
+          cd ./auth
+          npm i
+          npm run build
+          cdk bootstrap aws://${AWS_ACCOUNT_ID}/${AWS_DEFAULT_REGION}
+          cdk deploy '*' --require-approval never
+        env:
+          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_REGION }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          APP_NAME: rocket-auth-dev
+          SIGNIN_CALLBACK_URL: ${{ secrets.SIGNIN_CALLBACK_URL_DEV }}
+          SIGNOUT_CALLBACK_URL: ${{ secrets.SIGNOUT_CALLBACK_URL_DEV }}
+          GOOGLE_WEB_CLIENT_ID: ${{ secrets.GOOGLE_WEB_CLIENT_ID_DEV }}
+          GOOGLE_WEB_APP_SECRET: ${{ secrets.GOOGLE_WEB_APP_SECRET_DEV }}
+          FACEBOOK_APP_ID: ${{ secrets.FACEBOOK_APP_ID_DEV }}
+          FACEBOOK_APP_SECRET: ${{ secrets.FACEBOOK_APP_SECRET_DEV }}
  

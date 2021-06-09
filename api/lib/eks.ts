@@ -1,17 +1,18 @@
 import * as cdk from '@aws-cdk/core';
 import {
     Vpc,
-    InstanceType,
+    // InstanceType,
     SecurityGroup,
     Port,
     SubnetType,
 } from '@aws-cdk/aws-ec2';
 import {
     Cluster,
+    FargateCluster,
     EndpointAccess,
     KubernetesVersion,
-    AwsAuth,
-    Nodegroup,
+    // AwsAuth,
+    // Nodegroup,
 } from '@aws-cdk/aws-eks';
 import {
     Role,
@@ -20,7 +21,7 @@ import {
     ManagedPolicy,
     PolicyStatement,
 } from '@aws-cdk/aws-iam';
-import { UpdatePolicy } from '@aws-cdk/aws-autoscaling';
+// import { UpdatePolicy } from '@aws-cdk/aws-autoscaling';
 import { Repository } from '@aws-cdk/aws-ecr';
 import { LinuxBuildImage, BuildSpec, PipelineProject } from '@aws-cdk/aws-codebuild';
 import { Artifact, Pipeline } from '@aws-cdk/aws-codepipeline';
@@ -29,7 +30,7 @@ import { GitHubSourceAction, CodeBuildAction } from '@aws-cdk/aws-codepipeline-a
 import * as ApplicationManifest from './manifests/application';
 import * as MackerelServiceAccount from './manifests/mackerel-serviceaccount';
 import * as FluentdManifest from './manifests/fluentd';
-import { users } from '../config';
+// import { users } from '../config';
 import { Config } from '../typing';
 
 interface EKSStackProps extends cdk.StackProps {
@@ -80,40 +81,69 @@ export class EKSStack extends cdk.Stack {
             assumedBy: new AccountRootPrincipal(),
         });
 
+        const podExecutionRole = new Role(this, `${props.config.appName}-PodExecutionRole`, {
+            assumedBy: new ServicePrincipal('eks-fargate-pods.amazonaws.com'),
+                managedPolicies: [
+                    ManagedPolicy.fromAwsManagedPolicyName('AmazonEKSFargatePodExecutionRolePolicy'),
+                ],
+        })
+
         // ECR Repository
         const ecrRepository = new Repository(this, `${props.config.appName}-ECR`, {
             repositoryName: `${props.config.appName}`,
         });
 
         // EKS Cluster
-        const cluster = new Cluster(this, `${props.config.appName}-cluster`, {
+        const cluster = new FargateCluster(this, `${props.config.appName}-cluster`, {
             vpc: props.vpc,
             vpcSubnets: [
-                { subnets: props.vpc.publicSubnets },
+                { subnetType: SubnetType.PRIVATE },
             ],
             endpointAccess: EndpointAccess.PUBLIC,
-            defaultCapacity: 0,
             role: eksRole,
             mastersRole: adminRole,
             version: KubernetesVersion.V1_18,
-            clusterName: `${props.config.appName}-cluster`,
+            clusterName:  `${props.config.appName}-cluster`,
         });
 
+        cluster.addFargateProfile(`${props.config.appName}-fargate-profile`, {
+            selectors: [
+                { namespace: 'default' },
+                { namespace: 'kube-system' },
+            ],
+            subnetSelection: { subnetType: SubnetType.PRIVATE },
+            vpc: props.vpc,
+            podExecutionRole: podExecutionRole,
+        })
+
+        // const cluster = new Cluster(this, `${props.config.appName}-cluster`, {
+        //     vpc: props.vpc,
+        //     vpcSubnets: [
+        //         { subnets: props.vpc.publicSubnets },
+        //     ],
+        //     endpointAccess: EndpointAccess.PUBLIC,
+        //     defaultCapacity: 0,
+        //     role: eksRole,
+        //     mastersRole: adminRole,
+        //     version: KubernetesVersion.V1_18,
+        //     clusterName: `${props.config.appName}-cluster`,
+        // });
+
         // Node Group
-        const ng = cluster.addNodegroupCapacity(`${props.config.appName}-capacity`, {
-            desiredSize: minCapacity,
-            subnets: { subnetType: SubnetType.PUBLIC },
-            instanceType: new InstanceType(instanceType),
-        });
-        ["service-role/AmazonEC2RoleforSSM", "AmazonEC2ContainerRegistryPowerUser", "CloudWatchLogsFullAccess"].forEach((policyName) => {
-            ng.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName(policyName));
-        });
+        // const ng = cluster.addNodegroupCapacity(`${props.config.appName}-capacity`, {
+        //     desiredSize: minCapacity,
+        //     subnets: { subnetType: SubnetType.PUBLIC },
+        //     instanceType: new InstanceType(instanceType),
+        // });
+        // ["service-role/AmazonEC2RoleforSSM", "AmazonEC2ContainerRegistryPowerUser", "CloudWatchLogsFullAccess"].forEach((policyName) => {
+        //     ng.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName(policyName));
+        // });
 
         // add manifest for cluster
         this.addManifest(cluster, ecrRepository);
 
         // add aws-auth for cluster
-        this.addAuth(cluster, adminRole, ng);
+        // this.addAuth(cluster, adminRole, ng);
         
         // Inject RDS Inbound Security Group Rule
         if (props.mysqlSecurityGroupId) {
@@ -188,15 +218,15 @@ export class EKSStack extends cdk.Stack {
         );
     }
 
-    private addAuth(cluster: Cluster, adminRole: Role, ng: Nodegroup) {
-        const awsAuth = new AwsAuth(this, `${this.props.config.appName}-AwsAuth`, { cluster: cluster });
-        awsAuth.addRoleMapping(ng.role, {
-            groups: ["system:bootstrappers", "system:nodes"],
-            username: "system:node:{{EC2PrivateDNSName}}",
-        });
-        awsAuth.addMastersRole(adminRole, adminRole.roleName);
-        users.forEach(user => { awsAuth.addMastersRole(adminRole, user) });
-    }
+    // private addAuth(cluster: Cluster, adminRole: Role, ng: Nodegroup) {
+    //     const awsAuth = new AwsAuth(this, `${this.props.config.appName}-AwsAuth`, { cluster: cluster });
+    //     awsAuth.addRoleMapping(ng.role, {
+    //         groups: ["system:bootstrappers", "system:nodes"],
+    //         username: "system:node:{{EC2PrivateDNSName}}",
+    //     });
+    //     awsAuth.addMastersRole(adminRole, adminRole.roleName);
+    //     users.forEach(user => { awsAuth.addMastersRole(adminRole, user) });
+    // }
 
     private injectSecurityGroup(appSGId: string, rdsSecurityGroupId: string) {
         const rdsSecurityGroup = SecurityGroup.fromSecurityGroupId(this, `${this.props.config.appName}-DB-SG`, rdsSecurityGroupId);

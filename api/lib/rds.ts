@@ -3,6 +3,7 @@ import {
     Vpc,
     SecurityGroup,
     Port,
+    IVpc,
 } from '@aws-cdk/aws-ec2';
 import {
     DatabaseCluster,
@@ -34,6 +35,7 @@ interface RDSStackProps extends cdk.StackProps {
 
 export class RDSStack extends cdk.Stack {
     props: RDSStackProps;
+    vpc: IVpc;
     mysqlUrl: string;
     dbProxyUrl: string;
     rdsSecurityGroupId: string;

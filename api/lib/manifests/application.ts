@@ -1,6 +1,6 @@
 import environment from './environment.json';
 import { SSMSecret } from '../../typing';
-import { Container } from 'cdk8s-plus';
+// import { Container } from 'cdk8s-plus';
 
 export interface Obj {
     [index: string]: string;
@@ -160,6 +160,11 @@ export const service = (acmCertificateArn: string) => {
         kind: 'Service',
         metadata: {
             name: appLabel.app,
+            annotations: {
+                'service.beta.kubernetes.io/aws-load-balancer-type': "nlb-ip",
+                'service.beta.kubernetes.io/aws-load-balancer-nlb-target-type': "ip",
+                'service.beta.kubernetes.io/aws-load-balancer-scheme': "internet-facing",
+            },
             // annotations: {
             //     'service.beta.kubernetes.io/aws-load-balancer-ssl-cert': acmCertificateArn,
             //     'service.beta.kubernetes.io/aws-load-balancer-backend-protocol': 'http',
@@ -181,6 +186,9 @@ export const service = (acmCertificateArn: string) => {
                     port: 80,
                     targetPort: 8080
                 },
+            ],
+            externalIPs: [
+                '10.100.0.1',
             ],
             selector: appLabel,
         },
