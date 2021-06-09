@@ -10,8 +10,6 @@ import { Config } from '../typing';
 import * as ecsPatterns from '@aws-cdk/aws-ecs-patterns';
 import { Certificate } from '@aws-cdk/aws-certificatemanager';
 import { HostedZone } from '@aws-cdk/aws-route53';
-import { service } from './manifests/application';
-import environment from './manifests/environment.json';
 
 interface ECSStackProps extends cdk.StackProps {
     config: Config,
@@ -66,8 +64,11 @@ export class ECSStack extends cdk.Stack {
 
             domainZone: HostedZone.fromLookup(this, 'hostZone', { domainName: props.config.domainZone }),
             domainName: props.config.domainName,
-            certificate: Certificate.fromCertificateArn(this, 'certificate', props.config.acmCertificateArn),
-            redirectHTTP: true,
+
+            // tmp
+            // certificate: Certificate.fromCertificateArn(this, 'certificate', props.config.acmCertificateArn),
+            // redirectHTTP: true,
+            listenerPort: 80,
         });
 
         if (props.mysqlSecurityGroupId) {
