@@ -112,10 +112,10 @@ export class ECSStack extends cdk.Stack {
             },
             environmentVariables: {
                 'ECR_REPO_URI': {
-                    value: `${ecrRepository.repositoryUri}`,
+                    value: ecrRepository.repositoryUri,
                 },
                 'APP_NAME': {
-                    value: 'api',
+                    value: this.props.config.appName,
                 },
                 'DOCKER_BUILDKIT': {
                     value: '1',
