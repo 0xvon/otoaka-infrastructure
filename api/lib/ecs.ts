@@ -48,7 +48,7 @@ export class ECSStack extends cdk.Stack {
             securityGroups: [serviceSecurityGroup],
             assignPublicIp: true,
             publicLoadBalancer: true,
-            
+
             taskImageOptions: {
                 image: ecs.ContainerImage.fromEcrRepository(ecrRepository),
                 containerPort: 8080,
@@ -139,7 +139,7 @@ export class ECSStack extends cdk.Stack {
                     },
                     post_build: {
                         commands: [
-                            'echo "[{\"name\":\"${APP_NAME}\",\"imageUri\":\"${ECR_REPO_URI}:${TAG}\"}]" > imagedefinitions.json',
+                            'echo "[{\\"name\\":\\"${APP_NAME}\\",\\"imageUri\\":\\"${ECR_REPO_URI}:${TAG}\\"}]" > imagedefinitions.json',
                             'cat imagedefinitions.json',
                         ],
                     },
