@@ -50,6 +50,7 @@ export class ECSStack extends cdk.Stack {
             publicLoadBalancer: true,
 
             taskImageOptions: {
+                containerName: 'api',
                 image: ecs.ContainerImage.fromEcrRepository(ecrRepository),
                 containerPort: 8080,
                 environment: {
@@ -115,7 +116,7 @@ export class ECSStack extends cdk.Stack {
                     value: ecrRepository.repositoryUri,
                 },
                 'APP_NAME': {
-                    value: this.props.config.appName,
+                    value: 'api',
                 },
                 'DOCKER_BUILDKIT': {
                     value: '1',
