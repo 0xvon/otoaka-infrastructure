@@ -129,7 +129,7 @@ export class ECSStack extends cdk.Stack {
                         commands: [
                             'env',
                             'export TAG=latest',
-                            'aws ecr get-login-password --region ap-northeast-1 | docker login --username AWS --password-stdin 960722127407.dkr.ecr.ap-northeast-1.amazonaws.com',
+                            'aws ecr get-login-password --region ap-northeast-1 | docker login --username AWS --password-stdin ${ECR_REPO_URI}',
                         ],
                     },
                     build: {
