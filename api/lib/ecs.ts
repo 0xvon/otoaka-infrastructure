@@ -135,7 +135,7 @@ export class ECSStack extends cdk.Stack {
                     },
                     build: {
                         commands: [
-                            'docker build --cache-from $ECR_REPO_URI:$TAG -t $ECR_REPO_URI:$TAG .',
+                            'docker build $ECR_REPO_URI:$TAG -t $ECR_REPO_URI:$TAG .',
                             'docker push $ECR_REPO_URI:$TAG',
                         ],
                     },
