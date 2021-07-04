@@ -59,10 +59,10 @@ export class CognitoStack extends cdk.Stack {
                 },
             },
             userVerification: {
-                emailSubject: 'Rocket for Bands II ログイン認証コード',
+                emailSubject: 'OTOAKAログイン認証コード',
                 emailBody: '認証コードは{####}です',
                 emailStyle: VerificationEmailStyle.CODE,
-                smsMessage: 'Rocket for Bands IIの認証コードは{####}です',
+                smsMessage: 'OTOAKA認証コードは{####}です',
             },
         });
 
