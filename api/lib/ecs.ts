@@ -10,8 +10,6 @@ import { Config } from '../typing';
 import * as ecsPatterns from '@aws-cdk/aws-ecs-patterns';
 import { Certificate } from '@aws-cdk/aws-certificatemanager';
 import { HostedZone } from '@aws-cdk/aws-route53';
-import { service } from './manifests/application';
-import environment from './manifests/environment.json';
 
 interface ECSStackProps extends cdk.StackProps {
     config: Config,
