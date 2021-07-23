@@ -32,19 +32,13 @@ export class ECSStack extends cdk.Stack {
             repositoryName: `${props.config.appName}`,
         });
 
-        const serviceSecurityGroup = new ec2.SecurityGroup(this, `ServiceSecurityGroup`, {
-            allowAllOutbound: true,
+        const application = new ecsPatterns.NetworkLoadBalancedFargateService(this, 'ecs-service', {
             vpc: props.vpc,
-            securityGroupName: `${props.config.appName}-APP-SG`,
-        });
-
-        const application = new ecsPatterns.ApplicationLoadBalancedFargateService(this, 'ecs-service', {
-            vpc: props.vpc,
+            
             platformVersion: ecs.FargatePlatformVersion.VERSION1_4,
             memoryLimitMiB: memorySize,
             cpu: cpuSize,
-            securityGroups: [serviceSecurityGroup],
-            assignPublicIp: true,
+            assignPublicIp: false,
             publicLoadBalancer: true,
 
             taskImageOptions: {
@@ -64,14 +58,16 @@ export class ECSStack extends cdk.Stack {
 
             domainZone: HostedZone.fromLookup(this, 'hostZone', { domainName: props.config.domainZone }),
             domainName: props.config.domainName,
-
-            // tmp
-            // certificate: Certificate.fromCertificateArn(this, 'certificate', props.config.acmCertificateArn),
-            // redirectHTTP: true,
         });
 
+        application.service.connections.allowFrom(
+            ec2.Peer.ipv4(props.vpc.vpcCidrBlock),
+            ec2.Port.allTraffic(),
+            "allow all traffic",
+        );
+
         if (props.mysqlSecurityGroupId) {
-            this.injectSecurityGroup([serviceSecurityGroup.securityGroupId], props.mysqlSecurityGroupId);
+            this.injectSecurityGroup(application.service.connections.securityGroups.map((t) => t.securityGroupId), props.mysqlSecurityGroupId);
         }
 
         this.buildPipeline(application.service, ecrRepository);
