@@ -67,6 +67,12 @@ export class ECSStack extends cdk.Stack {
             domainName: props.config.domainName,
         });
 
+        application.service.connections.allowFrom(
+            ec2.Peer.ipv4(props.vpc.vpcCidrBlock),
+            ec2.Port.allTraffic(),
+            "allow all traffic",
+        );
+
         // application.service.connections.allowToAnyIpv4()
 
         // const application = new ecsPatterns.ApplicationLoadBalancedFargateService(this, 'ecs-service', {
