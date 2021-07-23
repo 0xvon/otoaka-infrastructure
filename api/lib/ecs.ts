@@ -32,19 +32,12 @@ export class ECSStack extends cdk.Stack {
             repositoryName: `${props.config.appName}`,
         });
 
-        // const serviceSecurityGroup = new ec2.SecurityGroup(this, `ServiceSecurityGroup`, {
-        //     allowAllOutbound: true,
-        //     vpc: props.vpc,
-        //     securityGroupName: `${props.config.appName}-APP-SG`,
-        // });
-
         const application = new ecsPatterns.NetworkLoadBalancedFargateService(this, 'ecs-service', {
             vpc: props.vpc,
             
             platformVersion: ecs.FargatePlatformVersion.VERSION1_4,
             memoryLimitMiB: memorySize,
             cpu: cpuSize,
-            // securityGroups: [serviceSecurityGroup],
             assignPublicIp: false,
             publicLoadBalancer: true,
 
@@ -72,38 +65,6 @@ export class ECSStack extends cdk.Stack {
             ec2.Port.allTraffic(),
             "allow all traffic",
         );
-
-        // application.service.connections.allowToAnyIpv4()
-
-        // const application = new ecsPatterns.ApplicationLoadBalancedFargateService(this, 'ecs-service', {
-        //     vpc: props.vpc,
-        //     platformVersion: ecs.FargatePlatformVersion.VERSION1_4,
-        //     memoryLimitMiB: memorySize,
-        //     cpu: cpuSize,
-        //     securityGroups: [serviceSecurityGroup],
-        //     assignPublicIp: true,
-        //     publicLoadBalancer: true,
-
-        //     taskImageOptions: {
-        //         containerName: 'api',
-        //         image: ecs.ContainerImage.fromEcrRepository(ecrRepository),
-        //         containerPort: 8080,
-        //         environment: {
-        //             DATABASE_URL: this.props.mysqlUrl ?? 'mysql://mqmxmrqzd9ju4jrx:l53q2rdezr37fbvp@s0znzigqvfehvff5.cbetxkdyhwsb.us-east-1.rds.amazonaws.com:3306/k6wzwtd2rxfh67wk',
-        //             AWS_ACCESS_KEY_ID: this.props.config.awsAccessKeyId,
-        //             AWS_SECRET_ACCESS_KEY: this.props.config.awsSecretAccessKey,
-        //             AWS_REGION: this.props.config.awsRegion,
-        //             LOG_LEVEL: 'DEBUG',
-        //             CONGNITO_IDP_USER_POOL_ID: this.props.config.environment === 'prd' ? 'ap-northeast-1_6SJ90evpD' : 'ap-northeast-1_JgZtZFWS8',
-        //             SNS_PLATFORM_APPLICATION_ARN: this.props.config.environment === 'prd' ? 'arn:aws:sns:ap-northeast-1:960722127407:app/APNS/rocket-ios-prod' : 'arn:aws:sns:ap-northeast-1:960722127407:app/APNS_SANDBOX/rocket-ios-dev',
-        //         },
-        //     },
-
-        //     domainZone: HostedZone.fromLookup(this, 'hostZone', { domainName: props.config.domainZone }),
-        //     domainName: props.config.domainName,
-        //     certificate: Certificate.fromCertificateArn(this, 'certificate', props.config.acmCertificateArn),
-        //     redirectHTTP: true,
-        // });
 
         if (props.mysqlSecurityGroupId) {
             this.injectSecurityGroup(application.service.connections.securityGroups.map((t) => t.securityGroupId), props.mysqlSecurityGroupId);
