@@ -28,7 +28,6 @@ export class LambdaStack extends cdk.Stack {
         });
         const rdsSecurityGroup = ec2.SecurityGroup.fromSecurityGroupId(this, `${this.props.config.appName}-DB-SG`, props.dbSecurityGroupId);
         rdsSecurityGroup.addIngressRule(adminLambdaSG, ec2.Port.tcp(3306), `allow ${props.config.appName} admin lambda connection`);
-
         const adminLambdaRole = new iam.Role(this, `${props.config.appName}-adminLambdaRole`, {
             assumedBy: new iam.ServicePrincipal('lambda.amazonaws.com'),
         });
