@@ -43,6 +43,7 @@ jobs:
           MACKEREL_APIKEY: ${{ secrets.MACKEREL_APIKEY }}
           APP_NAME: rocket-api
           ENVIRONMENT: prd
+          DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
       
       - name: Deploy Dev
         if: github.ref == 'refs/heads/develop'
@@ -65,3 +66,4 @@ jobs:
           MACKEREL_APIKEY: ${{ secrets.MACKEREL_APIKEY }}
           APP_NAME: rocket-api-dev
           ENVIRONMENT: dev
+          DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}

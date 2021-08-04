@@ -20,6 +20,8 @@ const config: Config = {
     acmCertificateArn: 'arn:aws:acm:ap-northeast-1:960722127407:certificate/a32583f3-ec6e-420a-8dd4-9c5aa26a3215', // need to create in the same region as a Load Balancer
     domainZone: 'rocketfor.band.',
     domainName: process.env.ENVIRONMENT == 'prd' ? 'api.rocketfor.band' : 'api-dev.rocketfor.band',
+    dockerHubUsernmae: 'masatsch',
+    dockerHubPassword: process.env.DOCKER_HUB_PASSWORD!,
 };
 
 const app = new cdk.App();
