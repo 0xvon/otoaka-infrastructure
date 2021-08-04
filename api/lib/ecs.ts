@@ -113,6 +113,12 @@ export class ECSStack extends cdk.Stack {
                 'ECR_REPO_URI': {
                     value: ecrRepository.repositoryUri,
                 },
+                'DOCKER_HUB_ID': {
+                    value: this.props.config.dockerHubUsernmae,
+                },
+                'DOCKER_HUB_PASSWORD': {
+                    value: this.props.config.dockerHubPassword,
+                },
                 'APP_NAME': {
                     value: 'api',
                 },
@@ -128,6 +134,8 @@ export class ECSStack extends cdk.Stack {
                             'env',
                             'export TAG=latest',
                             'aws ecr get-login-password --region ap-northeast-1 | docker login --username AWS --password-stdin ${ECR_REPO_URI}',
+                            'echo Logging in to Docker Hub...',
+                            'echo ${DOCKER_HUB_PASSWORD} | docker login -u ${DOCKER_HUB_ID} --password-stdin',
                         ],
                     },
                     build: {

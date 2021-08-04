@@ -24,4 +24,6 @@ export interface Config {
     acmCertificateArn: string,
     domainZone: string,
     domainName: string,
+    dockerHubUsernmae: string,
+    dockerHubPassword: string,
 }

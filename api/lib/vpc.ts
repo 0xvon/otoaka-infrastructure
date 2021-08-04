@@ -3,6 +3,8 @@ import {
     Vpc,
     SubnetType,
     NatProvider,
+    GatewayVpcEndpointOptions,
+    GatewayVpcEndpointAwsService,
 } from '@aws-cdk/aws-ec2';
 
 interface VPCStackProps extends cdk.StackProps {
@@ -20,6 +22,16 @@ export class VPCStack extends cdk.Stack {
             maxAzs: 2,
             natGateways: 1,
             natGatewayProvider: NatProvider.gateway(),
+            gatewayEndpoints: {
+                's3': {
+                    service: GatewayVpcEndpointAwsService.S3,
+                    subnets: [
+                        {
+                            subnetType: SubnetType.PRIVATE,
+                        },
+                    ],
+                },
+            },
             subnetConfiguration: [
                 {
                     cidrMask: 24,
