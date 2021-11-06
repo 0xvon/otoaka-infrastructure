@@ -65,7 +65,7 @@ export class ECSStack extends cdk.Stack {
             domainZone: HostedZone.fromLookup(this, 'hostZone', { domainName: props.config.domainZone }),
             domainName: props.config.domainName,
             certificate: Certificate.fromCertificateArn(this, 'certificate', props.config.acmCertificateArn),
-            redirectHTTP: false,
+            redirectHTTP: true,
         });
 
         if (props.mysqlSecurityGroupId) {
