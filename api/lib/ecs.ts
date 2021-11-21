@@ -25,7 +25,7 @@ export class ECSStack extends cdk.Stack {
         super(scope, id, props);
         this.props = props;
 
-        const cpuSize = 256;
+        const cpuSize = 512;
         const memorySize = 1024;
 
         const ecrRepository = new Repository(this, `ECR`, {

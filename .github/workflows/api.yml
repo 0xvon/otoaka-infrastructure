@@ -45,25 +45,25 @@ jobs:
           ENVIRONMENT: prd
           DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
       
-      - name: Deploy Dev
-        if: github.ref == 'refs/heads/develop'
-        run: |
-          cd ./api
-          aws s3 cp ./mackerel-config.yaml s3://rocket-config/api/mackerel-config.yaml
-          npm install -g aws-cdk
-          npm i
-          sh container_environment.sh
-          npm run build
-          cdk bootstrap aws://${AWS_ACCOUNT_ID}/${AWS_DEFAULT_REGION}
-          cdk deploy '*' --require-approval never
-        env:
-          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-          AWS_DEFAULT_REGION: ${{ secrets.AWS_REGION }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          RDS_PASSWORD: ${{ secrets.RDS_PASSWORD }}
-          OAUTH_TOKEN: ${{ secrets.OAUTH_TOKEN }}
-          MACKEREL_APIKEY: ${{ secrets.MACKEREL_APIKEY }}
-          APP_NAME: rocket-api-dev
-          ENVIRONMENT: dev
-          DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
+      # - name: Deploy Dev
+      #   if: github.ref == 'refs/heads/develop'
+      #   run: |
+      #     cd ./api
+      #     aws s3 cp ./mackerel-config.yaml s3://rocket-config/api/mackerel-config.yaml
+      #     npm install -g aws-cdk
+      #     npm i
+      #     sh container_environment.sh
+      #     npm run build
+      #     cdk bootstrap aws://${AWS_ACCOUNT_ID}/${AWS_DEFAULT_REGION}
+      #     cdk deploy '*' --require-approval never
+      #   env:
+      #     AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+      #     AWS_DEFAULT_REGION: ${{ secrets.AWS_REGION }}
+      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     RDS_PASSWORD: ${{ secrets.RDS_PASSWORD }}
+      #     OAUTH_TOKEN: ${{ secrets.OAUTH_TOKEN }}
+      #     MACKEREL_APIKEY: ${{ secrets.MACKEREL_APIKEY }}
+      #     APP_NAME: rocket-api-dev
+      #     ENVIRONMENT: dev
+      #     DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
