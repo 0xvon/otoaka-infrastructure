@@ -98,6 +98,7 @@ export class RDSStack extends cdk.Stack {
             ],
             parameterGroup: rdsParameterGroup,
             removalPolicy: cdk.RemovalPolicy.DESTROY,
+            instances: 1
         });
         const [dbSecret, dbProxy] = this.addProxy(cluster, rdsSecurityGroup);
 
@@ -166,6 +167,7 @@ export class RDSStack extends cdk.Stack {
             ],
             parameterGroup: rdsParameterGroup,
             removalPolicy: cdk.RemovalPolicy.DESTROY,
+            instances: 1
         });
 
         return cluster;
