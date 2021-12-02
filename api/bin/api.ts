@@ -4,7 +4,6 @@ import * as cdk from '@aws-cdk/core';
 import { VPCStack } from '../lib/vpc';
 import { RDSStack } from '../lib/rds';
 // import { EKSStack } from '../lib/eks';
-import { LambdaStack } from '../lib/lambda';
 import { ECSStack } from '../lib/ecs';
 import { Config } from '../typing';
 
@@ -65,16 +64,5 @@ const ecsStack = new ECSStack(app, `${config.appName}-ecs`, {
 //         region: config.awsRegion,
 //     },
 // });
-
-const lambdaStack = new LambdaStack(app, `${config.appName}-lambda`, {
-    config: config,
-    vpc: vpcStack.vpc,
-    dbProxyUrl: rdsStack.dbProxyUrl,
-    dbSecurityGroupId: rdsStack.rdsSecurityGroupId,
-    env: {
-        region: config.awsRegion,
-        account: process.env.CDK_DEFAULT_ACCOUNT,
-    },
-});
 
 app.synth();

@@ -37,7 +37,6 @@ export class RDSStack extends cdk.Stack {
     props: RDSStackProps;
     vpc: IVpc;
     mysqlUrl: string;
-    dbProxyUrl: string;
     rdsSecurityGroupId: string;
 
     constructor(scope: cdk.Construct, id: string, props: RDSStackProps) {
@@ -100,47 +99,8 @@ export class RDSStack extends cdk.Stack {
             removalPolicy: cdk.RemovalPolicy.DESTROY,
             instances: 1
         });
-        const [dbSecret, dbProxy] = this.addProxy(cluster, rdsSecurityGroup);
 
         this.mysqlUrl = `mysql://${props.rdsUserName}:${props.config.rdsPassword}@${cluster.clusterEndpoint.hostname}:3306/${props.rdsDBName}`;
-        this.dbProxyUrl = `mysql://${props.rdsUserName}:${props.config.rdsPassword}@${dbProxy.endpoint}:3306/${props.rdsDBName}`;
-    }
-
-    addProxy(dbCluster: DatabaseCluster | DatabaseClusterFromSnapshot, dbSecurityGroup: SecurityGroup): [ISecret, DatabaseProxy] {
-        const databaseCredentialsSecret = Secret.fromSecretCompleteArn(
-            this,
-            `${this.props.config.appName}-rdsSecret`,
-            this.props.config.environment === 'prd' ? 'arn:aws:secretsmanager:ap-northeast-1:960722127407:secret:rocket-api/rds-CBs3zG' : 'arn:aws:secretsmanager:ap-northeast-1:960722127407:secret:rocket-api-dev/rds-E0r1ph',
-        );
-        
-        const dbProxyRole = new Role(this, `${this.props.config.appName}-rdsproxyrole`, {
-            assumedBy: new ServicePrincipal('rds.amazonaws.com'),
-        });
-        dbProxyRole.addToPolicy(
-            new PolicyStatement({
-                resources: ['*'],
-                effect: Effect.ALLOW,
-                actions: [
-                    "secretsmanager:GetSecretValue",
-                    "secretsmanager:DescribeSecret",
-                ],
-            })
-        );
-
-        const dbProxy = new DatabaseProxy(this, `${this.props.config.appName}-rdsproxy`, {
-            dbProxyName: `${this.props.config.appName}-rdsproxy`,
-            proxyTarget: ProxyTarget.fromCluster(dbCluster),
-            requireTLS: false,
-            secrets: [databaseCredentialsSecret],
-            vpc: this.props.vpc,
-            vpcSubnets: {
-                subnets: this.props.vpc.privateSubnets,
-            },
-            role: dbProxyRole,
-            securityGroups: [dbSecurityGroup],
-        });
-
-        return [databaseCredentialsSecret, dbProxy];
     }
 
     createClusterFromSnapshots(rdsSecurityGroup: SecurityGroup, rdsParameterGroup: ParameterGroup): DatabaseClusterFromSnapshot {
