@@ -44,7 +44,7 @@ export class ECSStack extends cdk.Stack {
             memoryLimitMiB: memorySize,
             cpu: cpuSize,
             securityGroups: [serviceSecurityGroup],
-            assignPublicIp: false,
+            assignPublicIp: true,
             publicLoadBalancer: true,
 
             taskImageOptions: {
