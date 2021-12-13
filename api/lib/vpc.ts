@@ -20,18 +20,7 @@ export class VPCStack extends cdk.Stack {
         const vpc: Vpc = new Vpc(this, `${props.appName}-vpc`, {
             cidr: '192.168.0.0/16',
             maxAzs: 2,
-            natGateways: 1,
-            natGatewayProvider: NatProvider.gateway(),
-            gatewayEndpoints: {
-                's3': {
-                    service: GatewayVpcEndpointAwsService.S3,
-                    subnets: [
-                        {
-                            subnetType: SubnetType.PRIVATE,
-                        },
-                    ],
-                },
-            },
+            natGateways: 0,
             subnetConfiguration: [
                 {
                     cidrMask: 24,
