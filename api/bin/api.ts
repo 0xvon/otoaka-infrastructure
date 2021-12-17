@@ -17,6 +17,7 @@ const config: Config = {
     awsSecretAccessKey: process.env.AWS_SECRET_ACCESS_KEY ?? 'HOGE',
     awsRegion: process.env.AWS_DEFAULT_REGION ?? 'ap-northeast-1',
     mackerelApiKey: process.env.MACKEREL_APIKEY ?? 'hogehoge',
+    auth0Domain: 'https://dev-eef7o1id.us.auth0.com',
     acmCertificateArn: 'arn:aws:acm:ap-northeast-1:960722127407:certificate/a32583f3-ec6e-420a-8dd4-9c5aa26a3215', // need to create in the same region as a Load Balancer
     domainZone: 'rocketfor.band.',
     domainName: process.env.ENVIRONMENT == 'prd' ? 'api.rocketfor.band' : 'api-dev.rocketfor.band',
