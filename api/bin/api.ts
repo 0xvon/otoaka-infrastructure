@@ -5,6 +5,7 @@ import { VPCStack } from '../lib/vpc';
 import { RDSStack } from '../lib/rds';
 // import { EKSStack } from '../lib/eks';
 import { ECSStack } from '../lib/ecs';
+import { SubECSStack } from '../lib/subEcs';
 import { Config } from '../typing';
 
 const config: Config = {
@@ -54,6 +55,21 @@ const ecsStack = new ECSStack(app, `${config.appName}-ecs`, {
         account: process.env.CDK_DEFAULT_ACCOUNT,
     },
 });
+
+const subEcsStack = new SubECSStack(app, `${config.appName}-sub-ecs`, {
+    config: {
+        ...config,
+        appName: `${config.appName}-sub`,
+        domainName: 'api-v2.rocketfor.band',
+    },
+    vpc: vpcStack.vpc,
+    mysqlUrl: rdsStack.mysqlUrl,
+    mysqlSecurityGroupId: rdsStack.rdsSecurityGroupId,
+    env: {
+        region: config.awsRegion,
+        account: process.env.CDK_DEFAULT_ACCOUNT,
+    },
+})
 
 // const eksStack = new EKSStack(app, `${config.appName}-eks`, {
 //     config: config,
