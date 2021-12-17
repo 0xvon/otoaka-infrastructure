@@ -56,6 +56,7 @@ export class ECSStack extends cdk.Stack {
                     AWS_ACCESS_KEY_ID: this.props.config.awsAccessKeyId,
                     AWS_SECRET_ACCESS_KEY: this.props.config.awsSecretAccessKey,
                     AWS_REGION: this.props.config.awsRegion,
+                    AUTH0_DOMAIN: this.props.config.auth0Domain,
                     LOG_LEVEL: 'DEBUG',
                     CONGNITO_IDP_USER_POOL_ID: this.props.config.environment === 'prd' ? 'ap-northeast-1_6SJ90evpD' : 'ap-northeast-1_JgZtZFWS8',
                     SNS_PLATFORM_APPLICATION_ARN: this.props.config.environment === 'prd' ? 'arn:aws:sns:ap-northeast-1:960722127407:app/APNS/rocket-ios-prod' : 'arn:aws:sns:ap-northeast-1:960722127407:app/APNS_SANDBOX/rocket-ios-dev',
