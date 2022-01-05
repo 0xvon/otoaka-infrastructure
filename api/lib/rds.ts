@@ -4,6 +4,9 @@ import {
     SecurityGroup,
     Port,
     IVpc,
+    InstanceType,
+    InstanceClass,
+    InstanceSize,
 } from '@aws-cdk/aws-ec2';
 import {
     DatabaseCluster,
@@ -120,6 +123,7 @@ export class RDSStack extends cdk.Stack {
                 vpc: this.props.vpc,
                 securityGroups: [rdsSecurityGroup],
                 autoMinorVersionUpgrade: true,
+                instanceType: InstanceType.of(InstanceClass.BURSTABLE2, InstanceSize.LARGE)
             },
             cloudwatchLogsExports: [
                 'slowquery',
