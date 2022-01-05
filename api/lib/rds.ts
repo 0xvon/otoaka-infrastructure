@@ -111,7 +111,7 @@ export class RDSStack extends cdk.Stack {
 
         const cluster = new DatabaseClusterFromSnapshot(this, `${this.props.config.appName}-clusterFromSnapShot`, {
             engine: DatabaseClusterEngine.auroraMysql({
-                version: AuroraMysqlEngineVersion.VER_3_01_0,
+                version: AuroraMysqlEngineVersion.VER_2_10_1,
             }),
             clusterIdentifier: `${this.props.config.appName}-rds-cluster`,
             snapshotIdentifier: snapshotID,
