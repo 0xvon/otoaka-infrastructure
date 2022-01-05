@@ -56,7 +56,7 @@ export class RDSStack extends cdk.Stack {
 
         const rdsParameterGroup = new ParameterGroup(this, `${props.config.appName}-PG`, {
             engine: DatabaseClusterEngine.auroraMysql({
-                version: AuroraMysqlEngineVersion.VER_2_08_1,
+                version: AuroraMysqlEngineVersion.VER_3_01_0,
             }),
             parameters: {
                 character_set_server: 'utf8mb4',
@@ -81,7 +81,7 @@ export class RDSStack extends cdk.Stack {
 
         const cluster = props.useSnapshot ? this.createClusterFromSnapshots(rdsSecurityGroup, rdsParameterGroup) : new DatabaseCluster(this, `${props.config.appName}-DB-cluster`, {
             engine: DatabaseClusterEngine.auroraMysql({
-                version: AuroraMysqlEngineVersion.VER_2_08_1,
+                version: AuroraMysqlEngineVersion.VER_3_01_0,
             }),
             credentials: Credentials.fromPassword(props.rdsUserName, new cdk.SecretValue(props.config.rdsPassword)),
             defaultDatabaseName: props.rdsDBName,
@@ -111,7 +111,7 @@ export class RDSStack extends cdk.Stack {
 
         const cluster = new DatabaseClusterFromSnapshot(this, `${this.props.config.appName}-clusterFromSnapShot`, {
             engine: DatabaseClusterEngine.auroraMysql({
-                version: AuroraMysqlEngineVersion.VER_2_08_2,
+                version: AuroraMysqlEngineVersion.VER_3_01_0,
             }),
             clusterIdentifier: `${this.props.config.appName}-rds-cluster`,
             snapshotIdentifier: snapshotID,
