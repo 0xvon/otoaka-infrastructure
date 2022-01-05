@@ -123,7 +123,7 @@ export class RDSStack extends cdk.Stack {
                 vpc: this.props.vpc,
                 securityGroups: [rdsSecurityGroup],
                 autoMinorVersionUpgrade: true,
-                instanceType: InstanceType.of(InstanceClass.T2, InstanceSize.LARGE)
+                instanceType: InstanceType.of(InstanceClass.M4, InstanceSize.LARGE)
             },
             cloudwatchLogsExports: [
                 'slowquery',
