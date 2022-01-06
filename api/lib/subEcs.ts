@@ -40,6 +40,7 @@ export class SubECSStack extends cdk.Stack {
 
         const application = new ecsPatterns.ApplicationLoadBalancedFargateService(this, 'ecs-service', {
             vpc: props.vpc,
+            desiredCount: 2,
             platformVersion: ecs.FargatePlatformVersion.VERSION1_4,
             memoryLimitMiB: memorySize,
             cpu: cpuSize,
