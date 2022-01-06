@@ -25,8 +25,8 @@ export class SubECSStack extends cdk.Stack {
         super(scope, id, props);
         this.props = props;
 
-        const cpuSize = 1024;
-        const memorySize = 2048;
+        const cpuSize = 2048;
+        const memorySize = 4096;
 
         const ecrRepository = new Repository(this, `ECR`, {
             repositoryName: `${props.config.appName}`,
