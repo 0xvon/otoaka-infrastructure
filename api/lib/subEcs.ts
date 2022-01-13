@@ -25,8 +25,8 @@ export class SubECSStack extends cdk.Stack {
         super(scope, id, props);
         this.props = props;
 
-        const cpuSize = 2048;
-        const memorySize = 4096;
+        const cpuSize = 1024;
+        const memorySize = 2048;
 
         const ecrRepository = new Repository(this, `ECR`, {
             repositoryName: `${props.config.appName}`,
@@ -40,7 +40,7 @@ export class SubECSStack extends cdk.Stack {
 
         const application = new ecsPatterns.ApplicationLoadBalancedFargateService(this, 'ecs-service', {
             vpc: props.vpc,
-            desiredCount: 2,
+            desiredCount: 1,
             platformVersion: ecs.FargatePlatformVersion.VERSION1_4,
             memoryLimitMiB: memorySize,
             cpu: cpuSize,
