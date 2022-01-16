@@ -70,6 +70,15 @@ export class ECSStack extends cdk.Stack {
             redirectHTTP: true,
         });
 
+        // auto scaling policy
+        const scalableTarget = application.service.autoScaleTaskCount({
+            maxCapacity: 20,
+            minCapacity: 2,
+        });
+        scalableTarget.scaleOnCpuUtilization('scale up', {
+            targetUtilizationPercent: 40,
+        });
+
         if (props.mysqlSecurityGroupId) {
             this.injectSecurityGroup([serviceSecurityGroup.securityGroupId], props.mysqlSecurityGroupId);
         }
