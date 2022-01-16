@@ -2,9 +2,6 @@ import * as cdk from '@aws-cdk/core';
 import {
     Vpc,
     SubnetType,
-    NatProvider,
-    GatewayVpcEndpointOptions,
-    GatewayVpcEndpointAwsService,
 } from '@aws-cdk/aws-ec2';
 
 interface VPCStackProps extends cdk.StackProps {

@@ -2,7 +2,7 @@ name: Deployment Rocket API
 
 on:
   push:
-    branches: ["master", "develop"]
+    branches: ["master"]
 
 jobs:
   deploy:
@@ -25,11 +25,8 @@ jobs:
       - name: Deploy Prd
         if: github.ref == 'refs/heads/master'
         run: |
-          cd ./api
-          aws s3 cp ./mackerel-config.yaml s3://rocket-config/api/mackerel-config.yaml
           npm install -g aws-cdk
           npm i
-          sh container_environment.sh
           npm run build
           cdk bootstrap aws://${AWS_ACCOUNT_ID}/${AWS_DEFAULT_REGION}
           cdk deploy '*' --require-approval never

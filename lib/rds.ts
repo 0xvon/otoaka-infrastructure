@@ -15,16 +15,7 @@ import {
     AuroraMysqlEngineVersion,
     Credentials,
     ParameterGroup,
-    DatabaseProxy,
-    ProxyTarget,
 } from '@aws-cdk/aws-rds';
-import {
-    Role,
-    ServicePrincipal,
-    PolicyStatement,
-    Effect,
-} from '@aws-cdk/aws-iam';
-import { Secret, ISecret } from '@aws-cdk/aws-secretsmanager';
 import { Config } from '../typing';
 
 interface RDSStackProps extends cdk.StackProps {
